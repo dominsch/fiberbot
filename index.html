@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>fiberbot</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <script src="https://unpkg.com/htmx.org@1.9.5"></script>
+    <!-- have a button POST a click via AJAX -->
+    <div id="target">20</div>
+    <button hx-post="/keydown" hx-trigger="click, keydown[key==' '] from:body" hx-target="#target" hx-swap="outerHTML">
+      keydown
+    </button>
+    <button hx-post="/keyup" hx-trigger="click, keyup[key==' '] from:body" hx-target="#target" hx-swap="outerHTML">
+      keyup
+    </button>
+  </body>
+</html>
