@@ -1,7 +1,7 @@
 import { dlopen, FFIType } from "bun:ffi";
 
-//const path = `liblxi.${suffix}`;
-const path = `liblxi.so.1.0.0`;
+const path = `liblxi.so`;
+//const path = `liblxi.so.1.0.0`;
 
 const lib = dlopen(path, {
   lxi_init: {
@@ -30,12 +30,12 @@ const lib = dlopen(path, {
   },
 });
 
-// lxi_init()
-// let dev = lxi_connect("localhost", 8301, "device")//lib.symbols.lxi_connect(str2ab("localhost"), 8301, str2ab("fake"), 1000, 1)
-// lxi_send(dev, "*IDN?")
-// let res = lxi_receive(dev)
-// console.log(res)
-// lxi_disconnect(dev)
+lxi_init()
+let dev = lxi_connect("192.168.10.104", 8301, "device")//lib.symbols.lxi_connect(str2ab("localhost"), 8301, str2ab("fake"), 1000, 1)
+lxi_send(dev, "*IDN?")
+let res = lxi_receive(dev)
+console.log(res)
+lxi_disconnect(dev)
 
 function lxi_init() {
   lib.symbols.lxi_init()
@@ -67,3 +67,5 @@ function lxi_receive(device) {
 function lxi_disconnect(device) {
   lib.symbols.lxi_disconnect(device)
 }
+
+export {lxi_init as init, lxi_connect as connect, lxi_send as send, lxi_receive as receive, lxi_disconnect as disconnect}

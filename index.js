@@ -1,7 +1,10 @@
-//const lxi = require( "./lxi.js")
-import lxi from "./lxi.js"
+// import * as lxi from "./lxi.js"
 
-console.log(lxi)
+// console.log(lxi)
+// lxi.init()
+// let map = lxi.connect("192.168.10.104", 8301, "map")
+// lxi.send(map, "*IDN?")
+// console.log(lxi.receive(map))
 
 var IL = 0;
 var RL = 0;
