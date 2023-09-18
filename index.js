@@ -1,3 +1,8 @@
+//const lxi = require( "./lxi.js")
+import lxi from "./lxi.js"
+
+console.log(lxi)
+
 var IL = 0;
 var RL = 0;
 var WL = 1310;
