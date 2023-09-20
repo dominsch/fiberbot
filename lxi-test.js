@@ -8,13 +8,15 @@ class Device {
         this.port = port
         this.connected = false
     }
+    IL;
+    RL;
     connect() {
         try { 
             this.id = lxi.connect(this.address, this.port, this.name)
+            this.connected = true
         } catch (e) {
             console.error(e)
         }
-        this.connected = true
     }
     disconnect() {
         lxi.disconnect(this.id)
@@ -22,38 +24,59 @@ class Device {
     }
 
 }
-//console.log(lxi)
-// try {
-//     lxi.init()
-//     let d = new Device("map104", "192.168.10.104", 8301)
-//     d.connect()
-//     lxi.send(d.id, "*IDN?")
-//     console.log(lxi.receive(d.id))
-//     d.disconnect()
-// } catch (e) {
-//     console.log(e)
-// }
 
 async function query(d, q) {
-    lxi.send(d.id, q)
-    return lxi.receive(d.id)
-}
-
-
-async function scpi(socket){
-    let myres = ""
     try {
-        lxi.init()
-        let d = new Device("map104", "192.168.10.104", 8301)
+        lxi.send(d.id, q)
+        let res = lxi.receive(d.id)
+        return res
     } catch (e) {
         console.error(e)
     }
-    console.log(d.connected)
+}
+
+let dev_conf = [["maplocal", "localhost", 8301],
+            ["map104", "localhost", 8302]] 
+var devices = []
+
+async function scpi(socket) {
+    lxi.init()
+    dev_conf.forEach((element, index) => {
+        console.log(element, index)
+        try {
+            devices.push(new Device(...element))
+            console.log(devices[index])
+            console.log("try to connect")
+            devices[index].connect()
+            console.log("connected")
+        } catch (e) {
+            console.error(e)
+        }
+    });
+    console.log("2")
     while(true) {
-        query(d, "*IDN?").then((res) => {
-            myres = res
+        devices.forEach((d) => {
+            console.log(d.connected)
+            if (d.connected) {
+                query(d, "*IDN?").then((res) => {
+                    d.name = res
+                })
+                query(d, ":FETCH:LOSS?").then((res) => {
+                    d.IL = res
+                })
+                query(d, ":FETCH:ORL?").then((res) => {
+                    d.RL = res
+                })
+                console.log(d.name)
+                console.log(d.IL)
+                console.log(d.RL)
+            } else {
+                d.connect()
+            }
         })
-        console.log(myres)
-        await Bun.sleep(100);
+        
+        await Bun.sleep(1000);
     }
   }
+
+  scpi()

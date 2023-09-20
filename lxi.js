@@ -59,16 +59,15 @@ function lxi_send(device, command) {
   for (let i in command) {
     buffer[i] = command.charCodeAt(i)
   }
-  let err = lib.symbols.lxi_send(device, buffer, command.length, 1000)
-  if (err) throw new Error("send failed")
-  console.log("send success")
+  let sent_bytes = lib.symbols.lxi_send(device, buffer, command.length, 1000)
+  if (sent_bytes <= 0) throw new Error("send failed")
 }
 
 function lxi_receive(device) {
   let buffer = new Uint8Array(1024)
-  let err = lib.symbols.lxi_receive(device, buffer, buffer.length, 1000)
-  if (err) throw new Error("receive failed")
-  return String.fromCharCode.apply(null, buffer).match(/([^\0]+)/g)[0]
+  let recd_bytes = lib.symbols.lxi_receive(device, buffer, buffer.length, 1000)
+  if (recd_bytes < 0) throw new Error("receive failed")
+  return String.fromCharCode.apply(null, buffer.slice(0, recd_bytes))//.substring(0, recd_bytes) //.match(/([^\0]+)/g)[0]
 }
 
 function lxi_disconnect(device) {
