@@ -26,15 +26,17 @@ Bun.listen({
     hostname: "localhost",
     port: 8302,
     socket: {
-      data(socket, data) {
+      async data(socket, data) {
         console.log(data, data.toString())
         if (data.toString().search(/\*IDN\?/g) != -1){
             socket.write(`bun server 2` + ending)
         }
         if (data.toString().search(/:FETCH:LOSS\?/g) != -1){
+			await Bun.sleep(1000);
             socket.write(Math.trunc(Math.random()*50)/100 + ending)
         }
         if (data.toString().search(/:FETCH:ORL\?/g) != -1){
+			await Bun.sleep(1000);
             socket.write(Math.trunc(Math.random()*20 + 50) + ending)
         }
       }, // message received from client
