@@ -16,7 +16,7 @@ async function scpi(socket){
   await Bun.sleep(10);
   responseType = "RL"
   socket.write(":FETCH:ORL?\r\n")
-  await Bun.sleep(1000);
+  await Bun.sleep(200);
   //await new Promise(resolve => setTimeout(resolve, 100));
   }
 }
@@ -65,11 +65,11 @@ const server = Bun.serve({
     if (url.pathname === "/") return new Response(Bun.file("index.html"));
     if (url.pathname === "/keydown") {
       lowest = Math.min(lowest, IL)
-      return new Response(`<div id="target">${lowest}</div>`);
+      return new Response(`${lowest}`);
     }
     if (url.pathname === "/keyup"){
       lowest = 1000
-      return new Response(`<div id="target">---</div>`);
+      return new Response(`---`);
     } 
   },
 });

@@ -9,12 +9,32 @@
   </head>
   <body>
     <script src="https://unpkg.com/htmx.org@1.9.5"></script>
+    <script>
+      var acc = 5
+      document.addEventListener("keyup", e => {
+        if (e.key !== "a") return;
+        
+        htmx.trigger("#up", "click");
+        console.log("up")
+        acc = 5
+      });
+      document.addEventListener("keydown", e => {
+        if (e.key !== "a") return;
+        acc = acc + 1
+        if(acc > 5){
+          htmx.trigger("#down", "click");
+          console.log("down")
+          acc = 0
+        }
+      });
+    </script>
     <!-- have a button POST a click via AJAX -->
-    <div id="target">20</div>
-    <button hx-post="/keydown" hx-trigger="click, keydown[key==' '] from:body" hx-target="#target" hx-swap="outerHTML">
+    <div id="list">-</div>
+    <div id="target">---</div>
+    <button hx-post="/keydown" hx-trigger="click" hx-target="#target" hx-swap="innerHTML" id="down">
       keydown
     </button>
-    <button hx-post="/keyup" hx-trigger="click, keyup[key==' '] from:body" hx-target="#target" hx-swap="outerHTML">
+    <button hx-post="/keyup" hx-trigger="click" hx-target="#list" hx-swap="innerHTML" id="up">
       keyup
     </button>
   </body>
