@@ -1,5 +1,6 @@
 import commands from "./commands.json"
-import device_configs from "./devices.json"
+//import device_configs from "./devices.json"
+import device_configs from "./test.json"
 
 
 class Device {
@@ -85,16 +86,6 @@ const handlers = {
                 socket.data.device.RL = String.fromCharCode.apply(null, buffer).trim()
                 break 
         }
-        // if (socket.data.mode == "live") {
-        //     switch (socket.data.respType) {
-        //         case "IL":
-        //             socket.data.device.IL = String.fromCharCode.apply(null, buffer)
-        //             break
-        //         case "RL":
-        //             socket.data.device.RL = String.fromCharCode.apply(null, buffer)
-        //             break 
-        //     }
-        // }
         socket.data.device.unlock()
     },
     close(socket) {
