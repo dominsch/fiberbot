@@ -14,15 +14,15 @@ if (path) {
     devices[0] = ["tester", "localhost", parseInt(Bun.argv[2]) || 8301]
 }
 
-devices.forEach(d => {
+devices.forEach(async d => {
     console.log(`${d[0]} started listening on ${d[1]}:${d[2]}`)
     Bun.listen({
         hostname: d[1],
         port: d[2],
         socket: {
             async data(socket, data) {
-                console.log(data, data.toString())
-                await Bun.sleep(Math.random()*1000)
+                console.log(d[0], data.toString())
+                await Bun.sleep(Math.random()*600)
                 if (data.toString().search(/\*IDN\?/g) != -1){
                     socket.write(d[0] + ending)
                 }
@@ -33,10 +33,10 @@ devices.forEach(d => {
                     socket.write(Math.trunc(Math.random()*20 + 50) + ending)
                 }
             }, // message received from client
-            open(socket) {console.log("open")}, // socket opened
-            close(socket) {console.log("close")}, // socket closed
-            drain(socket) {console.log("drain")}, // socket ready for more data
-            error(socket, error) {console.log("error")}, // error handler
+            open(socket) {console.log("open ", d[0])}, // socket opened
+            close(socket) {console.log("close ", d[0])}, // socket closed
+            drain(socket) {console.log("drain ", d[0])}, // socket ready for more data
+            error(socket, error) {console.log("error ", d[0])}, // error handler
         },
     });
 });

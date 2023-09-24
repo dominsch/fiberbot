@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>fiberbot</title>
-    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,100,300,700" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://preview.colorlib.com/theme/bootstrap/table-01/css/style.css">
   </head>
   <body>
     <script src="https://unpkg.com/htmx.org@1.9.5"></script>
@@ -14,7 +16,7 @@
       document.addEventListener("keyup", e => {
         if (e.key !== "a") return;
         
-        htmx.trigger("#up", "click");
+        htmx.trigger("#tb", "click");
         console.log("up")
         acc = 5
       });
@@ -27,15 +29,21 @@
           acc = 0
         }
       });
+
     </script>
-    <!-- have a button POST a click via AJAX -->
-    <div id="list">-</div>
-    <div id="target">---</div>
-    <button hx-post="/keydown" hx-trigger="click" hx-target="#target" hx-swap="innerHTML" id="down">
-      keydown
-    </button>
-    <button hx-post="/keyup" hx-trigger="click" hx-target="#list" hx-swap="innerHTML" id="up">
-      keyup
-    </button>
+    <table class="table" id="t">
+      <thead class="thead-primary">
+        <tr>
+          <th>Name</th>
+          <th>Address</th>
+          <th>Port</th>
+          <th>IL</th>
+          <th>RL</th>
+        </tr>
+      </thead>
+      <tbody id="tb" hx-post="/tb" hx-trigger="click, every 100ms" hx-swap="innerHTML">
+      </tbody>
+      
+    </table>
   </body>
 </html>

@@ -1,7 +1,7 @@
 import commands from "./commands.json"
 //import device_configs from "./devices.json"
 import device_configs from "./test.json"
-
+var devices = []
 
 class Device {
     constructor(name, address, port, flavour) {
@@ -15,10 +15,11 @@ class Device {
         this.mode = "idle"
         this.busy = 0
         this.isLocked = false
+        this.socket;
+        this.respType;
+        this.lockqueue = [];
+        this.error = ""
     }
-    socket;
-    respType;
-    lockqueue = [];
     connect() {
         return new Promise(async (resolve, reject) => {
             try {
@@ -28,11 +29,13 @@ class Device {
                     device: this
                 }
                 this.connected = true
+                this.error = ""
+                if (this.unlock) this.unlock()
                 resolve(true)
             }
             catch (e) {
-                console.error(e)
-                reject()
+                this.error = e
+                reject(false)
             }
         })
     }
@@ -56,6 +59,7 @@ class Device {
         return [lock, releaser]
     }
     async query(q, t) {
+        if (this.busy > 5) this.error = "ERROR unresponsive"
         const [lock, unlock] = this.getLock()
         await lock
         this.respType = t
@@ -97,7 +101,6 @@ const handlers = {
   };
 
 async function scpi(socket){
-    var devices = []
     device_configs.forEach((element, index) => {
         devices.push(new Device(...element))
     });
@@ -116,12 +119,44 @@ async function scpi(socket){
             } else {
                 d.query(d.commands.il, "IL")
                 d.query(d.commands.rl, "RL")
-                console.log(d.name, " il: ", d.IL, " rl: ", d.RL)
+                //console.log(d.name, " il: ", d.IL, " rl: ", d.RL, " busy ", d.busy, d.error)
             }
 
         })
-        await Bun.sleep(100);
+        await Bun.sleep(1000);
     }
-  }
+}
 
-  scpi()
+scpi()
+
+const server = Bun.serve({
+    port: 3000,
+    fetch(req) {
+        const url = new URL(req.url);
+        if (url.pathname === "/") return new Response(Bun.file("index.html"));
+        if (url.pathname === "/keydown") {
+            lowest = Math.min(lowest, IL)
+            return new Response(`${lowest}`);
+        }
+        if (url.pathname === "/keyup"){
+            lowest = 1000
+            return new Response(`---`);
+        }
+        if (url.pathname === "/tb"){
+            return new Response(makeTableBody())
+        } 
+    },
+});
+
+function makeTableBody() {
+    let tb = ""
+    for (let i = 0; i < devices.length; i++) {
+        tb = tb + `<tr>\n<td>${devices[i].name}</td>\n` +
+                        `<td>${devices[i].address}</td>\n` +
+                        `<td>${devices[i].port}</td>\n` +
+                        `<td>${devices[i].IL}</td>\n` +
+                        `<td>${devices[i].RL}</td>\n</tr>\n`
+    }
+    console.log(tb)
+    return tb
+}
