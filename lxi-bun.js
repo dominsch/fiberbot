@@ -1,41 +1,68 @@
-import { privateEncrypt } from "crypto"
+import commands from "./commands.json"
+import device_configs from "./devices.json"
 
 
 class Device {
-    constructor(name, address, port, commands) {
+    constructor(name, address, port, flavour) {
         this.name = name
         this.address = address
         this.port = port
-        this.commands = commands
+        this.commands = commands[flavour]
+        this.IL = -1
+        this.RL = -1
+        this.connected = false
+        this.mode = "idle"
+        this.busy = 0
+        this.isLocked = false
     }
-    IL;
-    RL;
     socket;
-    connected;
-    async connect() {
-        try { 
-            console.log("try")
-            this.socket = await Bun.connect({hostname: this.address, port: this.port, socket: handlers})
-            this.socket.data = {
-                device: this,
-                mode: "idle",
-                respType: "",
-                busy: false
+    respType;
+    lockqueue = [];
+    connect() {
+        return new Promise(async (resolve, reject) => {
+            try {
+                console.log("try to connect ", this.name)
+                this.socket = await Bun.connect({hostname: this.address, port: this.port, socket: handlers})
+                this.socket.data = {
+                    device: this
+                }
+                this.connected = true
+                resolve(true)
             }
-            console.log("suc")
-            this.connected = true
-        } catch (e) {
-            console.log(e)            
+            catch (e) {
+                console.error(e)
+                reject()
+            }
+        })
+    }
+    getLock() {
+        this.isLocked = this.busy > 0
+        const lock = new Promise(resolve => {
+            if (!this.isLocked) {
+                resolve()
+                return
+            }
+            this.lockqueue.push(resolve)
+        })
+        this.busy++
+        const releaser = () => {
+            const resolve = this.lockqueue.shift()
+            this.busy--
+            if (resolve) {
+                resolve()
+            }
         }
+        return [lock, releaser]
+    }
+    async query(q, t) {
+        const [lock, unlock] = this.getLock()
+        await lock
+        this.respType = t
+        this.socket.write(q)
+        this.unlock = unlock
     }
     setMode(mode) {
-        this.socket.data.mode = mode
-        if (mode == "live") {
-            this.socket.data.busy = true
-            this.socket.data.respType = "IL"
-            this.socket.write(this.socket.data.device.commands.il)
-            this.socket.data.busy = false
-        }
+        this.mode = mode
     }
     disconnect() {
         this.socket.end()
@@ -48,69 +75,61 @@ const handlers = {
     open(socket) {
         console.log("open")
     },
-    async data(socket, buffer) {
-        while (socket.data.busy == true) await Bun.sleep(100)
-        socket.data.busy = true
-        if (socket.data.mode == "live") {
-            switch (socket.data.respType) {
-                case "IL":
-                    socket.data.device.IL = String.fromCharCode.apply(null, buffer)
-                    socket.data.respType = "RL"
-                    await socket.write(socket.data.device.commands.rl)
-                    await Bun.sleep(100);
-                    break
-                case "RL":
-                    socket.data.device.RL = String.fromCharCode.apply(null, buffer)
-                    socket.data.respType = "IL"
-                    await socket.write(socket.data.device.commands.il)
-                    await Bun.sleep(100);
-                    break 
-            }
+    data(socket, buffer) {
+        let res = String.fromCharCode.apply(null, buffer)
+        switch (socket.data.device.respType) {
+            case "IL":
+                socket.data.device.IL = String.fromCharCode.apply(null, buffer).trim()
+                break
+            case "RL":
+                socket.data.device.RL = String.fromCharCode.apply(null, buffer).trim()
+                break 
         }
-        socket.data.busy = false
+        // if (socket.data.mode == "live") {
+        //     switch (socket.data.respType) {
+        //         case "IL":
+        //             socket.data.device.IL = String.fromCharCode.apply(null, buffer)
+        //             break
+        //         case "RL":
+        //             socket.data.device.RL = String.fromCharCode.apply(null, buffer)
+        //             break 
+        //     }
+        // }
+        socket.data.device.unlock()
     },
     close(socket) {
         console.log("close")
         socket.data.device.connected = false
-    }, // socket closed
-    drain(socket) {console.log("drain")}, // socket ready for more data
-    error(socket, error) {console.log("error")}, // error handler
+    },
+    drain(socket) {console.log("drain")},
+    error(socket, error) {console.log("error")},
   };
-  
-const commandsViavi =  {idn: "*IDN?\n",
-                        il: ":FETCH:LOSS?\n",
-                        rl: ":FETCH:ORL?\n"}
-const commandsJGR =    {idn: "*IDN?\n",
-                        il: "READ:IL:det1? 1550\n",
-                        rl: "READ:RL? 1550\n"}
-
-let dev_configs = [["maplocal", "localhost", 8301, commandsViavi],
-                ["map104", "localhost", 8302, commandsViavi]] 
-
-
-
 
 async function scpi(socket){
     var devices = []
-    dev_configs.forEach(async (element, index) => {
-        try {
-            devices.push(new Device(...element))
-            await devices[index].connect()
-            await devices[index].setMode("live")
-            console.log("connected")
-        } catch (e) {
-            console.error(e)
-        }
+    device_configs.forEach((element, index) => {
+        devices.push(new Device(...element))
     });
     while(true) {
         devices.forEach(async (d) => {
+            //console.log(d)
             if(d.connected == false) {
-                await d.connect()
-                await d.setMode("live")
+                try {
+                    console.log("try to connect", d.name)
+                    let succ = await d.connect()
+                    if (succ) console.log("connection successful")
+                    await d.setMode("live")
+                } catch (e) {
+                    console.error(e)
+                }
+            } else {
+                d.query(d.commands.il, "IL")
+                d.query(d.commands.rl, "RL")
+                console.log(d.name, " il: ", d.IL, " rl: ", d.RL)
             }
-            console.log(d.name, " il: ", d.IL, " rl: ", d.RL)
+
         })
-        await Bun.sleep(200);
+        await Bun.sleep(100);
     }
   }
 
