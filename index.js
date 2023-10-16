@@ -16,7 +16,7 @@ async function scpi(socket){
   await Bun.sleep(10);
   responseType = "RL"
   socket.write(":FETCH:ORL?\r\n")
-  await Bun.sleep(200);
+  await Bun.sleep(2000);
   //await new Promise(resolve => setTimeout(resolve, 100));
   }
 }
@@ -61,6 +61,7 @@ const socket = Bun.connect({
 const server = Bun.serve({
   port: 3000,
   fetch(req) {
+    console.log(req)
     const url = new URL(req.url);
     if (url.pathname === "/") return new Response(Bun.file("index.html"));
     if (url.pathname === "/keydown") {

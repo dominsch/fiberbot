@@ -1,7 +1,7 @@
 import { privateEncrypt } from "crypto"
 
 
-class Device {
+class Instrument {
     constructor(name, address, port, commands) {
         this.name = name
         this.address = address
@@ -17,7 +17,7 @@ class Device {
             console.log("try")
             this.socket = await Bun.connect({hostname: this.address, port: this.port, socket: handlers})
             this.socket.data = {
-                device: this,
+                instrument: this,
                 mode: "idle",
                 respType: "",
                 busy: false
@@ -33,7 +33,7 @@ class Device {
         if (mode == "live") {
             this.socket.data.busy = true
             this.socket.data.respType = "IL"
-            this.socket.write(this.socket.data.device.commands.il)
+            this.socket.write(this.socket.data.instrument.commands.il)
             this.socket.data.busy = false
         }
     }
@@ -54,15 +54,15 @@ const handlers = {
         if (socket.data.mode == "live") {
             switch (socket.data.respType) {
                 case "IL":
-                    socket.data.device.IL = String.fromCharCode.apply(null, buffer)
+                    socket.data.instrument.IL = String.fromCharCode.apply(null, buffer)
                     socket.data.respType = "RL"
-                    await socket.write(socket.data.device.commands.rl)
+                    await socket.write(socket.data.instrument.commands.rl)
                     await Bun.sleep(100);
                     break
                 case "RL":
-                    socket.data.device.RL = String.fromCharCode.apply(null, buffer)
+                    socket.data.instrument.RL = String.fromCharCode.apply(null, buffer)
                     socket.data.respType = "IL"
-                    await socket.write(socket.data.device.commands.il)
+                    await socket.write(socket.data.instrument.commands.il)
                     await Bun.sleep(100);
                     break 
             }
@@ -71,7 +71,7 @@ const handlers = {
     },
     close(socket) {
         console.log("close")
-        socket.data.device.connected = false
+        socket.data.instrument.connected = false
     }, // socket closed
     drain(socket) {console.log("drain")}, // socket ready for more data
     error(socket, error) {console.log("error")}, // error handler
@@ -91,19 +91,19 @@ let dev_configs = [["maplocal", "localhost", 8301, commandsViavi],
 
 
 async function scpi(socket){
-    var devices = []
+    var instruments = []
     dev_configs.forEach(async (element, index) => {
         try {
-            devices.push(new Device(...element))
-            await devices[index].connect()
-            await devices[index].setMode("live")
+            instruments.push(new Instrument(...element))
+            await instruments[index].connect()
+            await instruments[index].setMode("live")
             console.log("connected")
         } catch (e) {
             console.error(e)
         }
     });
     while(true) {
-        devices.forEach(async (d) => {
+        instruments.forEach(async (d) => {
             if(d.connected == false) {
                 await d.connect()
                 await d.setMode("live")

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>HTML 5 Boilerplate</title>
+    <link rel="stylesheet" href="style.css">
+    <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
+  </head>
+  <style>
+    /* Define the colors according to the TIA-598-C standard */
+    :root {
+    --blue: #0471a499;
+    --orange: #ec6a4f99;
+    --green: #00923c99;
+    --brown: #782e0a99;
+    --slate: #7c7c7c99;
+    --white: #e8e8e899;
+    --red: #ac314b99;
+    --black: #30303990;
+    --yellow: #fdc90990;
+    --violet: #69599a99;
+    --rose: #dc9ea699;
+    --aqua: #56bec199;
+    --offset: 1
+    }
+
+    /* Select the table element */
+    table {
+        background-color: white;
+        border-spacing: 0;
+        font-family: 'Roboto';font-size: 22px;
+        border-radius: 10px;
+        border: 1px solid rgb(0, 0, 0);
+        text-align: center;
+        overflow: hidden;
+    }
+
+   thead {
+        border-radius: 10px;
+        border: 1px solid rgb(0, 0, 0);
+   }
+
+    td {
+        width: 100px;
+    }
+
+
+    thead>tr:nth-child(1)>td:first-child{
+        background-color: rgb(0, 0, 0);
+        color: white;
+    }
+    tbody>tr:nth-child(1)>td:first-child{background-color: var(--blue);}
+    tbody>tr:nth-child(2)>td:first-child{background-color: var(--orange);}
+    tbody>tr:nth-child(3)>td:first-child{background-color: var(--green);}
+    tbody>tr:nth-child(4)>td:first-child{background-color: var(--brown);}
+    tbody>tr:nth-child(5)>td:first-child{background-color: var(--slate);}
+    tbody>tr:nth-child(6)>td:first-child{background-color: var(--white);}
+    tbody>tr:nth-child(7)>td:first-child{background-color: var(--red);}
+    tbody>tr:nth-child(8)>td:first-child{background-color: var(--black);}
+    tbody>tr:nth-child(9)>td:first-child{background-color: var(--yellow);}
+    tbody>tr:nth-child(10)>td:first-child{background-color: var(--violet);}
+    tbody>tr:nth-child(11)>td:first-child{background-color: var(--rose);}
+    tbody>tr:nth-child(12)>td:first-child{background-color: var(--aqua);}
+  </style>
+  <body style="background-color: rgb(255, 255, 255)">
+    <script src="https://unpkg.com/htmx.org@1.9.5"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/sse.js"></script>
+    
+    <table hx-post="/tab" hx-trigger="load, keyup[key=='a'] from:body" hx-swap="innerHTML">
+      <thead>
+        <tr>
+          <td colspan = 10 id="SN">P1291655</td>
+        </tr>
+        <tr>
+          <th>Fiber</th>
+          <th>IL</th>
+          <th >RL</th>
+        </tr>
+      </thead>
+      <tbody  id="tbod">
+      </tbody>
+    </table>
+    <div hx-ext="sse" sse-connect="/event" sse-swap="live"></div>
+  </body>
+</html>
