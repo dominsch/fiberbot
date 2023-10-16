@@ -1,41 +1,73 @@
-import { privateEncrypt } from "crypto"
+import commands from "./commands.json"
+//import device_configs from "./devices.json"
+import device_configs from "./test.json"
+var devices = []
 
-
-class Instrument {
-    constructor(name, address, port, commands) {
+class Device {
+    constructor(name, address, port, flavour) {
         this.name = name
         this.address = address
         this.port = port
-        this.commands = commands
+        this.commands = commands[flavour]
+        this.IL = -1
+        this.RL = -1
+        this.connected = false
+        this.mode = "idle"
+        this.busy = 0
+        this.isLocked = false
+        this.socket;
+        this.respType;
+        this.lockqueue = [];
+        this.error = ""
     }
-    IL;
-    RL;
-    socket;
-    connected;
-    async connect() {
-        try { 
-            console.log("try")
-            this.socket = await Bun.connect({hostname: this.address, port: this.port, socket: handlers})
-            this.socket.data = {
-                instrument: this,
-                mode: "idle",
-                respType: "",
-                busy: false
+    connect() {
+        return new Promise(async (resolve, reject) => {
+            try {
+                console.log("try to connect ", this.name)
+                this.socket = await Bun.connect({hostname: this.address, port: this.port, socket: handlers})
+                this.socket.data = {
+                    device: this
+                }
+                this.connected = true
+                this.error = ""
+                if (this.unlock) this.unlock()
+                resolve(true)
             }
-            console.log("suc")
-            this.connected = true
-        } catch (e) {
-            console.log(e)            
+            catch (e) {
+                this.error = e
+                reject(false)
+            }
+        })
+    }
+    getLock() {
+        this.isLocked = this.busy > 0
+        const lock = new Promise(resolve => {
+            if (!this.isLocked) {
+                resolve()
+                return
+            }
+            this.lockqueue.push(resolve)
+        })
+        this.busy++
+        const releaser = () => {
+            const resolve = this.lockqueue.shift()
+            this.busy--
+            if (resolve) {
+                resolve()
+            }
         }
+        return [lock, releaser]
+    }
+    async query(q, t) {
+        if (this.busy > 5) this.error = "ERROR unresponsive"
+        const [lock, unlock] = this.getLock()
+        await lock
+        this.respType = t
+        this.socket.write(q)
+        this.unlock = unlock
     }
     setMode(mode) {
-        this.socket.data.mode = mode
-        if (mode == "live") {
-            this.socket.data.busy = true
-            this.socket.data.respType = "IL"
-            this.socket.write(this.socket.data.instrument.commands.il)
-            this.socket.data.busy = false
-        }
+        this.mode = mode
     }
     disconnect() {
         this.socket.end()
@@ -48,70 +80,83 @@ const handlers = {
     open(socket) {
         console.log("open")
     },
-    async data(socket, buffer) {
-        while (socket.data.busy == true) await Bun.sleep(100)
-        socket.data.busy = true
-        if (socket.data.mode == "live") {
-            switch (socket.data.respType) {
-                case "IL":
-                    socket.data.instrument.IL = String.fromCharCode.apply(null, buffer)
-                    socket.data.respType = "RL"
-                    await socket.write(socket.data.instrument.commands.rl)
-                    await Bun.sleep(100);
-                    break
-                case "RL":
-                    socket.data.instrument.RL = String.fromCharCode.apply(null, buffer)
-                    socket.data.respType = "IL"
-                    await socket.write(socket.data.instrument.commands.il)
-                    await Bun.sleep(100);
-                    break 
-            }
+    data(socket, buffer) {
+        let res = String.fromCharCode.apply(null, buffer)
+        switch (socket.data.device.respType) {
+            case "IL":
+                socket.data.device.IL = String.fromCharCode.apply(null, buffer).trim()
+                break
+            case "RL":
+                socket.data.device.RL = String.fromCharCode.apply(null, buffer).trim()
+                break 
         }
-        socket.data.busy = false
+        socket.data.device.unlock()
     },
     close(socket) {
         console.log("close")
-        socket.data.instrument.connected = false
-    }, // socket closed
-    drain(socket) {console.log("drain")}, // socket ready for more data
-    error(socket, error) {console.log("error")}, // error handler
+        socket.data.device.connected = false
+    },
+    drain(socket) {console.log("drain")},
+    error(socket, error) {console.log("error")},
   };
-  
-const commandsViavi =  {idn: "*IDN?\n",
-                        il: ":FETCH:LOSS?\n",
-                        rl: ":FETCH:ORL?\n"}
-const commandsJGR =    {idn: "*IDN?\n",
-                        il: "READ:IL:det1? 1550\n",
-                        rl: "READ:RL? 1550\n"}
-
-let dev_configs = [["maplocal", "localhost", 8301, commandsViavi],
-                ["map104", "localhost", 8302, commandsViavi]] 
-
-
-
 
 async function scpi(socket){
-    var instruments = []
-    dev_configs.forEach(async (element, index) => {
-        try {
-            instruments.push(new Instrument(...element))
-            await instruments[index].connect()
-            await instruments[index].setMode("live")
-            console.log("connected")
-        } catch (e) {
-            console.error(e)
-        }
+    device_configs.forEach((element, index) => {
+        devices.push(new Device(...element))
     });
     while(true) {
-        instruments.forEach(async (d) => {
+        devices.forEach(async (d) => {
+            //console.log(d)
             if(d.connected == false) {
-                await d.connect()
-                await d.setMode("live")
+                try {
+                    console.log("try to connect", d.name)
+                    let succ = await d.connect()
+                    if (succ) console.log("connection successful")
+                    await d.setMode("live")
+                } catch (e) {
+                    console.error(e)
+                }
+            } else {
+                d.query(d.commands.il, "IL")
+                d.query(d.commands.rl, "RL")
+                //console.log(d.name, " il: ", d.IL, " rl: ", d.RL, " busy ", d.busy, d.error)
             }
-            console.log(d.name, " il: ", d.IL, " rl: ", d.RL)
-        })
-        await Bun.sleep(200);
-    }
-  }
 
-  scpi()
+        })
+        await Bun.sleep(1000);
+    }
+}
+
+scpi()
+
+const server = Bun.serve({
+    port: 3000,
+    fetch(req) {
+        const url = new URL(req.url);
+        if (url.pathname === "/") return new Response(Bun.file("index.html"));
+        if (url.pathname === "/keydown") {
+            lowest = Math.min(lowest, IL)
+            return new Response(`${lowest}`);
+        }
+        if (url.pathname === "/keyup"){
+            lowest = 1000
+            return new Response(`---`);
+        }
+        if (url.pathname === "/tb"){
+            return new Response(makeTableBody())
+        } 
+    },
+});
+
+function makeTableBody() {
+    let tb = ""
+    for (let i = 0; i < devices.length; i++) {
+        tb = tb + `<tr>\n<td>${devices[i].name}</td>\n` +
+                        `<td>${devices[i].address}</td>\n` +
+                        `<td>${devices[i].port}</td>\n` +
+                        `<td>${devices[i].IL}</td>\n` +
+                        `<td>${devices[i].RL}</td>\n</tr>\n`
+    }
+    console.log(tb)
+    return tb
+}
