@@ -11,19 +11,18 @@
   <style>
     /* Define the colors according to the TIA-598-C standard */
     :root {
-    --blue: #0471a499;
-    --orange: #ec6a4f99;
-    --green: #00923c99;
-    --brown: #782e0a99;
-    --slate: #7c7c7c99;
-    --white: #e8e8e899;
-    --red: #ac314b99;
-    --black: #30303990;
-    --yellow: #fdc90990;
-    --violet: #69599a99;
-    --rose: #dc9ea699;
-    --aqua: #56bec199;
-    --offset: 1
+    --blue: #0471a480;
+    --orange: #ec6a4f80;
+    --green: #00923c80;
+    --brown: #782e0a80;
+    --slate: #7c7c7c80;
+    --white: #e8e8e880;
+    --red: #ac314b80;
+    --black: #30303980;
+    --yellow: #fdc90980;
+    --violet: #69599a80;
+    --rose: #dc9ea680;
+    --aqua: #56bec180;
     }
 
     /* Select the table element */
@@ -37,36 +36,58 @@
         overflow: hidden;
     }
 
-   thead {
-        border-radius: 10px;
-        border: 1px solid rgb(0, 0, 0);
-   }
+    thead {
+          border-radius: 10px;
+          border: 1px solid rgb(0, 0, 0);
+    }
 
     td {
         width: 100px;
     }
 
-
     thead>tr:nth-child(1)>td:first-child{
         background-color: rgb(0, 0, 0);
         color: white;
     }
-    tbody>tr:nth-child(1)>td:first-child{background-color: var(--blue);}
-    tbody>tr:nth-child(2)>td:first-child{background-color: var(--orange);}
-    tbody>tr:nth-child(3)>td:first-child{background-color: var(--green);}
-    tbody>tr:nth-child(4)>td:first-child{background-color: var(--brown);}
-    tbody>tr:nth-child(5)>td:first-child{background-color: var(--slate);}
-    tbody>tr:nth-child(6)>td:first-child{background-color: var(--white);}
-    tbody>tr:nth-child(7)>td:first-child{background-color: var(--red);}
-    tbody>tr:nth-child(8)>td:first-child{background-color: var(--black);}
-    tbody>tr:nth-child(9)>td:first-child{background-color: var(--yellow);}
-    tbody>tr:nth-child(10)>td:first-child{background-color: var(--violet);}
-    tbody>tr:nth-child(11)>td:first-child{background-color: var(--rose);}
-    tbody>tr:nth-child(12)>td:first-child{background-color: var(--aqua);}
+    
+    .r1>td:first-child,.r1.focused{background-color: var(--blue);}
+    .r2>td:first-child,.r2.focused{background-color: var(--orange);}
+    .r3>td:first-child,.r3.focused{background-color: var(--green);}
+    .r4>td:first-child,.r4.focused{background-color: var(--brown);}
+    .r5>td:first-child,.r5.focused{background-color: var(--slate);}
+    .r6>td:first-child,.r6.focused{background-color: var(--white);}
+    .r7>td:first-child,.r7.focused{background-color: var(--red);}
+    .r8>td:first-child,.r8.focused{background-color: var(--black);}
+    .r9>td:first-child,.r9.focused{background-color: var(--yellow);}
+    .r10>td:first-child,.r10.focused{background-color: var(--violet);}
+    .r11>td:first-child,.r11.focused{background-color: var(--rose);}
+    .r12>td:first-child,.r12.focused{background-color: var(--aqua);}
   </style>
   <body style="background-color: rgb(255, 255, 255)">
     <script src="https://unpkg.com/htmx.org@1.9.5"></script>
     <script src="https://unpkg.com/htmx.org/dist/ext/sse.js"></script>
+    <script>
+      document.addEventListener("keyup", e => {
+        if(e.key == "ArrowUp" || e.key == "ArrowDown") {
+          let el = document.getElementsByClassName("focused")[0];
+          if(el == undefined) el = document.getElementsByClassName("r1")[0];
+          let n = parseInt(/r(?<row>\d+)/.exec(el.className)[1])
+          el.className = "r" + n
+          if(e.key == "ArrowDown") {
+            n = n + 1
+            if (n > 12 ) n = 1
+          }
+          if(e.key == "ArrowUp") {
+            n = n - 1
+            if (n < 1 ) n = 12
+          }
+          let name = "r" + n
+          el = document.getElementsByClassName(name)[0]
+          el.className = name + " focused"
+        }
+      });
+
+    </script>
     
     <table hx-post="/tab" hx-trigger="load, keyup[key=='a'] from:body" hx-swap="innerHTML">
       <thead>

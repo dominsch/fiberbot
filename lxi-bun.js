@@ -4,13 +4,15 @@ import device_configs from "./test.json"
 var devices = []
 
 class Device {
-    constructor(name, address, port, flavour) {
+    constructor(name, address, netport, flavour) {
         this.name = name
         this.address = address
-        this.port = port
+        this.netport = netport
         this.commands = commands[flavour]
-        this.IL = -1
-        this.RL = -1
+        this.IL = [-1]
+        this.RL = [-1]
+        this.SW = 1
+        this.PORT
         this.connected = false
         this.mode = "idle"
         this.busy = 0
@@ -18,18 +20,18 @@ class Device {
         this.socket;
         this.respType;
         this.lockqueue = [];
-        this.error = ""
+        this.error = "none"
     }
     connect() {
         return new Promise(async (resolve, reject) => {
             try {
                 console.log("try to connect ", this.name)
-                this.socket = await Bun.connect({hostname: this.address, port: this.port, socket: handlers})
+                this.socket = await Bun.connect({hostname: this.address, port: this.netport, socket: handlers})
                 this.socket.data = {
                     device: this
                 }
                 this.connected = true
-                this.error = ""
+                this.error = "none"
                 if (this.unlock) this.unlock()
                 resolve(true)
             }
@@ -66,6 +68,14 @@ class Device {
         this.socket.write(q)
         this.unlock = unlock
     }
+    // async query(q) {
+    //     if (this.busy > 5) this.error = "ERROR unresponsive"
+    //     const [lock, unlock] = this.getLock()
+    //     await lock
+    //     this.respType = q
+    //     this.socket.write(this.commands[q])
+    //     this.unlock = unlock
+    // }
     setMode(mode) {
         this.mode = mode
     }
@@ -81,15 +91,17 @@ const handlers = {
         console.log("open")
     },
     data(socket, buffer) {
-        let res = String.fromCharCode.apply(null, buffer)
+        let res = String.fromCharCode.apply(null, buffer).trim()
         switch (socket.data.device.respType) {
             case "IL":
-                socket.data.device.IL = String.fromCharCode.apply(null, buffer).trim()
+                socket.data.device.IL[0] = res
                 break
             case "RL":
-                socket.data.device.RL = String.fromCharCode.apply(null, buffer).trim()
+                socket.data.device.RL[0] = res
                 break 
         }
+        // console.log(socket.data.device[socket.data.device.respType], socket.data.device.respType)
+        // socket.data.device[socket.data.device.respType] = res
         socket.data.device.unlock()
     },
     close(socket) {
@@ -134,14 +146,6 @@ const server = Bun.serve({
     fetch(req) {
         const url = new URL(req.url);
         if (url.pathname === "/") return new Response(Bun.file("index.html"));
-        if (url.pathname === "/keydown") {
-            lowest = Math.min(lowest, IL)
-            return new Response(`${lowest}`);
-        }
-        if (url.pathname === "/keyup"){
-            lowest = 1000
-            return new Response(`---`);
-        }
         if (url.pathname === "/tb"){
             return new Response(makeTableBody())
         } 
@@ -154,9 +158,24 @@ function makeTableBody() {
         tb = tb + `<tr>\n<td>${devices[i].name}</td>\n` +
                         `<td>${devices[i].address}</td>\n` +
                         `<td>${devices[i].port}</td>\n` +
-                        `<td>${devices[i].IL}</td>\n` +
-                        `<td>${devices[i].RL}</td>\n</tr>\n`
+                        `<td>${devices[i].IL[0]}</td>\n` +
+                        `<td>${devices[i].RL[0]}</td>\n` +
+                        `<td>${devices[i].error}</td>\n</tr>\n`
     }
-    console.log(tb)
+    //console.log(tb)
     return tb
 }
+
+// function makeVertTableBody() {
+//     let tb = ""
+//     for (let i = 0; i < devices.length; i++) {
+//         tb = tb + `<tr>\n<td>${devices[i].name}</td>\n` +
+//                         `<td>${devices[i].address}</td>\n` +
+//                         `<td>${devices[i].port}</td>\n` +
+//                         `<td>${devices[i].IL}</td>\n` +
+//                         `<td>${devices[i].RL}</td>\n` +
+//                         `<td>${devices[i].error}</td>\n</tr>\n`
+//     }
+//     //console.log(tb)
+//     return tb
+// }
