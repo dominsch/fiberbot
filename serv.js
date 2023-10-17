@@ -32,11 +32,11 @@ setInterval(() => {
   let f = Math.trunc(Math.random()*d.fibers)+1
   d.IL[1][f][d.wavs[0]] = Math.trunc(Math.random()*50)/100
   d.RL[1][f][d.wavs[0]] = Math.trunc(Math.random()*20 + 50)
-  // sseEvents.emit(
-  //   "sse",
-  //   `event: live\ndata: Fiber: ${f} IL:${d.IL[1][f][d.wavs[0]]} RL:${d.RL[1][f][d.wavs[0]]}\n\n`
-  // );
-}, 10);
+  sseEvents.emit(
+    "sse",
+    `event: live\ndata: Fiber: ${f} IL:${d.IL[1][f][d.wavs[0]]} RL:${d.RL[1][f][d.wavs[0]]}\n\n`
+  );
+}, 1000);
 
 const server = Bun.serve({
   port: 3000,
@@ -129,7 +129,7 @@ function makeRow(d, f, n) {
   let sn = d.sn
   n = d.wavs.length
   //let out = `<tr class="${f}", id="${sn}-${f}" hx-post="/row" hx-trigger="click, sse:EventName, sse:event${f}" hx-swap="outerHTML">\n`
-  let out = `<tr class="${f}", id="P${sn}-A${f}" hx-post="/row" hx-trigger="click, keydown[key=='${f}'] from:body" hx-swap="outerHTML">\n`
+  let out = `<tr class="r${(f==1)? f + " focused" : f}", id="P${sn}-${f}" hx-post="/row" hx-trigger="click, keydown[key=='${f}'] from:body" hx-swap="outerHTML">\n`
   out = out + `<td>${f}</td>\n`
   for(let i = 1; i<=n; i++){
     out = out + makeCell(d, f, d.wavs[i-1], "IL")
