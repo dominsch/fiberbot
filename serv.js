@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { EventEmitter } from "node:events";
+import { maxHeaderSize } from "node:http";
 
 class DUT {
   constructor(sn, ends, fibers, wavs, hasrl) {
@@ -8,46 +9,70 @@ class DUT {
     this.ends = ends
     this.wavs = wavs
     this.hasrl = hasrl
+    this.focus = 1
     this.IL = []
     this.RL = []
-    for(let e = 1; e<=ends; e++) {
+    this.clear()
+  }
+  clear() {
+    for(let e = 1; e<=this.ends; e++) {
       this.IL[e] = []
       this.RL[e] = []
-      for(let f = 1; f<=fibers; f++) {
+      for(let f = 1; f<=this.fibers; f++) {
         this.IL[e][f] = {}
         this.RL[e][f] = {}
         this.wavs.forEach(wl => {
-          this.IL[e][f][wl] = -100+f-wl*0.001
-          this.RL[e][f][wl] = -100+f-wl*0.001
+          this.IL[e][f][wl] = -100
+          this.RL[e][f][wl] = -100
         })
       }
     }
   }
+  next() {
+    (d.focus >= d.fibers) ? d.focus = 1 : d.focus++
+  }
+  prev() {
+    (d.focus <= 1) ? d.focus = d.fibers : d.focus--
+  }
 }
 
-const sseEvents = new EventEmitter();
-let d = new DUT("1231432",1,12,[1310, 1550, 850],true)
-
-setInterval(() => {
-  let f = Math.trunc(Math.random()*d.fibers)+1
-  d.IL[1][f][d.wavs[0]] = Math.trunc(Math.random()*50)/100
-  d.RL[1][f][d.wavs[0]] = Math.trunc(Math.random()*20 + 50)
-  sseEvents.emit(
-    "sse",
-    `event: live\ndata: Fiber: ${f} IL:${d.IL[1][f][d.wavs[0]]} RL:${d.RL[1][f][d.wavs[0]]}\n\n`
-  );
-}, 1000);
+let d = new DUT(Math.trunc(Math.random()*100000000),1,12,[1550],true)
+let il
+let rl
 
 const server = Bun.serve({
   port: 3000,
   fetch(req) {
     //console.log(req)
     const url = new URL(req.url);
+    console.log(url.pathname)
     if (url.pathname === "/") return new Response(Bun.file("table.html"));
-    if (url.pathname === "/keydown") {
-      lowest = Math.min(lowest, IL)
-      return new Response(`${lowest}`);
+    if (url.pathname === "/clear") {
+      d.clear()
+      d.focus = 1
+      return new Response(makeTBody(d));
     }
+    if (url.pathname === "/cap") {
+      if (il < Math.abs(d.IL[1][d.focus][d.wavs[0]])) d.IL[1][d.focus][d.wavs[0]] = il
+      if (rl > d.RL[1][d.focus][d.wavs[0]]) d.RL[1][d.focus][d.wavs[0]] = rl
+      return new Response(makeTBody(d));
+    }
+    if (url.pathname === "/capend") {
+      d.next()
+      return new Response(makeTBody(d));
+    }
+    if (url.pathname === "/next") {
+      d.next()
+      return new Response(makeTBody(d));
+    }
+    if (url.pathname === "/prev") {
+      d.prev()
+      return new Response(makeTBody(d));
+    }
+    if (url.pathname === "/live"){
+      let res = makeLive()
+      return new Response(res);
+    } 
     if (url.pathname === "/tab"){
       let res = makeTable(d)
       return new Response(res);
@@ -58,38 +83,15 @@ const server = Bun.serve({
       let res = makeRow(d, row,1)
       return new Response(res);
     } 
-    if (url.pathname === "/event"){
-      const stream = new ReadableStream({
-        start(controller) {
-          sseEvents.once("sse", () => {
-            controller.enqueue(`retry: 3000\n\n`);
-          });
-        },
-        pull(controller) {
-          sseEvents.on("sse", (data) => {
-            const queue = [Buffer.from(data)];
-            const chunk = queue.shift();
-            controller.enqueue(chunk);
-          });
-        },
-        cancel(controller) {
-          sseEvents.removeAllListeners("sse");
-          controller.close();
-        },
-      });
-      return new Response(stream, {
-        status: 200,
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-          "Content-Type": "text/event-stream;charset=utf-8",
-          "Cache-Control": "no-cache, no-transform",
-          Connection: "keep-alive",
-          "X-Accel-Buffering": "no",
-        },
-      });
-    }
   },
 });
+
+function makeLive() {
+  let wl = d.wavs[Math.trunc(Math.random()*d.wavs.length)]
+  il = Math.trunc(Math.random()*50)/100
+  rl = Math.trunc(Math.random()*20 + 50)
+  return `WL: ${wl} IL:${il} RL:${rl}`
+}
 
 function makeTable(d) {
   let sn = d.sn
@@ -110,7 +112,7 @@ function makeTable(d) {
   })
   out = out +    `</tr>
                 </thead>
-                <tbody id="P${sn}-tbod">`
+                <tbody id="tbod">`
   out = out + makeTBody(d)
   out = out +  `</tbody>`
   return out
@@ -129,16 +131,21 @@ function makeRow(d, f, n) {
   let sn = d.sn
   n = d.wavs.length
   //let out = `<tr class="${f}", id="${sn}-${f}" hx-post="/row" hx-trigger="click, sse:EventName, sse:event${f}" hx-swap="outerHTML">\n`
-  let out = `<tr class="r${(f==1)? f + " focused" : f}", id="P${sn}-${f}" hx-post="/row" hx-trigger="click, keydown[key=='${f}'] from:body" hx-swap="outerHTML">\n`
+  // _="on click add .focused to next <tr/>"
+  let out = `<tr class="r${(f==d.focus)? f + " focused" : f}", id="P${sn}-${f}" hx-post="/row" hx-trigger="click, keydown[key=='${f}'] from:body" hx-swap="outerHTML">\n`
   out = out + `<td>${f}</td>\n`
   for(let i = 1; i<=n; i++){
     out = out + makeCell(d, f, d.wavs[i-1], "IL")
-    if (d.hasrl) out = out + makeCell(d, f, d.wavs[i-1], "RL")
+    if (d.hasrl) {
+      out = out + makeCell(d, f, d.wavs[i-1], "RL")
+    }
   }
   out = out + `</tr>\n`
   return out
 }
 
 function makeCell(d, f ,wl, type) {
-  return `<td id="${"P" + d.sn + "-A" + f + "-" + wl + "-" + type}">${(type = "IL") ? d.IL[1][f][wl] : d.RL[1][f][wl]}</td>\n`
+  let content = (type == "IL") ? d.IL[1][f][wl] : d.RL[1][f][wl]
+  if (content == -100) content = ""
+  return `<td id="${"P" + d.sn + "-A" + f + "-" + wl + "-" + type}">${content}</td>\n`
 }

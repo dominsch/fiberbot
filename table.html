@@ -65,44 +65,40 @@
   </style>
   <body style="background-color: rgb(255, 255, 255)">
     <script src="https://unpkg.com/htmx.org@1.9.5"></script>
+    <script src="https://unpkg.com/hyperscript.org@0.9.11"></script>
     <script src="https://unpkg.com/htmx.org/dist/ext/sse.js"></script>
     <script>
-      document.addEventListener("keyup", e => {
-        if(e.key == "ArrowUp" || e.key == "ArrowDown") {
-          let el = document.getElementsByClassName("focused")[0];
-          if(el == undefined) el = document.getElementsByClassName("r1")[0];
-          let n = parseInt(/r(?<row>\d+)/.exec(el.className)[1])
-          el.className = "r" + n
-          if(e.key == "ArrowDown") {
-            n = n + 1
-            if (n > 12 ) n = 1
-          }
-          if(e.key == "ArrowUp") {
-            n = n - 1
-            if (n < 1 ) n = 12
-          }
-          let name = "r" + n
-          el = document.getElementsByClassName(name)[0]
-          el.className = name + " focused"
-        }
-      });
+      // document.addEventListener("keyup", e => {
+      //   if(e.key == "ArrowUp" || e.key == "ArrowDown") {
+      //     let el = document.getElementsByClassName("focused")[0];
+      //     if(el == undefined) el = document.getElementsByClassName("r1")[0];
+      //     let n = parseInt(/r(?<row>\d+)/.exec(el.className)[1])
+      //     el.className = "r" + n
+      //     if(e.key == "ArrowDown") {
+      //       n = n + 1
+      //       if (n > 12 ) n = 1
+      //     }
+      //     if(e.key == "ArrowUp") {
+      //       n = n - 1
+      //       if (n < 1 ) n = 12
+      //     }
+      //     let name = "r" + n
+      //     el = document.getElementsByClassName(name)[0]
+      //     el.className = name + " focused"
+      //   }
+      // });
 
     </script>
     
-    <table hx-post="/tab" hx-trigger="load, keyup[key=='a'] from:body" hx-swap="innerHTML">
-      <thead>
-        <tr>
-          <td colspan = 10 id="SN">P1291655</td>
-        </tr>
-        <tr>
-          <th>Fiber</th>
-          <th>IL</th>
-          <th >RL</th>
-        </tr>
-      </thead>
-      <tbody  id="tbod">
-      </tbody>
+    <table id="tab" hx-post="/tab" hx-trigger="load, keyup[key=='a'] from:body" hx-swap="innerHTML">
     </table>
-    <div hx-ext="sse" sse-connect="/event" sse-swap="live"></div>
+    <!-- <div hx-ext="sse" sse-connect="/event" sse-swap="live"></div> -->
+    <div hx-post="/live" hx-trigger="load, every 1s" hx-swap="innerHTML"></div>
+    <div hx-post="/next" hx-trigger="keyup[key=='ArrowDown'] from:body" hx-target="#tbod" hx-swap="innerHTML"></div>
+    <div hx-post="/prev" hx-trigger="keyup[key=='ArrowUp'] from:body" hx-target="#tbod" hx-swap="innerHTML"></div>
+    <div hx-post="/cap" hx-trigger="keydown[key=='x'] from:body" hx-target="#tbod" hx-swap="innerHTML"></div>
+    <div hx-post="/capend" hx-trigger="keyup[key=='x'] from:body" hx-target="#tbod" hx-swap="innerHTML"></div>
+    <div hx-post="/clear" hx-trigger="keyup[key=='c'] from:body" hx-target="#tbod" hx-swap="innerHTML"></div>
+    <div _="on keyup[key is 'q'] from body add .focused"
   </body>
 </html>
