@@ -26,7 +26,7 @@ class DUT {
 }
 
 const sseEvents = new EventEmitter();
-let d = new DUT("P1231432",1,12,[1310, 1550, 850],true)
+let d = new DUT("1231432",1,12,[1310, 1550, 850],true)
 
 setInterval(() => {
   let f = Math.trunc(Math.random()*d.fibers)+1
@@ -95,7 +95,7 @@ function makeTable(d) {
   let sn = d.sn
   let out =    `<thead>
                   <tr>
-                    <td colspan = 10 id="${sn}">${sn}</td>
+                    <td colspan = 10 id="P${sn}">P${sn}</td>
                   </tr>
                   <tr>
                     <th></th>`
@@ -110,7 +110,7 @@ function makeTable(d) {
   })
   out = out +    `</tr>
                 </thead>
-                <tbody id="${sn}-tbod">`
+                <tbody id="P${sn}-tbod">`
   out = out + makeTBody(d)
   out = out +  `</tbody>`
   return out
@@ -129,12 +129,16 @@ function makeRow(d, f, n) {
   let sn = d.sn
   n = d.wavs.length
   //let out = `<tr class="${f}", id="${sn}-${f}" hx-post="/row" hx-trigger="click, sse:EventName, sse:event${f}" hx-swap="outerHTML">\n`
-  let out = `<tr class="${f}", id="${sn}-${f}" hx-post="/row" hx-trigger="click, keydown[key=='${f}'] from:body" hx-swap="outerHTML">\n`
+  let out = `<tr class="${f}", id="P${sn}-A${f}" hx-post="/row" hx-trigger="click, keydown[key=='${f}'] from:body" hx-swap="outerHTML">\n`
   out = out + `<td>${f}</td>\n`
   for(let i = 1; i<=n; i++){
-    out = out + `<td>${d.IL[1][f][d.wavs[i-1]]}</td>\n`
-    if (d.hasrl) out = out + `<td>${d.RL[1][f][d.wavs[i-1]]}</td>\n`
+    out = out + makeCell(d, f, d.wavs[i-1], "IL")
+    if (d.hasrl) out = out + makeCell(d, f, d.wavs[i-1], "RL")
   }
   out = out + `</tr>\n`
   return out
+}
+
+function makeCell(d, f ,wl, type) {
+  return `<td id="${"P" + d.sn + "-A" + f + "-" + wl + "-" + type}">${(type = "IL") ? d.IL[1][f][wl] : d.RL[1][f][wl]}</td>\n`
 }
