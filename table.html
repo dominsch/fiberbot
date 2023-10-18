@@ -89,16 +89,15 @@
       // });
 
     </script>
-    
+    <div hx-post="/instrument" hx-trigger="load" hx-swap="innerHTML"></div>
     <table id="tab" hx-post="/tab" hx-trigger="load, keyup[key=='a'] from:body" hx-swap="innerHTML">
     </table>
     <!-- <div hx-ext="sse" sse-connect="/event" sse-swap="live"></div> -->
-    <div hx-post="/live" hx-trigger="load, every 1s" hx-swap="innerHTML"></div>
+    <div hx-post="/live" hx-trigger="load, every 0.3s" hx-swap="innerHTML"></div>
     <div hx-post="/next" hx-trigger="keyup[key=='ArrowDown'] from:body" hx-target="#tbod" hx-swap="innerHTML"></div>
     <div hx-post="/prev" hx-trigger="keyup[key=='ArrowUp'] from:body" hx-target="#tbod" hx-swap="innerHTML"></div>
-    <div hx-post="/cap" hx-trigger="keydown[key=='x'] from:body" hx-target="#tbod" hx-swap="innerHTML"></div>
-    <div hx-post="/capend" hx-trigger="keyup[key=='x'] from:body" hx-target="#tbod" hx-swap="innerHTML"></div>
+    <div hx-post="/cap" hx-trigger="keydown[key==' '] queue:none from:body" hx-target="#tbod" hx-swap="innerHTML"></div>
+    <div hx-post="/capend" hx-trigger="keyup[key==' '] from:body" hx-target="#tbod" hx-swap="innerHTML"></div>
     <div hx-post="/clear" hx-trigger="keyup[key=='c'] from:body" hx-target="#tbod" hx-swap="innerHTML"></div>
-    <div _="on keyup[key is 'q'] from body add .focused"
   </body>
 </html>

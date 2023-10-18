@@ -1,6 +1,7 @@
 import commands from "./commands.json"
 //import device_configs from "./devices.json"
-import device_configs from "./test.json"
+//import device_configs from "./test.json"
+let device_configs = [ ["BUN1", "localhost", 8301, "Viavi", 1] ]
 var devices = []
 
 class Device {
@@ -87,7 +88,8 @@ class Device {
 }
 
 class DUT {
-    constructor(sn, ends, fibers, wavs, hasrl) {
+    constructor(instrument, sn, ends, fibers, wavs, hasrl) {
+      this.instrument = instrument
       this.sn = sn
       this.fibers = fibers
       this.ends = ends
@@ -149,6 +151,7 @@ const handlers = {
 async function scpi(socket){
     device_configs.forEach((element, index) => {
         if (index == 0) devices.push(new Device(...element))
+        //devices.element[0] = new Device(...element)
     });
     while(true) {
         devices.forEach(async (d) => {
@@ -165,19 +168,19 @@ async function scpi(socket){
             } else {
                 d.query(d.commands.il, "IL")
                 d.query(d.commands.rl, "RL")
-                gil = parseFloat(d.IL)
-                grl = parseInt(d.RL)
-                console.log(d.name, " il: ", d.IL, " rl: ", d.RL, " busy ", d.busy, d.error)
+                // gil = parseFloat(d.IL)
+                // grl = parseInt(d.RL)
+                //console.log(d.name, " il: ", d.IL, " rl: ", d.RL, " busy ", d.busy, d.error)
             }
 
         })
-        await Bun.sleep(1000);
+        await Bun.sleep(400);
     }
 }
 
 scpi()
 
-let d = new DUT(Math.trunc(Math.random()*100000000),1,12,[1550],true)
+let d
 let gil = -1
 let grl = -1
 
@@ -187,15 +190,24 @@ const server = Bun.serve({
     //console.log(req)
     const url = new URL(req.url);
     console.log(url.pathname)
-    if (url.pathname === "/") return new Response(Bun.file("table.html"));
+    if (url.pathname === "/") {
+      d = new DUT(devices[0], Math.trunc(Math.random()*100000000),1,12,[1550],true)
+      return new Response(Bun.file("table.html"));
+    }
+    if (url.pathname === "/instrument") {
+      devices.forEach((d) => {
+        if(d.name == "BUN1") console.log("found")
+      })
+      return new Response("Instrument: " + d.instrument.name);
+    }
     if (url.pathname === "/clear") {
       d.clear()
       d.focus = 1
       return new Response(makeTBody(d));
     }
     if (url.pathname === "/cap") {
-      if (gil < Math.abs(d.IL[1][d.focus][d.wavs[0]])) d.IL[1][d.focus][d.wavs[0]] = gil
-      if (grl > d.RL[1][d.focus][d.wavs[0]]) d.RL[1][d.focus][d.wavs[0]] = grl
+      if (d.instrument.IL[0] < Math.abs(d.IL[1][d.focus][d.wavs[0]])) d.IL[1][d.focus][d.wavs[0]] = d.instrument.IL[0]
+      if (d.instrument.RL[0] > d.RL[1][d.focus][d.wavs[0]]) d.RL[1][d.focus][d.wavs[0]] = d.instrument.RL[0]
       return new Response(makeTBody(d));
     }
     if (url.pathname === "/capend") {
@@ -211,7 +223,7 @@ const server = Bun.serve({
       return new Response(makeTBody(d));
     }
     if (url.pathname === "/live"){
-      let res = makeLive()
+      let res = makeLive(d)
       return new Response(res);
     } 
     if (url.pathname === "/tab"){
@@ -227,11 +239,11 @@ const server = Bun.serve({
   },
 });
 
-function makeLive() {
+function makeLive(d) {
   let wl = d.wavs[Math.trunc(Math.random()*d.wavs.length)]
   // gil = Math.trunc(Math.random()*50)/100
   // grl = Math.trunc(Math.random()*20 + 50)
-  return `WL: ${wl} IL:${gil} RL:${grl}`
+  return `WL: ${wl} IL:${d.instrument.IL[0]} RL:${d.instrument.RL[0]}`
 }
 
 function makeTable(d) {
