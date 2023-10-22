@@ -22,7 +22,11 @@ devices.forEach(async d => {
         socket: {
             async data(socket, data) {
                 console.log(d[0], data.toString())
-                await Bun.sleep(Math.random()*300)
+                await Bun.sleep(Math.random()*500)
+                if(Math.random() <= 0.02) {
+                    console.log("oops")
+                    return 0
+                }
                 if (data.toString().search(/\*IDN\?/g) != -1){
                     socket.write(d[0] + ending)
                 }

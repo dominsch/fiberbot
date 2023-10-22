@@ -4,100 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>HTML 5 Boilerplate</title>
+    <title>fiberbot</title>
     <link rel="stylesheet" href="style.css">
     <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
   </head>
-  <style>
-    /* Define the colors according to the TIA-598-C standard */
-    :root {
-    --blue: #0471a480;
-    --orange: #ec6a4f80;
-    --green: #00923c80;
-    --brown: #782e0a80;
-    --slate: #7c7c7c80;
-    --white: #e8e8e880;
-    --red: #ac314b80;
-    --black: #30303980;
-    --yellow: #fdc90980;
-    --violet: #69599a80;
-    --rose: #dc9ea680;
-    --aqua: #56bec180;
-    }
-
-    /* Select the table element */
-    table {
-        background-color: white;
-        border-spacing: 0;
-        font-family: 'Roboto';font-size: 22px;
-        border-radius: 10px;
-        border: 1px solid rgb(0, 0, 0);
-        text-align: center;
-        overflow: hidden;
-    }
-
-    thead {
-          border-radius: 10px;
-          border: 1px solid rgb(0, 0, 0);
-    }
-
-    td {
-        width: 100px;
-    }
-
-    thead>tr:nth-child(1)>td:first-child{
-        background-color: rgb(0, 0, 0);
-        color: white;
-    }
-    
-    .r1>td:first-child,.r1.focused{background-color: var(--blue);}
-    .r2>td:first-child,.r2.focused{background-color: var(--orange);}
-    .r3>td:first-child,.r3.focused{background-color: var(--green);}
-    .r4>td:first-child,.r4.focused{background-color: var(--brown);}
-    .r5>td:first-child,.r5.focused{background-color: var(--slate);}
-    .r6>td:first-child,.r6.focused{background-color: var(--white);}
-    .r7>td:first-child,.r7.focused{background-color: var(--red);}
-    .r8>td:first-child,.r8.focused{background-color: var(--black);}
-    .r9>td:first-child,.r9.focused{background-color: var(--yellow);}
-    .r10>td:first-child,.r10.focused{background-color: var(--violet);}
-    .r11>td:first-child,.r11.focused{background-color: var(--rose);}
-    .r12>td:first-child,.r12.focused{background-color: var(--aqua);}
-  </style>
   <body style="background-color: rgb(255, 255, 255)">
     <script src="https://unpkg.com/htmx.org@1.9.5"></script>
-    <script src="https://unpkg.com/hyperscript.org@0.9.11"></script>
-    <script src="https://unpkg.com/htmx.org/dist/ext/sse.js"></script>
     <script>
-      // document.addEventListener("keyup", e => {
-      //   if(e.key == "ArrowUp" || e.key == "ArrowDown") {
-      //     let el = document.getElementsByClassName("focused")[0];
-      //     if(el == undefined) el = document.getElementsByClassName("r1")[0];
-      //     let n = parseInt(/r(?<row>\d+)/.exec(el.className)[1])
-      //     el.className = "r" + n
-      //     if(e.key == "ArrowDown") {
-      //       n = n + 1
-      //       if (n > 12 ) n = 1
-      //     }
-      //     if(e.key == "ArrowUp") {
-      //       n = n - 1
-      //       if (n < 1 ) n = 12
-      //     }
-      //     let name = "r" + n
-      //     el = document.getElementsByClassName(name)[0]
-      //     el.className = name + " focused"
-      //   }
-      // });
-
+      document.body.addEventListener("myEvent", function(evt){
+    alert(evt.detail.value);
+})
     </script>
-    <div hx-post="/instrument" hx-trigger="load" hx-swap="innerHTML"></div>
-    <table id="tab" hx-post="/tab" hx-trigger="load, keyup[key=='a'] from:body" hx-swap="innerHTML">
-    </table>
-    <!-- <div hx-ext="sse" sse-connect="/event" sse-swap="live"></div> -->
-    <div hx-post="/live" hx-trigger="load, every 0.3s" hx-swap="innerHTML"></div>
-    <div hx-post="/next" hx-trigger="keyup[key=='ArrowDown'] from:body" hx-target="#tbod" hx-swap="innerHTML"></div>
-    <div hx-post="/prev" hx-trigger="keyup[key=='ArrowUp'] from:body" hx-target="#tbod" hx-swap="innerHTML"></div>
-    <div hx-post="/cap" hx-trigger="keydown[key==' '] queue:none from:body" hx-target="#tbod" hx-swap="innerHTML"></div>
-    <div hx-post="/capend" hx-trigger="keyup[key==' '] from:body" hx-target="#tbod" hx-swap="innerHTML"></div>
-    <div hx-post="/clear" hx-trigger="keyup[key=='c'] from:body" hx-target="#tbod" hx-swap="innerHTML"></div>
+  
+    <form hx-get="/form" hx-target="#tables" hx-trigger="load" hx-swap="innerHTML">
+      <label>First SN</label>
+      <input type="text" name="firstSN" value="1">
+      <label>Last SN</label>
+      <input type="text" name="lastSN" value="30">
+      <label>Number of Fibers</label>
+      <input type="number" name="numFibers" value="4">
+      <button class="btn">Submit</button>
+    </form>
+
+    <ol id="tables"></ol>
+    <div hx-post="/live" hx-trigger="load, every 10s, myEvent[detail.value] from:body" hx-vals='{"sn": "1"}' hx-swap="innerHTML"></div>
+    <div hx-get="/next" hx-trigger="keyup[key=='ArrowDown'] from:body" hx-vals='{"sn": "1"}' hx-target="#tbod" hx-swap="innerHTML"></div>
+    <div hx-get="/prev" hx-trigger="keyup[key=='ArrowUp'] from:body" hx-vals='{"sn": "1"}' hx-target="#tbod" hx-swap="innerHTML"></div>
+    <div hx-get="/cap" hx-trigger="keydown[key==' '] queue:none from:body" hx-vals='{"sn": "1"}' hx-target="#tbod" hx-swap="innerHTML"></div>
+    <div hx-get="/capend" hx-trigger="keyup[key==' '] from:body" hx-vals='{"sn": "1"}' hx-target="#tbod" hx-swap="innerHTML"></div>
+    <div hx-get="/clear" hx-trigger="keyup[key=='c'] from:body" hx-vals='{"sn": "1"}' hx-target="#tbod" hx-swap="innerHTML"></div>
   </body>
 </html>

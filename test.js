@@ -194,6 +194,10 @@ const server = Bun.serve({
       d = new DUT(devices[0], Math.trunc(Math.random()*100000000),1,12,[1550],true)
       return new Response(Bun.file("table.html"));
     }
+    if (url.pathname === "/setup") {
+      d = new DUT(devices[0], Math.trunc(Math.random()*100000000),1,12,[1550],true)
+      return new Response(Bun.file("table.html"));
+    }
     if (url.pathname === "/instrument") {
       devices.forEach((d) => {
         if(d.name == "BUN1") console.log("found")
