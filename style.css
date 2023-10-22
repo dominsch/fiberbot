@@ -1,16 +1,16 @@
 :root {
---blue: #0471a480;
---orange: #ec6a4f80;
---green: #00923c80;
---brown: #782e0a80;
---slate: #7c7c7c80;
---white: #e8e8e880;
---red: #ac314b80;
---black: #30303980;
---yellow: #fdc90980;
---violet: #69599a80;
---rose: #dc9ea680;
---aqua: #56bec180;
+    --blue: #0471a480;
+    --orange: #ec6a4f80;
+    --green: #00923c80;
+    --brown: #782e0a80;
+    --slate: #7c7c7c80;
+    --white: #e8e8e880;
+    --red: #ac314b80;
+    --black: #30303980;
+    --yellow: #fdc90980;
+    --violet: #69599a80;
+    --rose: #dc9ea680;
+    --aqua: #56bec180;
 }
 
 /* ol, li {
@@ -19,7 +19,7 @@
     padding: 0;
   } */
 
- /* ol {
+/* ol {
     position: absolute;
     top: 0;
     right: 0;
@@ -38,60 +38,56 @@ li {
   }
 
  li:before {
-    content: counter(item);
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate3d(-50%,-40%,70px);
-    color: #fff;
-    font-size: 2em;
-  }  */
+content: counter(item);
+position: absolute;
+top: 50%;
+left: 50%;
+transform: translate3d(-50%,-40%,70px);
+color: #fff;
+font-size: 2em;
+}  */
 
-  #tables {
-    /* Use flexbox to align the items horizontally */
+#tables {
     display: flex;
     flex-direction: row;
-    
-    /* Prevent the items from wrapping to the next line */
+
     flex-wrap: nowrap;
-    
-    /* Allow horizontal scrolling if the items overflow the container */
+
     overflow-x: hidden;
-    
-    }
-    
-    /* Select the list items */
-    #tables li {
-        list-style: none;
-    /* Set a fixed width for each item */
+
+}
+
+
+#tables li {
+    list-style: none;
     width: 1000px;
-    
-    /* Add some margin for spacing */
+
     margin: 10px;
+}
+/*
+#tables li.hidden {
+    opacity: 0;
+    transform: translateX(-100%);
+}
+
+#tables li.center {
+    opacity: 1;
+    transform: translateX(0);
+    z-index: 1;
+}
+*/
+@media (max-width: 768px) {
+    #tables li {
+        width: 200px;
+        margin: 5px;
     }
-
-    #tables li.hidden {
-        opacity: 0;
-        transform: translateX(-100%);
-        }
-    
-        #tables li.center {
-            opacity: 1;
-            transform: translateX(0);
-            z-index: 1;
-            }
-
-            @media (max-width: 768px) {
-                #tables li {
-                width: 200px;
-                margin: 5px;
-                }
-                }
+} 
 
 table {
     background-color: white;
     border-spacing: 0;
-    font-family: 'Roboto';font-size: 22px;
+    font-family: 'Roboto';
+    font-size: 22px;
     border-radius: 10px;
     border: 1px solid rgb(0, 0, 0);
     text-align: center;
@@ -99,28 +95,75 @@ table {
 }
 
 thead {
-        border-radius: 10px;
-        border: 1px solid rgb(0, 0, 0);
+    border-radius: 10px;
+    border: 1px solid rgb(0, 0, 0);
 }
 
 /* td {
     width: 100px;
 } */
 
-thead>tr:nth-child(1)>td:first-child{
+thead>tr:nth-child(1)>td:first-child {
     background-color: rgb(0, 0, 0);
     color: white;
 }
 
-.r1>td:first-child,.r1.focused{background-color: var(--blue);}
-.r2>td:first-child,.r2.focused{background-color: var(--orange);}
-.r3>td:first-child,.r3.focused{background-color: var(--green);}
-.r4>td:first-child,.r4.focused{background-color: var(--brown);}
-.r5>td:first-child,.r5.focused{background-color: var(--slate);}
-.r6>td:first-child,.r6.focused{background-color: var(--white);}
-.r7>td:first-child,.r7.focused{background-color: var(--red);}
-.r8>td:first-child,.r8.focused{background-color: var(--black);}
-.r9>td:first-child,.r9.focused{background-color: var(--yellow);}
-.r10>td:first-child,.r10.focused{background-color: var(--violet);}
-.r11>td:first-child,.r11.focused{background-color: var(--rose);}
-.r12>td:first-child,.r12.focused{background-color: var(--aqua);}
+.r1>td:first-child,
+.r1.focused {
+    background-color: var(--blue);
+}
+
+.r2>td:first-child,
+.r2.focused {
+    background-color: var(--orange);
+}
+
+.r3>td:first-child,
+.r3.focused {
+    background-color: var(--green);
+}
+
+.r4>td:first-child,
+.r4.focused {
+    background-color: var(--brown);
+}
+
+.r5>td:first-child,
+.r5.focused {
+    background-color: var(--slate);
+}
+
+.r6>td:first-child,
+.r6.focused {
+    background-color: var(--white);
+}
+
+.r7>td:first-child,
+.r7.focused {
+    background-color: var(--red);
+}
+
+.r8>td:first-child,
+.r8.focused {
+    background-color: var(--black);
+}
+
+.r9>td:first-child,
+.r9.focused {
+    background-color: var(--yellow);
+}
+
+.r10>td:first-child,
+.r10.focused {
+    background-color: var(--violet);
+}
+
+.r11>td:first-child,
+.r11.focused {
+    background-color: var(--rose);
+}
+
+.r12>td:first-child,
+.r12.focused {
+    background-color: var(--aqua);
+}

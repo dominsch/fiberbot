@@ -1,37 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>fiberbot</title>
     <link rel="stylesheet" href="style.css">
     <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
-  </head>
-  <body style="background-color: rgb(255, 255, 255)">
+</head>
+
+<body style="background-color: rgb(255, 255, 255)">
     <script src="https://unpkg.com/htmx.org@1.9.5"></script>
     <script>
-      document.body.addEventListener("myEvent", function(evt){
-    alert(evt.detail.value);
-})
+    document.body.addEventListener("next", function (evt) {
+        //alert(evt.detail.value);
+        console.log(evt);
+    })
     </script>
-  
+
     <form hx-get="/form" hx-target="#tables" hx-trigger="load" hx-swap="innerHTML">
-      <label>First SN</label>
-      <input type="text" name="firstSN" value="1">
-      <label>Last SN</label>
-      <input type="text" name="lastSN" value="30">
-      <label>Number of Fibers</label>
-      <input type="number" name="numFibers" value="4">
-      <button class="btn">Submit</button>
+    <label>First SN</label>
+    <input type="text" name="firstSN" value="1">
+    <label>Last SN</label>
+    <input type="text" name="lastSN" value="10">
+    <label>Number of Fibers</label>
+    <input type="number" name="numFibers" value="4">
+    <button class="btn">Submit</button>
     </form>
+    <div id="dummy"></div>
 
     <ol id="tables"></ol>
-    <div hx-post="/live" hx-trigger="load, every 10s, myEvent[detail.value] from:body" hx-vals='{"sn": "1"}' hx-swap="innerHTML"></div>
-    <div hx-get="/next" hx-trigger="keyup[key=='ArrowDown'] from:body" hx-vals='{"sn": "1"}' hx-target="#tbod" hx-swap="innerHTML"></div>
-    <div hx-get="/prev" hx-trigger="keyup[key=='ArrowUp'] from:body" hx-vals='{"sn": "1"}' hx-target="#tbod" hx-swap="innerHTML"></div>
-    <div hx-get="/cap" hx-trigger="keydown[key==' '] queue:none from:body" hx-vals='{"sn": "1"}' hx-target="#tbod" hx-swap="innerHTML"></div>
-    <div hx-get="/capend" hx-trigger="keyup[key==' '] from:body" hx-vals='{"sn": "1"}' hx-target="#tbod" hx-swap="innerHTML"></div>
-    <div hx-get="/clear" hx-trigger="keyup[key=='c'] from:body" hx-vals='{"sn": "1"}' hx-target="#tbod" hx-swap="innerHTML"></div>
-  </body>
+    <div hx-post="/live" hx-trigger="load, every 100s, unfocus[detail.fiber==`4`] from:body" hx-swap="innerHTML"></div>
+    <div hx-get="/next" hx-trigger="keyup[key=='ArrowDown'] from:body"></div>
+    <div hx-get="/prev" hx-trigger="keyup[key=='ArrowUp'] from:body"></div>
+    <div hx-get="/nextDUT" hx-trigger="keyup[key=='ArrowRight'] from:body" hx-swap="none"></div>
+    <div hx-get="/prevDUT" hx-trigger="keyup[key=='ArrowLeft'] from:body" hx-swap="none"></div>
+    <div hx-get="/cap" hx-trigger="keydown[key==' '] queue:none from:body"></div>
+    <div hx-get="/capend" hx-trigger="keyup[key==' '] from:body"></div>
+    <div hx-get="/clear" hx-trigger="keyup[key=='r'] from:body" hx-vals='{"scope": "row"}'></div>
+    <div hx-get="/clear" hx-trigger="keyup[key=='d'] from:body" hx-vals='{"scope": "dut"}'></div>
+    <div hx-get="/clear" hx-trigger="keyup[key=='a'] from:body" hx-vals='{"scope": "all"}'></div>
+</body>
+
 </html>
