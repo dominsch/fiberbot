@@ -19,7 +19,7 @@
     })
     </script>
 
-    <form hx-get="/form" hx-target="#tables" hx-trigger="load" hx-swap="innerHTML">
+    <form hx-get="/form" hx-target="#tables" hx-swap="innerHTML">
     <label>First SN</label>
     <input type="text" name="firstSN" value="1">
     <label>Last SN</label>
@@ -31,7 +31,7 @@
     <div id="dummy"></div>
 
     <ol id="tables"></ol>
-    <div hx-post="/live" hx-trigger="load, every 100s, unfocus[detail.fiber==`4`] from:body" hx-swap="innerHTML"></div>
+    <div hx-post="/live" hx-trigger="load, every 1s, unfocus[detail.fiber==`4`] from:body" hx-swap="innerHTML"></div>
     <div hx-get="/next" hx-trigger="keyup[key=='ArrowDown'] from:body"></div>
     <div hx-get="/prev" hx-trigger="keyup[key=='ArrowUp'] from:body"></div>
     <div hx-get="/nextDUT" hx-trigger="keyup[key=='ArrowRight'] from:body" hx-swap="none"></div>

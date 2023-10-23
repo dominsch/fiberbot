@@ -2,17 +2,19 @@ const { ReadStream } = require("fs")
 
 class Session {
     constructor() {
-        //this.instrument = 
-        this.DUTs = []
+        //this.instrument =
         this.activeDUT = 0
         this.activeRow = 1
     }
     configure(firstSN, lastSN, numFibers) {
+        console.log("configuring", firstSN, lastSN, numFibers)
         this.firstSN = firstSN
         this.lastSN = lastSN
         this.numFibers = numFibers
+        this.base = 12
     }
     makeDUTs() {
+        this.DUTs = []
         for (let i = 0; i <= this.lastSN-this.firstSN; i++) {
             this.DUTs[i] = new DUT(this.firstSN + i, 1, this.numFibers, [1550], true, 1, (i==0))
         }
@@ -156,7 +158,7 @@ const server = Bun.serve({
             let d = sess.getActiveDUT()
             let prevf = d.focus
             if(!d.next()) {
-                let res = makeCard(sess.DUTs[sess.activeDUT], true)
+                let res = makeCard(sess.DUTs[sess.activeDUT], true, false)
                 sess.nextDUT()
                 res = res + makeCard(sess.DUTs[sess.activeDUT], true)
                 return new Response(res)
@@ -172,7 +174,7 @@ const server = Bun.serve({
             return new Response(res)
         }
         if (url.pathname === "/nextDUT") {
-            let res = makeCard(sess.DUTs[sess.activeDUT], true)
+            let res = makeCard(sess.DUTs[sess.activeDUT], true, false)
             sess.nextDUT()
             res = res + makeCard(sess.DUTs[sess.activeDUT], true)
             return new Response(res)
@@ -185,7 +187,7 @@ const server = Bun.serve({
             return new Response(res);
         }
         if (url.pathname === "/prevDUT") {
-            let res = makeCard(sess.DUTs[sess.activeDUT], true)
+            let res = makeCard(sess.DUTs[sess.activeDUT], true, false)
             sess.prevDUT()
             res = res + makeCard(sess.DUTs[sess.activeDUT], true)
             return new Response(res)
@@ -244,7 +246,7 @@ function makeRow(d, f, oob = false) {
     let n = d.wavs.length
     //let out = `<tr class="${f}", id="${sn}-${f}" hx-post="/row" hx-trigger="click, sse:EventName, sse:event${f}" hx-swap="outerHTML">\n` `{"updateRow": {"sn": "1", "fiber": "4"}}`
     // _="on click add .focused to next <tr/>"
-    let out = `<tr class="r${(f == d.focus && d.isActive) ? f + " focused" : f}" ` +
+    let out = `<tr class="r${(f == d.focus && d.isActive) ? f%sess.base + " focused" : f%sess.base}" ` +
                 `id="P${sn}-R${f}" ` +
                 `hx-get="/row?fiber=${f}" ` +
                 `${(oob) ? `hx-swap-oob="true"` : ""} ` +
@@ -268,9 +270,9 @@ function makeCell(d, f, wl, type) {
     return `<td id="${"P" + d.sn + "-A" + f + "-" + wl + "-" + type}">${content}</td>\n`
 }
 
-function makeCard(d, oob = false) {
+function makeCard(d, oob = false, active = d.isActive) {
     return `<li id="P${d.sn}-C" ` +
-            `class="item${d.sn - sess.firstSN + 1} ${(d.isActive) ? " center" : " hidden"} "` +
+            `class="item${d.sn - sess.firstSN + 1} ${(active) ? " center" : " hidden"} "` +
             `${(oob) ? `hx-swap-oob="true"` : ""}>` +
             `<table hx-get="/tab" hx-vals='{"sn": "${d.sn}"}' hx-trigger="load" hx-swap="innerHTML">` +
             `</table></li>`
