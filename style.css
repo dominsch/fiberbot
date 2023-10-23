@@ -1,16 +1,17 @@
 :root {
-    --blue: #0471a480;
-    --orange: #ec6a4f80;
-    --green: #00923c80;
-    --brown: #782e0a80;
-    --slate: #7c7c7c80;
-    --white: #e8e8e880;
-    --red: #ac314b80;
-    --black: #30303980;
-    --yellow: #fdc90980;
-    --violet: #69599a80;
-    --rose: #dc9ea680;
-    --aqua: #56bec180;
+    --blue: #0471a4;
+    --orange: #ec6a4f;
+    --green: #00923c;
+    --brown: #782e0a;
+    --slate: #7c7c7c;
+    --white: #e8e8e8;
+    --red: #ac314b;
+    --black: #303039;
+    --yellow: #fdc909;
+    --violet: #69599a;
+    --rose: #dc9ea6;
+    --aqua: #56bec1;
+    --brightness: 20%
 }
 
 li {
@@ -76,71 +77,77 @@ thead {
     border: 1px solid rgb(0, 0, 0);
 }
 
-td {
-    width: 100px;
-}
-
 thead>tr:nth-child(1)>td:first-child {
     background-color: rgb(0, 0, 0);
     color: white;
 }
 
+tr:has( > .bad)>td:first-child ~ td {
+    background-color: rgba(255, 0, 0, 0.116);
+}
+
+tr:has( > .empty)>td:first-child ~ td {
+    background-color: rgba(241, 241, 241, 0);
+}
+
+
+
 .r1>td:first-child,
 .r1.focused {
-    background-color: var(--blue);
+    background-color: color-mix(in srgb, var(--blue) var(--brightness), white);
 }
 
 .r2>td:first-child,
 .r2.focused {
-    background-color: var(--orange);
+    background-color: color-mix(in srgb, var(--orange) var(--brightness), white);
 }
 
 .r3>td:first-child,
 .r3.focused {
-    background-color: var(--green);
+    background-color: color-mix(in srgb, var(--green) var(--brightness), white);
 }
 
 .r4>td:first-child,
 .r4.focused {
-    background-color: var(--brown);
+    background-color: color-mix(in srgb, var(--brown) var(--brightness), white);
 }
 
 .r5>td:first-child,
 .r5.focused {
-    background-color: var(--slate);
+    background-color: color-mix(in srgb, var(--slate) var(--brightness), white);
 }
 
 .r6>td:first-child,
 .r6.focused {
-    background-color: var(--white);
+    background-color: color-mix(in srgb, var(--white) var(--brightness), white);
 }
 
 .r7>td:first-child,
 .r7.focused {
-    background-color: var(--red);
+    background-color: color-mix(in srgb, var(--red) var(--brightness), white);
 }
 
 .r8>td:first-child,
 .r8.focused {
-    background-color: var(--black);
+    background-color: color-mix(in srgb, var(--black) var(--brightness), white);
 }
 
 .r9>td:first-child,
 .r9.focused {
-    background-color: var(--yellow);
+    background-color: color-mix(in srgb, var(--yellow) var(--brightness), white);
 }
 
 .r10>td:first-child,
 .r10.focused {
-    background-color: var(--violet);
+    background-color: color-mix(in srgb, var(--violet) var(--brightness), white);
 }
 
 .r11>td:first-child,
 .r11.focused {
-    background-color: var(--rose);
+    background-color: color-mix(in srgb, var(--rose) var(--brightness), white);
 }
 
 .r12>td:first-child,
 .r12.focused {
-    background-color: var(--aqua);
+    background-color: color-mix(in srgb, var(--aqua) var(--brightness), white);
 }

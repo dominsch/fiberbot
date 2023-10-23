@@ -19,16 +19,8 @@
     })
     </script>
 
-    <form hx-get="/form" hx-target="#tables" hx-swap="innerHTML">
-    <label>First SN</label>
-    <input type="text" name="firstSN" value="1">
-    <label>Last SN</label>
-    <input type="text" name="lastSN" value="10">
-    <label>Number of Fibers</label>
-    <input type="number" name="numFibers" value="4">
-    <button class="btn">Submit</button>
-    </form>
-    <div id="dummy"></div>
+    <div id="settings" hx-post="/settings" hx-trigger="load" hx-swap="innerHTML"></div>
+    
 
     <ol id="tables"></ol>
     <div hx-post="/live" hx-trigger="load, every 1s, unfocus[detail.fiber==`4`] from:body" hx-swap="innerHTML"></div>
