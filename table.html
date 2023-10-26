@@ -13,9 +13,11 @@
 <body style="background-color: rgb(255, 255, 255)">
     <script src="https://unpkg.com/htmx.org@1.9.5"></script>
     <script>
-    document.body.addEventListener("next", function (evt) {
+    htmx.logAll();
+    document.body.addEventListener("pong", function (evt) {
         //alert(evt.detail.value);
         console.log(evt);
+        
     })
     </script>
 
@@ -23,13 +25,14 @@
     
 
     <ol id="tables"></ol>
-    <div hx-post="/live" hx-trigger="load, every 1s, unfocus[detail.fiber==`4`] from:body" hx-swap="innerHTML"></div>
+    <!-- <div hx-post="/live" hx-trigger="load, every 3s" hx-swap="innerHTML"></div> -->
     <div hx-get="/next" hx-trigger="keyup[key=='ArrowDown'] from:body"></div>
     <div hx-get="/prev" hx-trigger="keyup[key=='ArrowUp'] from:body"></div>
     <div hx-get="/nextDUT" hx-trigger="keyup[key=='ArrowRight'] from:body" hx-swap="none"></div>
     <div hx-get="/prevDUT" hx-trigger="keyup[key=='ArrowLeft'] from:body" hx-swap="none"></div>
     <div hx-get="/cap" hx-trigger="keydown[key==' '] queue:none from:body"></div>
     <div hx-get="/capend" hx-trigger="keyup[key==' '] from:body"></div>
+    <div hx-get="/ping" hx-trigger="keyup[key=='p'] from:body"></div>
     <div hx-get="/clear" hx-trigger="keyup[key=='r'] from:body" hx-vals='{"scope": "row"}'></div>
     <div hx-get="/clear" hx-trigger="keyup[key=='d'] from:body" hx-vals='{"scope": "dut"}'></div>
     <div hx-get="/clear" hx-trigger="keyup[key=='a'] from:body" hx-vals='{"scope": "all"}'></div>
