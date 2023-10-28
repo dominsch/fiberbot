@@ -25,7 +25,7 @@
     
 
     <ol id="tables"></ol>
-    <!-- <div hx-post="/live" hx-trigger="load, every 3s" hx-swap="innerHTML"></div> -->
+    <div hx-post="/live" hx-trigger="load, every 500ms" hx-swap="innerHTML"></div>
     <div hx-get="/next" hx-trigger="keyup[key=='ArrowDown'] from:body"></div>
     <div hx-get="/prev" hx-trigger="keyup[key=='ArrowUp'] from:body"></div>
     <div hx-get="/nextDUT" hx-trigger="keyup[key=='ArrowRight'] from:body" hx-swap="none"></div>

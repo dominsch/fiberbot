@@ -1,6 +1,6 @@
 import commands from "./commands.json"
-//import device_configs from "./devices.json"
-import device_configs from "./test.json"
+import device_configs from "./devices.json"
+// import device_configs from "./test.json"
 var devices = []
 
 class Device {

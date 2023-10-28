@@ -10,6 +10,8 @@ class Session {
         this.maxIL = 0.4
         this.minRL = 55
         this.WL = 1550
+        this.IL = -100
+        this.RL = -100
     }
     configure(firstSN, lastSN, numFibers, numEnds, maxIL, minRL) {
         this.firstSN = firstSN
@@ -177,17 +179,14 @@ const server = Bun.serve({
             }
         }
         if (url.pathname === "/ping") {
-            let d = sess.getActiveDUT()
-            if (il < Math.abs(d.IL[d.focusEnd][d.focusFiber][d.wavs[0]])) d.IL[d.focusEnd][d.focusFiber][d.wavs[0]] = il
-            if (rl > d.RL[d.focusEnd][d.focusFiber][d.wavs[0]]) d.RL[d.focusEnd][d.focusFiber][d.wavs[0]] = rl
             return new Response("pong", {
                 headers: { "HX-Trigger": "pong" }
             })
         }
         if (url.pathname === "/cap") {
             let d = sess.getActiveDUT()
-            if (il < Math.abs(d.IL[d.focusEnd][d.focusFiber][d.wavs[0]])) d.IL[d.focusEnd][d.focusFiber][d.wavs[0]] = il
-            if (rl > d.RL[d.focusEnd][d.focusFiber][d.wavs[0]]) d.RL[d.focusEnd][d.focusFiber][d.wavs[0]] = rl
+            if (il < Math.abs(d.IL[d.focusEnd][d.focusFiber][d.wavs[0]])) d.IL[d.focusEnd][d.focusFiber][d.wavs[0]] = sess.IL
+            if (rl > d.RL[d.focusEnd][d.focusFiber][d.wavs[0]]) d.RL[d.focusEnd][d.focusFiber][d.wavs[0]] = sess.RL
             return new Response(makeRow(d, d.focusFiber, true))
         }
         if (url.pathname === "/capend") {
@@ -277,11 +276,9 @@ const server = Bun.serve({
 });
 
 function makeLive(d) {
-    console.log("live")
-    let wl = "1550" //d.wavs[Math.trunc(Math.random()*d.wavs.length)]
-    il = Math.trunc(Math.random() * 50) / 100
-    rl = Math.trunc(Math.random() * 20 + 50)
-    return `WL: ${wl} IL:${il} RL:${rl}`
+    sess.IL = Math.trunc(Math.random() * 50) / 100
+    sess.RL = Math.trunc(Math.random() * 20 + 50)
+    return `WL: ${sess.WL} IL:${sess.IL} RL:${sess.RL}`
 }
 
 function makeTable(d, oob = false) {
