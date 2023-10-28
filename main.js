@@ -1,4 +1,4 @@
-// import {makeLive, makeCell, makeRow, makeTable, makeTBody} from './ui.js'
+// import {makeLive, makeCell, makeRow, makeTable, makeTBody} from './templates.js'
 import {InstrumentManager} from './InstrumentManager.js'
 import {Session} from './SessionManager.js'
 
@@ -18,6 +18,13 @@ const server = Bun.serve({
         //console.log(req)
         const url = new URL(req.url);
         console.log(url.pathname, url.searchParams)
+        let sn = parseInt(url.searchParams.get('sn'))
+        let end = parseInt(url.searchParams.get('end'))
+        let row = parseInt(url.searchParams.get('fiber'))
+        let wl = parseInt(url.searchParams.get('wl'))
+        let type = url.searchParams.get('type')
+        let val = url.searchParams.get('content')
+
         if (url.pathname === "/") return new Response(Bun.file("table.html"));
         if (url.pathname === "/style.css") return new Response(Bun.file("style.css"));
         if (url.pathname === "/form") {
@@ -36,7 +43,7 @@ const server = Bun.serve({
             return new Response(res)
         }
         if (url.pathname === "/settings") {
-            return new Response(makeForm())
+            return new Response(makeForm(sess))
         }
         if (url.pathname === "/clear") {
             let scope = url.searchParams.get('scope')
@@ -116,52 +123,32 @@ const server = Bun.serve({
             return new Response(res)
         }
         if (url.pathname === "/live") {
-            let d = sess.getDUT(url.searchParams.get('sn'))
-            return new Response(makeLive(d));
+            return new Response(makeLive(sess));
         }
         if (url.pathname === "/tab") {
             let d = sess.getDUT(url.searchParams.get('sn'))
-            let res = makeTable(d)
-            return new Response(res);
+            return new Response(makeTable(d));
         }
         if (url.pathname === "/row") {
-            let sn = parseInt(url.searchParams.get('sn'))
-            let row = parseInt(url.searchParams.get('fiber'))
             let d = sess.getDUT(url.searchParams.get('sn'))
             return new Response(makeRow(d, row, true));
         }
         if (url.pathname === "/cell") {
-            let d = sess.getActiveDUT()
-            let end = parseInt(url.searchParams.get('end'))
-            let row = parseInt(url.searchParams.get('fiber'))
-            let wl = parseInt(url.searchParams.get('wl'))
-            let val = url.searchParams.get('content')
             if (val != null && val != "" && val) console.log("old val", val)
             let type = url.searchParams.get('type')
             return new Response(makeCell(d, end, row, wl, type, val));
         }
         if (url.pathname === "/cellForm") {
-            let end = parseInt(url.searchParams.get('end'))
-            let row = parseInt(url.searchParams.get('fiber'))
-            let wl = parseInt(url.searchParams.get('wl'))
-            let type = url.searchParams.get('type')
             return new Response(makeCellForm(end, row, wl, type))
         }
         if (url.pathname === "/cellSubmit") {
-            let sn = parseInt(url.searchParams.get('sn'))
-            let end = parseInt(url.searchParams.get('end'))
-            let row = parseInt(url.searchParams.get('fiber'))
-            let wl = parseInt(url.searchParams.get('wl'))
-            let type = url.searchParams.get('type')
-            let val = url.searchParams.get('content')
             let d =sess.getDUT(sn)
-            console.log("A", end, row, wl, type)
             return new Response(makeCell(d, end, row, wl, type, true, val))
         }
     },
 });
 
-function makeLive(d) {
+function makeLive(sess) {
     sess.IL = im.getValue("MAP104", "IL")
     sess.RL = im.getValue("MAP104", "RL")
     return `WL: ${sess.WL} IL:${sess.IL} RL:${sess.RL}`
@@ -171,10 +158,10 @@ function makeTable(d, oob = false) {
     let sn = d.sn
     let out = `<thead>\n<tr>\n<td colspan = 10 id="P${sn}-T">P${sn}</td></tr><tr><th></th>`
     d.wavs.forEach(wl => {
-        out = out + `<th colspan = "${(d.hasrl) ? `${sess.numEnds * 2}` : `${sess.numEnds}`}">${wl}</th>`
+        out = out + `<th colspan = "${(d.hasrl) ? `${d.numEnds * 2}` : `${d.numEnds}`}">${wl}</th>`
     })
     out = out + `</tr><tr><th>Fiber</th>`
-    for (let e = 1; e <= sess.numEnds; e++) {
+    for (let e = 1; e <= d.numEnds; e++) {
         d.wavs.forEach(wl => {
             out = out + `<th>IL</th>\n${(d.hasrl) ? "<th>RL</th>\n" : ""}`
         })
@@ -195,12 +182,12 @@ function makeTBody(d) {
 function makeRow(d, f, oob = false) {
     let sn = d.sn
     let n = d.wavs.length
-    let out = `<tr class="r${(f == d.focusFiber && d.isActive) ? ((f-1) % sess.base+1) + " focused" : ((f-1) % sess.base+1)}" ` +
+    let out = `<tr class="r${(f == d.focusFiber && d.isActive) ? ((f-1) % d.base+1) + " focused" : ((f-1) % sess.base+1)}" ` +
         `id="P${sn}-R${f}" ` +
         `${(oob) ? `hx-swap-oob="true"` : ""} ` +
         `hx-swap="outerHTML">\n` +
         `<td>${f}</td>\n`
-    for (let e = 1; e <= sess.numEnds; e++) {
+    for (let e = 1; e <= d.numEnds; e++) {
         for (let i = 1; i <= n; i++) {
             out = out + makeCell(d, e, f, d.wavs[i - 1], "IL")
             if (d.hasrl) {
@@ -223,7 +210,7 @@ function makeCell(d, e, f, wl, type, oob = false, value) {
         content = ""
         c = "empty"
     } else {
-        (type == "IL" && content > sess.maxIL || type == "RL" && content < sess.minRL) ? c = "bad" : c = "good"
+        (type == "IL" && content > d.maxIL || type == "RL" && content < d.minRL) ? c = "bad" : c = "good"
     }
     // console.log(type, content, sess.maxIL, sess.minRL, c)
     return `<td id="${id}" class="${c}"` +
@@ -248,7 +235,7 @@ function makeCard(d, oob = false, active = d.isActive) {
         `</table></li>`
 }
 
-function makeForm() {
+function makeForm(sess) {
     return `<form hx-get="/form" hx-target="#tables" hx-swap="innerHTML">` +
         `<p><label>First SN</label>` +
         `<input type="number" name="firstSN" value="${sess.firstSN}"></p>\n` +

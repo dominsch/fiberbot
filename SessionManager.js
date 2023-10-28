@@ -10,6 +10,7 @@ export class Session {
         this.lastSN = 1292002
         this.maxIL = 0.4
         this.minRL = 55
+        this.base = 12
         this.WL = 1550
         this.IL = -100
         this.RL = -100
@@ -21,12 +22,21 @@ export class Session {
         this.numEnds = numEnds
         this.maxIL = maxIL
         this.minRL = minRL
-        this.base = 12
     }
     makeDUTs() {
         this.DUTs = []
         for (let i = 0; i <= this.lastSN - this.firstSN; i++) {
-            this.DUTs[i] = new DUT(this.firstSN + i, this.numEnds, this.numFibers, [1550], true, this.numEnds, this.maxIL, this.minRL, 1, (i == 0))
+            this.DUTs[i] = new DUT( this.firstSN + i,
+                                    this.numEnds,
+                                    this.numFibers,
+                                    [1550],
+                                    true,
+                                    this.numEnds,
+                                    this.maxIL,
+                                    this.minRL,
+                                    this.base,
+                                    1,
+                                    (i == 0))
         }
     }
     getDUT(sn) {
@@ -54,15 +64,16 @@ export class Session {
 }
 
 class DUT {
-    constructor(sn, ends, fibers, wavs, hasrl, numEnds, maxIL, minRL, focus, isActive) {
+    constructor(sn, ends, fibers, wavs, hasrl, numEnds, maxIL, minRL, base, focus, isActive) {
         this.sn = sn
         this.fibers = fibers
         this.ends = ends
         this.wavs = wavs
         this.hasrl = hasrl
-        this.numEnds = 1
-        this.maxIL = 0.4
-        this.minRL = 55
+        this.numEnds = numEnds
+        this.maxIL = maxIL
+        this.minRL = minRL
+        this.base = base
         this.focusFiber = focus
         this.focusEnd = 1
         this.isActive = isActive
