@@ -1,6 +1,6 @@
 export class Session {
-    constructor() {
-        //this.instrument =
+    constructor(instrument) {
+        this.instrument = instrument
         this.activeDUT = 0
         this.activeRow = 1
         this.activeEnd = 1
@@ -15,13 +15,15 @@ export class Session {
         this.IL = -100
         this.RL = -100
     }
-    configure(firstSN, lastSN, numFibers, numEnds, maxIL, minRL) {
+    configure(firstSN, lastSN, numFibers, base, numEnds, maxIL, minRL, wl) {
         this.firstSN = firstSN
         this.lastSN = lastSN
         this.numFibers = numFibers
+        this.base = base
         this.numEnds = numEnds
         this.maxIL = maxIL
         this.minRL = minRL
+        this.WL = wl
     }
     makeDUTs() {
         this.DUTs = []
@@ -29,14 +31,14 @@ export class Session {
             this.DUTs[i] = new DUT( this.firstSN + i,
                                     this.numEnds,
                                     this.numFibers,
-                                    [1550],
+                                    [this.WL],
                                     true,
                                     this.numEnds,
                                     this.maxIL,
                                     this.minRL,
                                     this.base,
                                     1,
-                                    (i == 0))
+                                    this.activeDUT)
         }
     }
     getDUT(sn) {

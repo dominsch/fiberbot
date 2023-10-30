@@ -57,6 +57,7 @@ class Instrument {
                     },
                     close(socket) {
                         console.log("close")
+                        socket.data.rejector("disconnect")
                         socket.data.instrument.connected = false
                     },
                     drain(socket) {console.log("drain")},
@@ -69,7 +70,7 @@ class Instrument {
     }
     async disconnect() {
         console.log(this.name, "disconnect")
-        try {this.socket.data.resolver("cleanup")} catch {}
+        this.socket.data.rejector("disconnect")
         this.socket.end()
         this.connected = false
         await this.connect()
@@ -91,18 +92,16 @@ class Instrument {
             tries++
         }
         return new Promise((resolve, reject) => {
-            let timeoutId = setTimeout((e) => {
-                
-                if (this.connected) {
-                    console.error("rejecting #", num, q)
-                    reject(e)
-                }
-            }, 5000, `ERROR: #${num} ${q} got no response`);
-            this.socket.data.resolver = (val) => {
-                // console.log("CLEAR #", num, q, val, timeoutId)
+            const resolver = (val) => {
                 clearTimeout(timeoutId)
                 resolve(val)
             }
+            let timeoutId = setTimeout((e) => {
+                    console.error("rejecting #", num, q)
+                    reject(e)
+            }, 1000, `ERROR: #${num} ${q} got no response`);
+            this.socket.data.resolver = resolver
+            this.socket.data.rejector = reject
         });
     }
     setMode(mode) {

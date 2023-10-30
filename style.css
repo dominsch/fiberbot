@@ -16,37 +16,75 @@
 }
 
 body {
-    background-color: black;
     margin: 0;
 }
 
-#settings {
-    background-color: rgb(224, 224, 224);
-    margin: 0;
+#settings>form {
+    display: flex;
+    flex-wrap: wrap;
+    background-color: #f0f0f0;
+    padding: 20px;
+    border-radius: 10px;
+    margin: auto;
+    gap: 1rem 0;
+    align-content: space-between;
+    }
+    
+    /* Use a darker gray border for the input fields */
+    input {
+    border: 1px solid #999;
+    padding: 5px;
+    border-radius: 5px;
+    justify-content: center;
+    }
+    
+    /* Use a blue color for the submit button */
+    button {
+    background-color: #2196f3;
+    color: white;
     padding: 10px;
-}
-
-form {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, 150px);
-    column-gap: 5px;
-    row-gap: 5px;
-    justify-items: stretch;
-
-    margin: 0;
-}
-
-form label {
+    margin: 1rem;
+    border-radius: 5px;
+    height: 40px;
+    width: 100px;
+    font-weight: bold;
+    align-self: center;
+    }
+    
+    /* Use a flexbox layout for the form elements */
+    .option {
+    display: flex;
+    align-items: center;
+    }
+    
+    /* Use a fixed width for the labels */
+    label {
     display: block;
-}
-
-form input {
-    width: 95%;
-}
-
-form p {
-    margin: 0;
-}
+    }
+    
+    /* Use a horizontal layout for the radio buttons */
+    fieldset {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    min-width: 100px;
+    align-items: start;
+    border: none;
+    }
+    
+    /* Use a legend element to label the fieldsets */
+    legend {
+    font-weight: bold;
+    margin-left: auto;
+    margin-right: auto;
+    }
+    
+    form>div,
+    form>fieldset {
+        border-right: 1px solid #d3d3d3;
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
   
   
   
@@ -57,9 +95,9 @@ form p {
     margin: 0 auto;
     flex-wrap: nowrap;
     overflow-x: auto;
-    scroll-behavior: smooth;
+    /* scroll-behavior: smooth; */
     scroll-snap-type: x mandatory;
-    overflow: hidden;
+    /* overflow: hidden; */
 }
 
 #tables li.center {
@@ -122,8 +160,11 @@ td {
     background-color: #00000000;
 }
 
-.cell_input {
-    
+.cell_input:focus-visible {
+    border: none;
+    margin: 0;
+    justify-content: center;
+    width: 45px;
 }
 
 .cell_submit {

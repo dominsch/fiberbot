@@ -22,8 +22,8 @@ devices.forEach(async d => {
         socket: {
             async data(socket, data) {
                 console.log(d[0], data.toString())
-                await Bun.sleep(Math.random()*500)
-                if(Math.random() <= 0.02) {
+                await Bun.sleep(Math.random()*200)
+                if(Math.random() <= 0.0005) {
                     console.log("oops")
                     return 0
                 }
