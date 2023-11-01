@@ -1,4 +1,4 @@
-const { ReadStream } = require("fs")
+import {makeCSV} from './csv.js'
 
 class Session {
     constructor() {
@@ -179,6 +179,7 @@ const server = Bun.serve({
             }
         }
         if (url.pathname === "/ping") {
+            makeCSV(sess.DUTs)
             return new Response("pong", {
                 headers: { "HX-Trigger": "pong" }
             })

@@ -1,6 +1,7 @@
 import {makeLive, makeCell, makeCellForm, makeRow, makeTable, makeForm, makeCard} from './templates.js'
 import {InstrumentManager} from './InstrumentManager.js'
 import {Session} from './SessionManager.js'
+import {makeCSV} from './csv.js'
 
 // let configs = {
 //     "MAP104": ["192.168.10.104", 8301, "Viavi"]
@@ -77,6 +78,7 @@ const server = Bun.serve({
             }
         }
         if (url.pathname === "/ping") {
+            makeCSV(sess.DUTs)
             return new Response("pong", {
                 headers: { "HX-Trigger": "pong" }
             })

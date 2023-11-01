@@ -1,0 +1,27 @@
+PART#,DUT
+TESTER,Anon
+CHASSIS,1234
+MODULE,123
+START,2023
+FINISH,2023
+CUSTOM1,
+CUSTOM2,
+CUSTOM3,
+CUSTOM4,
+CUSTOM5,
+NOTES,
+
+RESULTS,,,IL(dB),RL(dB)
+SERIAL#,INPUT,OUTPUT,1550nm,1550nm
+1,Fiber 1 End A,Fiber 1 End B,-100,-100
+1,Fiber 2 End A,Fiber 2 End B,-100,-100
+1,Fiber 3 End A,Fiber 3 End B,-100,-100
+1,Fiber 4 End A,Fiber 4 End B,-100,-100
+1,Fiber 5 End A,Fiber 5 End B,-100,-100
+1,Fiber 6 End A,Fiber 6 End B,-100,-100
+1,Fiber 1 End B,Fiber 1 End A,-100,-100
+1,Fiber 2 End B,Fiber 2 End A,-100,-100
+1,Fiber 3 End B,Fiber 3 End A,-100,-100
+1,Fiber 4 End B,Fiber 4 End A,-100,-100
+1,Fiber 5 End B,Fiber 5 End A,-100,-100
+1,Fiber 6 End B,Fiber 6 End A,-100,-100
