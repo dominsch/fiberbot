@@ -75,7 +75,7 @@ class Instrument {
         this.connected = false
         await this.connect()
     }
-    async query(q, num) {
+    async query(q) {
         // console.log("data out: from ", this.name, " query: ", q)
         let written = this.socket.write(q+'\n')
         // console.log(written)
@@ -97,9 +97,9 @@ class Instrument {
                 resolve(val)
             }
             let timeoutId = setTimeout((e) => {
-                    console.error("rejecting #", num, q)
+                    console.error("rejecting ", q)
                     reject(e)
-            }, 1000, `ERROR: #${num} ${q} got no response`);
+            }, 1000, `ERROR:  got no response`);
             this.socket.data.resolver = resolver
             this.socket.data.rejector = reject
         });
@@ -108,7 +108,9 @@ class Instrument {
         console.log("changing mode to ", mode)
         this.mode = mode
         switch(mode){
-            case "live": this.startLive() 
+            case "live": this.startLive(); break;
+            case "continuous": this.startContinuous(); break;
+            default: this.mode = "idle"; break;
         }
     }
 }
@@ -118,20 +120,27 @@ class ViaviInstrument extends Instrument {
         super(name, address, netport);
     }
     async startLive(){
-        let i = 0
         while(this.mode == "live") {
-            
             try{
-                this.IL = await this.query(":FETCH:LOSS?", i)
-                i++
-                this.RL = await this.query(":FETCH:ORL?", i)
-                i++
-                // console.log(`mode: ${this.mode}, IL: ${this.IL}, RL: ${this.RL}`)
+                this.IL = await this.query(":FETCH:LOSS?")
+                this.RL = await this.query(":FETCH:ORL?")
             } catch(e){
                 console.error("live error", e)
                 this.disconnect()
             }
             await Bun.sleep(500)
+        }
+    }
+    async readChannels(channels) {
+        let ILs = []
+        let RLs = []
+        for (chan of channels) {
+            newchan = await this.query(`:PATH:CHAN 1,1,1,${chan};:PATH:CHAN? 1,1,1`)
+            if (newchan != chan) {
+                console.error(`Channel switching error! should be ${chan} but is ${newchan}`)
+            }
+            IL[chan] = await this.query(":FETCH:LOSS?")
+            RL[chan] = await this.query(":FETCH:ORL?")
         }
     }
 }

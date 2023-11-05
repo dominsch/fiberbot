@@ -28,18 +28,18 @@ body {
     margin: auto;
     gap: 1rem 0;
     align-content: space-between;
-    }
-    
-    /* Use a darker gray border for the input fields */
-    input {
+}
+
+/* Use a darker gray border for the input fields */
+input {
     border: 1px solid #999;
     padding: 5px;
     border-radius: 5px;
     justify-content: center;
-    }
-    
-    /* Use a blue color for the submit button */
-    button {
+}
+
+/* Use a blue color for the submit button */
+button {
     background-color: #2196f3;
     color: white;
     padding: 10px;
@@ -49,58 +49,75 @@ body {
     width: 100px;
     font-weight: bold;
     align-self: center;
-    }
-    
-    /* Use a flexbox layout for the form elements */
-    .option {
+}
+
+/* Use a flexbox layout for the form elements */
+.option {
     display: flex;
     align-items: center;
-    }
-    
-    /* Use a fixed width for the labels */
-    label {
+}
+
+/* Use a fixed width for the labels */
+label {
     display: block;
-    }
-    
-    /* Use a horizontal layout for the radio buttons */
-    fieldset {
+}
+
+/* Use a horizontal layout for the radio buttons */
+fieldset {
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
     min-width: 100px;
     align-items: start;
     border: none;
-    }
-    
-    /* Use a legend element to label the fieldsets */
-    legend {
+}
+
+/* Use a legend element to label the fieldsets */
+legend {
     font-weight: bold;
     margin-left: auto;
     margin-right: auto;
-    }
-    
-    form>div,
-    form>fieldset {
-        border-right: 1px solid #d3d3d3;
-        padding-left: 1rem;
-        padding-right: 1rem;
-    }
-  
-  
-  
+}
 
-#tables {
+form>div,
+form>fieldset {
+    border-right: 1px solid #d3d3d3;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+#footer {
+    position: absolute;
+    bottom: 0;
+}
+
+#footer>form {
+    display: flex;
+    flex-wrap: wrap;
+    background-color: #f0f0f0;
+    padding: 20px;
+    border-radius: 10px;
+    margin: auto;
+    gap: 1rem 0;
+    align-content: space-between;
+}
+
+
+
+
+#card-container {
     display: flex;
     flex-direction: row;
     margin: 0 auto;
     flex-wrap: nowrap;
     overflow-x: auto;
+    /* height: 800px; */
     /* scroll-behavior: smooth; */
     scroll-snap-type: x mandatory;
-    /* overflow: hidden; */
+    overflow: hidden;
 }
 
-#tables li.center {
+#card-container li.center {
     scroll-snap-align: center;
     /* scale: 110%;
     z-index: 1; */
@@ -110,23 +127,32 @@ li {
     list-style: none;
     margin: 20px;
     padding: 0;
-  }
+}
 
 table {
     background-color: white;
     border-spacing: 0;
     font-family: 'Roboto';
     font-size: 22px;
-    border-radius: 10px;
-    border: 2px solid rgb(0, 0, 0);
+    border-radius: 10px !important;
+    border: 2px solid #000;
+    /* solid rgb(0, 0, 0); */
+    filter: drop-shadow(0 0 0.5rem lightgrey);
     text-align: center;
-    overflow: hidden;
+    overflow-y: auto;
+    height: 400px;
+    /* overflow: hidden; */
     /* border-collapse: collapse; */
+}
+
+.hidden {
+    filter: brightness(90%);
 }
 
 thead {
     /* border-radius: 10px; */
     /* border: 1px solid rgb(0, 0, 0); */
+    position: sticky;
 }
 
 thead>tr:nth-child(1)>td:first-child {
@@ -141,7 +167,7 @@ thead>tr:nth-child(1)>td:first-child {
     overflow-x: auto;
     scroll-behavior: smooth;
     scroll-snap-type: y mandatory;
-    overflow: hidden;
+    overflow: scroll;
 } */
 
 tr.focused {
@@ -160,7 +186,7 @@ td {
     background-color: #00000000;
 }
 
-.cell_input:focus-visible {
+.cell_input {
     border: none;
     margin: 0;
     justify-content: center;
@@ -176,32 +202,7 @@ td {
     color: red;
 }
 
-/* tr:has( > .empty)>td:first-child ~ td {
-    background-color: rgba(255, 255, 255, 0);
-} */
 
-
-
-/* .r1 {
-    background-image: linear-gradient(30deg, color-mix(in srgb, var(--blue) var(--brightness), white) , rgba(255, 255, 255, 0) 40px);
-}
-.r1.focused {
-    background-color: color-mix(in srgb, var(--blue) var(--brightness), white);
-}
-
-.r2 {
-    background-image: linear-gradient(60deg, color-mix(in srgb, var(--orange) var(--brightness), white) , rgba(255, 255, 255, 0) 30px);
-}
-.r2.focused {
-    background-color: color-mix(in srgb, var(--orange) var(--brightness), white);
-}
-
-.r3 {
-    background-image: linear-gradient(60deg, color-mix(in srgb, var(--green) var(--brightness), white) , rgba(255, 255, 255, 0) 40px);
-}
-.r3.focused {
-    background-color: color-mix(in srgb, var(--green) var(--brightness), white);
-} */
 
 .r1>td:first-child,
 .r1.focused {
@@ -262,3 +263,30 @@ td {
 .r12.focused {
     background-color: color-mix(in srgb, var(--aqua) var(--brightness), white);
 }
+
+/* tr:has( > .empty)>td:first-child ~ td {
+    background-color: rgba(255, 255, 255, 0);
+} */
+
+
+
+/* .r1 {
+    background-image: linear-gradient(30deg, color-mix(in srgb, var(--blue) var(--brightness), white) , rgba(255, 255, 255, 0) 40px);
+}
+.r1.focused {
+    background-color: color-mix(in srgb, var(--blue) var(--brightness), white);
+}
+
+.r2 {
+    background-image: linear-gradient(60deg, color-mix(in srgb, var(--orange) var(--brightness), white) , rgba(255, 255, 255, 0) 30px);
+}
+.r2.focused {
+    background-color: color-mix(in srgb, var(--orange) var(--brightness), white);
+}
+
+.r3 {
+    background-image: linear-gradient(60deg, color-mix(in srgb, var(--green) var(--brightness), white) , rgba(255, 255, 255, 0) 40px);
+}
+.r3.focused {
+    background-color: color-mix(in srgb, var(--green) var(--brightness), white);
+} */

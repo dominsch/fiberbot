@@ -14,6 +14,7 @@ export class Session {
         this.WL = 1550
         this.IL = -100
         this.RL = -100
+        this.DUTs = []
     }
     configure(firstSN, lastSN, numFibers, base, numEnds, maxIL, minRL, wl) {
         this.firstSN = firstSN
@@ -38,7 +39,7 @@ export class Session {
                                     this.minRL,
                                     this.base,
                                     1,
-                                    this.activeDUT)
+                                    i==this.activeDUT)
         }
     }
     getDUT(sn) {

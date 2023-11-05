@@ -42,9 +42,15 @@ const server = Bun.serve({
             let minRL = parseInt(url.searchParams.get('minRL'))
             sess.configure(firstSN, lastSN, numFibers, base, numEnds, maxIL, minRL, wl)
             sess.makeDUTs()
+            sess.startTime = new Date(Date.now())
+            return new Response("", {
+                headers: { "HX-Trigger": "newsettings" }
+            })
+        }
+        if (url.pathname === "/cards") {
             let res = ""
             for (let dut of sess.DUTs) {
-                res = res + makeCard(dut)
+                res += makeCard(dut)
             }
             return new Response(res)
         }
@@ -78,7 +84,7 @@ const server = Bun.serve({
             }
         }
         if (url.pathname === "/ping") {
-            makeCSV(sess.DUTs)
+            makeCSV(sess.DUTs, sess)
             return new Response("pong", {
                 headers: { "HX-Trigger": "pong" }
             })

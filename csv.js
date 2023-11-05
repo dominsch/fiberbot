@@ -1,16 +1,24 @@
-export async function makeCSV(duts) {
+export async function makeCSV(duts, sess) {
+    let tester = "Anon"
+    let chassis = sess.instrument
+    let start = sess.startTime
+    let end = new Date(Date.now())
+    let partName = "" + duts[0].ends + "X" + duts[0].fibers + "f" 
     let wlString = ""
     for (let wl of duts[0].wavs) {
         wlString += `,${wl}nm`
+        partName += "-" + wl
     }
     if (duts[0].hasrl) wlString += wlString
+    console.log(tester, chassis, start, end, partName, wlString)
+
     let header = 
-`PART#,DUT
-TESTER,Anon
-CHASSIS,1234
+`PART#,${partName}
+TESTER,${tester}
+CHASSIS,${chassis}
 MODULE,123
-START,2023
-FINISH,2023
+START,${start.toLocaleDateString('en-CA')} ${start.toLocaleTimeString('de-CA')}
+FINISH,${end.toLocaleDateString('en-CA')} ${end.toLocaleTimeString('de-CA')}
 CUSTOM1,
 CUSTOM2,
 CUSTOM3,
@@ -23,11 +31,8 @@ SERIAL#,INPUT,OUTPUT${wlString}\n`
 
     let results = ""
     for(let d of duts) {
-        console.log("dut", d.sn)
         for (let e = 1; e <= d.ends; e++) {
-            console.log("end", e)
             for (let f = 1; f <= d.fibers; f++) {
-                console.log("f", f)
                 results += `${d.sn},Fiber ${f} End ${(e==1) ? "A" : "B"},Fiber ${f} End ${(e==1) ? "B" : "A"}`
                 for (let wl of d.wavs) {
                     results += `,${d.IL[e][f][wl]}`
@@ -41,6 +46,5 @@ SERIAL#,INPUT,OUTPUT${wlString}\n`
         }
     }
     const csv = header + results
-    console.log(csv)
     await Bun.write("test.csv", csv);
 }

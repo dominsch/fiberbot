@@ -74,19 +74,19 @@ export function makeCell(d, e, f, wl, type, oob = false, value) {
 export function makeCellForm(e, f, wl, type) {
     return `<form class="cell_form" hx-get="/cellSubmit?end=${e}&fiber=${f}&wl=${wl}&type=${type}"` +
         ` hx-swap="innerHTML" ` +
-        `><input class="cell_input" type="text" name="content" autofocus><input class="cell_submit" type="submit"></form> `
+        `><input class="cell_input" type="number" step="${type=="IL" ? "0.01" : "1"}" name="content" autofocus><input class="cell_submit" type="submit"></form> `
 }
 
 export function makeCard(d, oob = false, active = d.isActive) {
     return `<li id="P${d.sn}-C" ` +
-        `class="card ${(active) ? " center" : " hidden"} "` +
+        `class="card smooth ${(active) ? " center" : " hidden"} "` +
         `${(oob) ? `hx-swap-oob="true"` : ""}>` +
         `<table hx-get="/tab" hx-vals='{"sn": "${d.sn}"}' hx-trigger="load" hx-swap="innerHTML">` +
         `</table></li>`
 }
 
 export function makeForm(sess) {
-    return `<form hx-get="/form" hx-target="#tables" hx-swap="innerHTML">
+    return `<form hx-get="/form" hx-target="#card-container" hx-swap="innerHTML">
             <div>
                 <legend>Serial Number</legend>
                 <label>First</label>
@@ -104,7 +104,7 @@ export function makeForm(sess) {
             <div>
                 <legend>Spec</legend>
                 <label>Max IL</label>
-                <input type="number" name="maxIL" value="${sess.maxIL}">
+                <input type="number" step="0.01" name="maxIL" value="${sess.maxIL}">
                 <label>Min RL</label>
                 <input type="number" name="minRL" value="${sess.minRL}">
             </div>
