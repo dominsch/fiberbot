@@ -22,6 +22,12 @@ export class InstrumentManager {
         let inst = this.instruments[instrument]
         return inst[value]
     }
+    readChannels(instrument, channels) {
+        return this.instruments[instrument].readChannels(channels)
+    }
+    readChannelsLive(instrument, channels) {
+        return this.instruments[instrument].readChannelsLive(channels)
+    }
     setMode(instrument, mode) {
         this.instruments[instrument].setMode(mode)
     }
@@ -147,6 +153,7 @@ class ViaviInstrument extends Instrument {
             IL[chan] = await this.query(":MEAS:IL? 1,1")
             RL[chan] = await this.query(":MEAS:ORL? 1,1")
         }
+        return [ILs, RLs]
     }
     async readChannelsLive(channels) {
         let ILs = []
@@ -156,6 +163,7 @@ class ViaviInstrument extends Instrument {
             IL[chan] = await this.query(":FETCH:LOSS? 1,1")
             RL[chan] = await this.query(":FETCH:ORL? 1,1")
         }
+        return [ILs, RLs]
     }
     
 
