@@ -131,18 +131,34 @@ class ViaviInstrument extends Instrument {
             await Bun.sleep(500)
         }
     }
+    async switchChannel(c) {
+        res = await this.query(`:PATH:CHAN 1,1,1,${c};:PATH:CHAN? 1,1,1`)
+        if(res != c) {
+            console.error("Channel Change Failed")
+            return false
+        }
+        return true
+    }
     async readChannels(channels) {
         let ILs = []
         let RLs = []
         for (chan of channels) {
-            newchan = await this.query(`:PATH:CHAN 1,1,1,${chan};:PATH:CHAN? 1,1,1`)
-            if (newchan != chan) {
-                console.error(`Channel switching error! should be ${chan} but is ${newchan}`)
-            }
-            IL[chan] = await this.query(":FETCH:LOSS?")
-            RL[chan] = await this.query(":FETCH:ORL?")
+            await this.switchChannel(chan)
+            IL[chan] = await this.query(":MEAS:IL? 1,1")
+            RL[chan] = await this.query(":MEAS:ORL? 1,1")
         }
     }
+    async readChannelsLive(channels) {
+        let ILs = []
+        let RLs = []
+        for (chan of channels) {
+            await this.switchChannel(chan)
+            IL[chan] = await this.query(":FETCH:LOSS? 1,1")
+            RL[chan] = await this.query(":FETCH:ORL? 1,1")
+        }
+    }
+    
+
 }
 
 class SantecInstrument extends Instrument {
