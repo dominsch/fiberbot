@@ -122,8 +122,8 @@ class ViaviInstrument extends Instrument {
     async startLive(){
         while(this.mode == "live") {
             try{
-                this.IL = await this.query(":FETCH:LOSS?")
-                this.RL = await this.query(":FETCH:ORL?")
+                this.IL = await this.query(":FETCH:LOSS? 1,1")
+                this.RL = await this.query(":FETCH:ORL? 1,1")
             } catch(e){
                 console.error("live error", e)
                 this.disconnect()
