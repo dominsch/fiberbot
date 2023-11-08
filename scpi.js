@@ -30,13 +30,16 @@ devices.forEach(async d => {
                 if (data.toString().search(/\*IDN\?/g) != -1){
                     socket.write(d[0] + ending)
                 }
-                if (data.toString().search(/:FETCH:LOSS\?/g) != -1){
+                if (data.toString().search(/:FETCH:LOSS\?.+/g) != -1){
+                    console.log("found loss")
                     socket.write(Math.trunc(Math.random()*50)/100 + ending)
                 }
-                if (data.toString().search(/:FETCH:ORL\?/g) != -1){
+                if (data.toString().search(/:FETCH:ORL\?.+/g) != -1){
+                    console.log("found orl")
                     socket.write(Math.trunc(Math.random()*20 + 50) + ending)
                 }
-                if (data.toString().search(/:PATH:CHAN?/g) != -1){
+                if (data.toString().search(/:PATH:CHAN\?.+/g) != -1){
+                    console.log("found chan")
                     let chan = /:PATH:CHAN \d,\d,\d,(\d+)/g.exec(data.toString())
                     socket.write(chan + ending)
                 }
