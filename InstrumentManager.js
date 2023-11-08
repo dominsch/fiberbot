@@ -15,7 +15,7 @@ export class InstrumentManager {
     async initialize() {
         for (const name in this.instruments) {
             await this.instruments[name].connect()
-            await this.instruments[name].setMode("live")
+            //await this.instruments[name].setMode("live")
         }
     }
     getValue(instrument, value) {
@@ -58,7 +58,7 @@ class Instrument {
                     },
                     data(socket, buffer) {
                         let res = String.fromCharCode.apply(null, buffer).trim()
-                        // console.log("data in: ", res)
+                        console.log("data in: ", res)
                         socket.data.resolver(res)
                     },
                     close(socket) {
@@ -82,9 +82,9 @@ class Instrument {
         await this.connect()
     }
     async query(q) {
-        // console.log("data out: from ", this.name, " query: ", q)
+        console.log("data out: from ", this.name, " query: ", q)
         let written = this.socket.write(q + '\n')
-        // console.log(written)
+        console.log(written)
         let tries = 1
         while (written < 1) {
             if (tries > 5) {
@@ -150,8 +150,8 @@ class ViaviInstrument extends Instrument {
         let RLs = []
         for (let chan of channels) {
             await this.switchChannel(chan)
-            ILs[chan] = await this.query(":MEAS:IL? 1,1")
-            RLs[chan] = await this.query(":MEAS:ORL? 1,1")
+            ILs[chan-1] = await this.query(":MEAS:IL? 1,1")
+            RLs[chan-1] = await this.query(":MEAS:ORL:ZON? 1,1,1")
         }
         return [ILs, RLs]
     }
@@ -160,8 +160,9 @@ class ViaviInstrument extends Instrument {
         let RLs = []
         for (let chan of channels) {
             await this.switchChannel(chan)
-            ILs[chan] = await this.query(":FETCH:LOSS? 1,1")
-            RLs[chan] = await this.query(":FETCH:ORL? 1,1")
+            await Bun.sleep(500)
+            ILs[chan-1] = await this.query(":FETCH:LOSS? 1,1")
+            RLs[chan-1] = await this.query(":FETCH:ORL? 1,1")
         }
         return [ILs, RLs]
     }
