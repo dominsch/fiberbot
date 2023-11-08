@@ -186,9 +186,9 @@ thead>tr:nth-child(1)>td:first-child {
     overflow: scroll;
 } */
 
-tr.focused {
-    /* border: 2px solid black; */
-}
+/* tr.focused {
+    border: 2px solid black;
+} */
 
 td:first-child {
     min-width: 50px;
