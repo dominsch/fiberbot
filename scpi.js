@@ -11,7 +11,7 @@ if (path) {
     devices = await file.json();
     console.log(devices)
 } else {
-    devices[0] = ["tester", "localhost", parseInt(Bun.argv[2]) || 8301]
+    devices[0] = ["tester", "localhost", parseInt(Bun.argv[2]) || 8100]
 }
 
 devices.forEach(async d => {
@@ -35,6 +35,10 @@ devices.forEach(async d => {
                 }
                 if (data.toString().search(/:FETCH:ORL\?/g) != -1){
                     socket.write(Math.trunc(Math.random()*20 + 50) + ending)
+                }
+                if (data.toString().search(/:PATH:CHAN?/g) != -1){
+                    let chan = /:PATH:CHAN \d,\d,\d,(\d+)/g.exec(data.toString())
+                    socket.write(chan + ending)
                 }
             }, // message received from client
             open(socket) {console.log("open ", d[0])}, // socket opened

@@ -7,7 +7,7 @@ import {makeCSV} from './csv.js'
 //     "MAP104": ["192.168.10.104", 8301, "Viavi"]
 // }
 let configs = {
-    "MAP104": ["localhost", 8301, "Viavi"]
+    "MAP104": ["localhost", 8100, "Viavi"]
 }
 
 let im = new InstrumentManager(configs)
