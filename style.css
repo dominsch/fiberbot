@@ -1,4 +1,9 @@
-:root {
+@font-face {
+    font-family: "Digital";
+    src:
+      url("digital.woff2") format("woff2");
+  }
+  :root {
     --blue: #0471a4;
     --orange: #ec6a4f;
     --green: #00923c;
@@ -38,6 +43,16 @@ input {
     justify-content: center;
 }
 
+/* input[type="number"] {
+    font-family: "digital";
+    font-size: 20px;
+} */
+
+.live {
+    font-family: "digital", monospace;
+    font-size: 20px;
+}
+
 /* Use a blue color for the submit button */
 button {
     background-color: #2196f3;
@@ -47,6 +62,7 @@ button {
     border-radius: 5px;
     height: 40px;
     width: 100px;
+    font-family: Digital, monospace;
     font-weight: bold;
     align-self: center;
 }

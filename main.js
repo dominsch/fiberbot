@@ -31,6 +31,7 @@ const server = Bun.serve({
 
         if (url.pathname === "/") return new Response(Bun.file("table.html"));
         if (url.pathname === "/style.css") return new Response(Bun.file("style.css"));
+        if (url.pathname === "/digital.woff2") return new Response(Bun.file("media/subset-Digital-7Mono.woff2"));
         if (url.pathname === "/form") {
             let firstSN = parseInt(url.searchParams.get('firstSN'))
             let lastSN = parseInt(url.searchParams.get('lastSN'))
