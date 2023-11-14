@@ -67,6 +67,7 @@ const server = Bun.serve({
                     d.clearFiber(d.focusFiber)
                     return new Response(makeRow(d, d.focusFiber, true));
                 case "dut":
+                    if(sn) d = sess.getDUT(url.searchParams.get('sn'))
                     d.clearAll()
                     d.focusFiber = 1
                     return new Response(makeCard(d, true));

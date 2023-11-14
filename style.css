@@ -1,9 +1,10 @@
 @font-face {
     font-family: "Digital";
     src:
-      url("digital.woff2") format("woff2");
-  }
-  :root {
+        url("digital.woff2") format("woff2");
+}
+
+:root {
     --blue: #0471a4;
     --orange: #ec6a4f;
     --green: #00923c;
@@ -22,9 +23,10 @@
 
 body {
     margin: 0;
+    font-family: 'Roboto';
 }
 
-#settings>form {
+.header>form {
     display: flex;
     flex-wrap: wrap;
     background-color: #f0f0f0;
@@ -33,104 +35,168 @@ body {
     margin: auto;
     gap: 1rem 0;
     align-content: space-between;
+
+    >fieldset,
+    >div {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+        min-width: 100px;
+        align-items: start;
+        border: none;
+        border-right: 1px solid #d3d3d3;
+        padding-left: 1rem;
+        padding-right: 1rem;
+
+        >legend {
+            font-weight: bold;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        >.option {
+            display: flex;
+            align-items: center;
+
+            >label {
+                display: block;
+            }
+
+            >input {
+                border: 1px solid #999;
+                padding: 5px;
+                border-radius: 5px;
+                justify-content: center;
+            }
+        }
+    }
+
+    >button {
+        background-color: #2196f3;
+        color: white;
+        padding: 10px;
+        margin: 1rem;
+        border-radius: 5px;
+        height: 40px;
+        width: 100px;
+        font-family: Digital, monospace;
+        font-weight: bold;
+        align-self: center;
+    }
 }
 
-/* Use a darker gray border for the input fields */
-input {
-    border: 1px solid #999;
-    padding: 5px;
-    border-radius: 5px;
-    justify-content: center;
-}
-
-/* input[type="number"] {
-    font-family: "digital";
-    font-size: 20px;
-} */
 
 .live {
     font-family: "digital", monospace;
     font-size: 20px;
 }
 
-/* Use a blue color for the submit button */
-button {
-    background-color: #2196f3;
-    color: white;
-    padding: 10px;
-    margin: 1rem;
-    border-radius: 5px;
-    height: 40px;
-    width: 100px;
-    font-family: Digital, monospace;
-    font-weight: bold;
-    align-self: center;
+.focused {
+    background-color: red;
 }
 
-/* Use a flexbox layout for the form elements */
-.option {
-    display: flex;
-    align-items: center;
-}
-
-/* Use a fixed width for the labels */
-label {
-    display: block;
-}
-
-/* Use a horizontal layout for the radio buttons */
-fieldset {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-evenly;
-    min-width: 100px;
-    align-items: start;
-    border: none;
-}
-
-/* Use a legend element to label the fieldsets */
-legend {
-    font-weight: bold;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-form>div,
-form>fieldset {
-    border-right: 1px solid #d3d3d3;
-    padding-left: 1rem;
-    padding-right: 1rem;
-}
-
-#footer {
-    position: absolute;
-    bottom: 0;
-}
-
-#footer>form {
-    display: flex;
-    flex-wrap: wrap;
-    background-color: #f0f0f0;
-    padding: 20px;
-    border-radius: 10px;
-    margin: auto;
-    gap: 1rem 0;
-    align-content: space-between;
-}
-
-
-
-
-#card-container {
+.card-container {
     display: flex;
     flex-direction: row;
+    height: 70vh;
     margin: 0 auto;
     flex-wrap: nowrap;
     overflow-x: auto;
-    /* height: 800px; */
-    /* scroll-behavior: smooth; */
+    scroll-behavior: smooth;
     scroll-snap-type: x mandatory;
-    overflow: hidden;
+    overflow: auto;
+    > .card {
+        height: 100%;
+        > .buttons {
+            margin: 8px;
+            display: flex;
+            justify-content: space-evenly;
+            > button {
+                background-color: #2196f3;
+                padding: 4px 8px;
+                border-radius: 5px;
+                font-size: 12px;
+                color: white;
+            }
+        }
+        > table {
+            background-color: white;
+            border-spacing: 0;
+            font-size: 22px;
+            border-radius: 20px;
+            border: 2px solid #000;
+            /* filter: drop-shadow(0 0 0.5rem grey); */
+            text-align: center;
+            max-height: 80%;
+            overflow: scroll;
+            table-layout: fixed;
+            overflow:  hidden;
+            
+            & td {
+                min-width: 50px;
+                padding: 0;
+            }
+
+            > thead {
+
+                display: block;
+                .sn {
+                    background-color: rgb(0, 0, 0);
+                    color: white;
+                }
+                .wl {
+                    font-size: 16px;
+                }
+                .cell {
+                    display: flex;
+                    justify-content: space-around;
+                    width: 100px;
+                }
+            }
+            > tbody::-webkit-scrollbar {
+                display: none;
+            }
+            > tbody {
+                display:block;
+                width: 100%;
+                overflow: auto;
+                height: 350px;
+                ::-webkit-scrollbar {
+                    display: hidden;
+                }
+
+                .fiber {
+                    color: pink;
+                    display: flex;
+                    justify-content: end;
+                    width: 50px;
+                    text-align: center;
+                    > div {
+                        width: 50px;
+                        flex-shrink: 0;
+                    }
+                }
+
+                .cell {
+                    display: flex;
+                    padding: 0;
+                    justify-content: space-around;
+                    align-items: center;
+                    width: 100px;
+                    height: 100%;
+                    > div {
+                        flex: 1;
+                        min-height: 30px;
+                        /* height: inherit; */
+                    }
+                }
+            }
+            
+
+        }
+
+
+    }
 }
 
 #card-container li.center {
@@ -145,24 +211,10 @@ li {
     padding: 0;
 }
 
-table {
-    background-color: white;
-    border-spacing: 0;
-    font-family: 'Roboto';
-    font-size: 22px;
-    border-radius: 10px !important;
-    border: 2px solid #000;
-    /* solid rgb(0, 0, 0); */
-    filter: drop-shadow(0 0 0.5rem lightgrey);
-    text-align: center;
-    overflow-y: auto;
-    height: 400px;
-    /* overflow: hidden; */
-    /* border-collapse: collapse; */
-}
 
-.hidden {
-    filter: brightness(90%);
+
+.dark {
+    filter: brightness(80%);
 }
 
 thead {
@@ -171,10 +223,6 @@ thead {
     position: sticky;
 }
 
-thead>tr:nth-child(1)>td:first-child {
-    background-color: rgb(0, 0, 0);
-    color: white;
-}
 
 /* tbody {
     display: flex;
@@ -186,17 +234,15 @@ thead>tr:nth-child(1)>td:first-child {
     overflow: scroll;
 } */
 
-tr.focused {
-    /* border: 2px solid black; */
-}
+/* tr.focused {
+    border: 2px solid black;
+} */
 
-td:first-child {
-    min-width: 50px;
-}
 
-td {
+
+/* td {
     min-width: 50px;
-}
+} */
 
 .cell_form {
     background-color: #00000000;

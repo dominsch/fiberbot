@@ -7,28 +7,38 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>fiberbot</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
 </head>
 
 <body style="background-color: rgb(255, 255, 255)">
     <script src="https://unpkg.com/htmx.org@1.9.5"></script>
-    <script src="https://unpkg.com/htmx.org/dist/ext/class-tools.js"></script>
+    <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
     <script>
-    htmx.logAll();
-    document.body.addEventListener("pong", function (evt) {
+    // htmx.logAll();
+    document.body.addEventListener("click", function (evt) {
+        //alert(evt.detail.value);
+        let cl = evt.target.classList
+        console.log(cl, typeof(cl))
+        console.log(cl[1])
+        console.log(evt.target.className.includes("focused"))
+        console.log(evt);
+        
+    })
+
+    document.body.addEventListener("keyup", function (evt) {
         //alert(evt.detail.value);
         console.log(evt);
         
     })
     </script>
 
-    <div id="settings" hx-post="/settings" hx-trigger="load" hx-swap="innerHTML"></div>
+    <div id="settings" class="header" hx-post="/settings" hx-trigger="load" hx-swap="innerHTML"></div>
     
 
-    <ol id="card-container" hx-post="/cards" hx-trigger="load, newsettings from:body"></ol>
-    <div hx-post="/live" hx-trigger="load, every 500ms" hx-swap="innerHTML" class="live"></div>
+    <ol class="card-container" hx-post="/cards" hx-trigger="load, newsettings from:body"></ol>
+    <div hx-post="/live" hx-trigger="load, every 5000ms" hx-swap="innerHTML" class="live"></div>
 
-    <div id="footer" hx-post="/settings" hx-trigger="load" hx-swap="innerHTML"></div>
 
     <div hx-get="/next" hx-trigger="keyup[key=='ArrowDown'] from:body"></div>
     <div hx-get="/prev" hx-trigger="keyup[key=='ArrowUp'] from:body"></div>

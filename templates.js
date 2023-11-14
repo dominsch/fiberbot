@@ -6,17 +6,27 @@ export function makeLive(sess, im) {
 
 export function makeTable(d, oob = false) {
     let sn = d.sn
-    let out = `<thead>\n<tr>\n<td colspan = 10 id="P${sn}-T">P${sn}</td></tr><tr><th></th>`
+    let out = `<thead>
+                <tr class="sn">
+                    <td colspan="100%">P${sn}</td>
+                </tr>
+                <tr class="wl">
+                    <th></th>`
     d.wavs.forEach(wl => {
-        out = out + `<th colspan = "${(d.hasrl) ? `${d.numEnds * 2}` : `${d.numEnds}`}">${wl}</th>`
+        out += `<th>${wl}</th>`
     })
-    out = out + `</tr><tr><th>Fiber</th>`
+    out += `</tr>
+            <tr class="desc">
+                <th>Fiber</th>`
     for (let e = 1; e <= d.numEnds; e++) {
         d.wavs.forEach(wl => {
-            out = out + `<th>IL</th>\n${(d.hasrl) ? "<th>RL</th>\n" : ""}`
+            out += `<th class="cell">
+                        <div>IL</div>
+                        ${(d.hasrl) ? "<div>RL</div>" : ""}
+                    </th>`
         })
     }
-    out = out + `</tr></thead><tbody id="P${sn}-B">` + makeTBody(d) + `</tbody>`
+    out = out + `</tr></thead><tbody id="P${sn}-B" _="on scroll log 'scrolled' remove .focused from .focused">` + makeTBody(d) + `</tbody>`
     return out
 }
 
@@ -34,15 +44,18 @@ export function makeRow(d, f, oob = false) {
     let n = d.wavs.length
     let out = `<tr class="r${(f == d.focusFiber && d.isActive) ? ((f - 1) % d.base + 1) + " focused" : ((f - 1) % d.base + 1)}" ` +
         `id="P${sn}-R${f}" ` +
+        `hx-vals='{"row": ${f}}' ` +
         `${(oob) ? `hx-swap-oob="true"` : ""} ` +
         `hx-swap="outerHTML">\n` +
         `<td>${f}</td>\n`
     for (let e = 1; e <= d.numEnds; e++) {
         for (let i = 1; i <= n; i++) {
-            out = out + makeCell(d, e, f, d.wavs[i - 1], "IL")
+            out += `<td class="cell" _="on click log 'clicked' take .focused" >` + makeCell(d, e, f, d.wavs[i - 1], "IL")
             if (d.hasrl) {
-                out = out + makeCell(d, e, f, d.wavs[i - 1], "RL")
+                out += makeCell(d, e, f, d.wavs[i - 1], "RL")
             }
+            out += `</td>`
+
         }
     }
     out = out + `</tr>\n`
@@ -57,18 +70,19 @@ export function makeCell(d, e, f, wl, type, oob = false, value) {
     let id = "P" + d.sn + "-" + e + "-" + f + "-" + wl + "-" + type
     content = (type == "IL") ? d.IL[e][f][wl] : d.RL[e][f][wl];
     if (content == -100) {
-        content = ""
+        content = " "
         c = "empty"
     } else {
         (type == "IL" && content > d.maxIL || type == "RL" && content < d.minRL) ? c = "bad" : c = "good"
     }
     // console.log(type, content, sess.maxIL, sess.minRL, c)
-    return `<td id="${id}" class="${c}"` +
-        `hx-get="/cellForm?end=${e}&fiber=${f}&wl=${wl}&type=${type}"` +
-        `hx-trigger="click"` +
+    return `<div id="${id}" class="${c}" ` +
+        `hx-get="/cellForm?end=${e}&fiber=${f}&wl=${wl}&type=${type}" ` +
+        `hx-trigger="click[target.className.includes('focused')]"` +
+        // `_="on click log 'clicked' take .focused" ` +
         `${(oob) ? ` hx-swap-oob="true" ` : ""}` +
         `hx-swap="innerHTML" ` +
-        `>${content}</td>\n`
+        `>${content}</div>\n`
 }
 
 export function makeCellForm(e, f, wl, type) {
@@ -78,15 +92,18 @@ export function makeCellForm(e, f, wl, type) {
 }
 
 export function makeCard(d, oob = false, active = d.isActive) {
-    return `<li id="P${d.sn}-C" ` +
-        `class="card smooth ${(active) ? " center" : " hidden"} "` +
-        `${(oob) ? `hx-swap-oob="true"` : ""}>` +
-        `<table hx-get="/tab" hx-vals='{"sn": "${d.sn}"}' hx-trigger="load" hx-swap="innerHTML">` +
-        `</table></li>`
+    return `<li id="P${d.sn}-C" ${(oob) ? ` hx-swap-oob="true" ` : ""} hx-vals='{"sn": "${d.sn}"}' class="card"}>
+                <div class="buttons">
+                    <button class="material-icons">save_alt</button>
+                    <button _="on click toggle .dark on the next <table/>" class="material-icons">visibility_off</button>
+                    <button hx-get="/clear" hx-vals='{"scope": "dut"}' class="material-icons">clear</button>
+                </div>
+                <table hx-get="/tab" hx-trigger="load" hx-swap="innerHTML"></table>
+            </li>`
 }
 
 export function makeForm(sess) {
-    return `<form hx-get="/form" hx-target="#card-container" hx-swap="innerHTML">
+    return `<form hx-get="/form" hx-target=".card-container" hx-swap="innerHTML">
             <div>
                 <legend>Serial Number</legend>
                 <label>First</label>
