@@ -23,6 +23,7 @@
 
 body {
     margin: 0;
+    padding: 0;
     font-family: 'Roboto';
 }
 
@@ -87,18 +88,21 @@ body {
 
 
 .live {
+    position: absolute;
+    bottom: 0;
     font-family: "digital", monospace;
     font-size: 20px;
 }
 
-.focused {
-    background-color: red;
+
+::-webkit-scrollbar {
+    display: none;
 }
 
 .card-container {
     display: flex;
     flex-direction: row;
-    height: 70vh;
+    /* height: 70vh; */
     margin: 0 auto;
     flex-wrap: nowrap;
     overflow-x: auto;
@@ -140,32 +144,66 @@ body {
             > thead {
 
                 display: block;
+                > tr {
+                    display: flex;
+                    flex-direction: row;
+                    flex-wrap: nowrap;
+                }
                 .sn {
                     background-color: rgb(0, 0, 0);
                     color: white;
+                    > td {
+                        flex: 1;
+                    }
                 }
                 .wl {
                     font-size: 16px;
+                    > th {
+                        flex: 1;
+                    }
+                    > th:first-child {
+                        min-width: 50px;
+                        flex-grow: 0;
+                    }
                 }
-                .cell {
-                    display: flex;
-                    justify-content: space-around;
-                    width: 100px;
+                .desc {
+                    > th:first-child {
+                        min-width: 50px;
+                        flex-grow: 0;
+                    }
+                    .cell {
+                        display: flex;
+                        justify-content: space-around;
+                        > div {
+                            flex: 1;
+                            width: 50px;
+                        }
+                    }
                 }
-            }
-            > tbody::-webkit-scrollbar {
-                display: none;
+                
             }
             > tbody {
                 display:block;
                 width: 100%;
                 overflow: auto;
-                height: 350px;
+                max-height: 450px;
                 ::-webkit-scrollbar {
                     display: hidden;
                 }
 
-                .fiber {
+                > tr {
+                    display: flex;
+                    flex-direction: row;
+                    align-items: stretch;
+                    height: 30px;
+                }
+
+                > td:first-child {
+                    /* flex: 1; */
+                    align-self: center;
+                }
+
+                /* .fiber {
                     color: pink;
                     display: flex;
                     justify-content: end;
@@ -175,6 +213,11 @@ body {
                         width: 50px;
                         flex-shrink: 0;
                     }
+                } */
+
+                .cell.focused {
+                    border: 3px dashed lightgrey;
+                    /* background-color: red; */
                 }
 
                 .cell {
@@ -183,10 +226,11 @@ body {
                     justify-content: space-around;
                     align-items: center;
                     width: 100px;
-                    height: 100%;
+                    /* height: 100%; */
                     > div {
+                        width: 50px;
                         flex: 1;
-                        min-height: 30px;
+                        /* min-height: 30px; */
                         /* height: inherit; */
                     }
                 }
