@@ -127,7 +127,7 @@ body {
             background-color: white;
             border-spacing: 0;
             font-size: 22px;
-            border-radius: 20px;
+            border-radius: 10px;
             border: 2px solid #000;
             /* filter: drop-shadow(0 0 0.5rem grey); */
             text-align: center;
@@ -192,7 +192,7 @@ body {
                 display:block;
                 width: 100%;
                 overflow: auto;
-                max-height: 450px;
+                max-height: 360px;
                 ::-webkit-scrollbar {
                     display: hidden;
                 }
@@ -257,27 +257,6 @@ thead {
     /* border: 1px solid rgb(0, 0, 0); */
     position: sticky;
 }
-
-
-/* tbody {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    scroll-behavior: smooth;
-    scroll-snap-type: y mandatory;
-    overflow: scroll;
-} */
-
-/* tr.focused {
-    border: 2px solid black;
-} */
-
-
-
-/* td {
-    min-width: 50px;
-} */
 
 .cell_form {
     background-color: #00000000;

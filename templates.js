@@ -46,7 +46,7 @@ export function makeRow(d, f, oob = false) {
         `id="P${sn}-R${f}" ` +
         `hx-vals='{"row": ${f}}' ` +
         `${(oob) ? `hx-swap-oob="true"` : ""} ` +
-        `_="on htmx:afterSettle beep! I beep! <.cell:has(.focused)/> beep! I is equal to <.cell:has(.focused)/>" ` +
+        `_="on htmx:afterSettle if my lastElementChild match .focused then log 'child' go to the middle of me"` +
         `hx-swap="outerHTML">\n` +
         `<td>${f}</td>\n`
     for (let e = 1; e <= d.numEnds; e++) {
