@@ -42,15 +42,17 @@ export function makeTBody(d) {
 export function makeRow(d, f, oob = false) {
     let sn = d.sn
     let n = d.wavs.length
-    let out = `<tr class="r${(f == d.focusFiber && d.isActive) ? ((f - 1) % d.base + 1) + " focused" : ((f - 1) % d.base + 1)}" ` +
+    let out = `<tr class="r${((f - 1) % d.base + 1)}" ` +
         `id="P${sn}-R${f}" ` +
         `hx-vals='{"row": ${f}}' ` +
         `${(oob) ? `hx-swap-oob="true"` : ""} ` +
+        `_="on htmx:afterSettle beep! I beep! <.cell:has(.focused)/> beep! I is equal to <.cell:has(.focused)/>" ` +
         `hx-swap="outerHTML">\n` +
         `<td>${f}</td>\n`
     for (let e = 1; e <= d.numEnds; e++) {
         for (let i = 1; i <= n; i++) {
-            out += `<td class="cell" _="on click log 'clicked' take .focused" >` + makeCell(d, e, f, d.wavs[i - 1], "IL")
+            out += `<td class="cell${(f == d.focusFiber && d.isActive) ? " focused" : ""}" 
+                    _="on click log 'clicked' take .focused" >` + makeCell(d, e, f, d.wavs[i - 1], "IL")
             if (d.hasrl) {
                 out += makeCell(d, e, f, d.wavs[i - 1], "RL")
             }
@@ -79,7 +81,6 @@ export function makeCell(d, e, f, wl, type, oob = false, value) {
     return `<div id="${id}" class="${c}" ` +
         `hx-get="/cellForm?end=${e}&fiber=${f}&wl=${wl}&type=${type}" ` +
         `hx-trigger="click[target.className.includes('focused')]"` +
-        // `_="on click log 'clicked' take .focused" ` +
         `${(oob) ? ` hx-swap-oob="true" ` : ""}` +
         `hx-swap="innerHTML" ` +
         `>${content}</div>\n`
@@ -92,7 +93,7 @@ export function makeCellForm(e, f, wl, type) {
 }
 
 export function makeCard(d, oob = false, active = d.isActive) {
-    return `<li id="P${d.sn}-C" ${(oob) ? ` hx-swap-oob="true" ` : ""} hx-vals='{"sn": "${d.sn}"}' class="card"}>
+    return `<li id="P${d.sn}-C" ${(oob) ? ` hx-swap-oob="true" ` : ""} hx-vals='{"sn": "${d.sn}"}' class="card">
                 <div class="buttons">
                     <button class="material-icons">save_alt</button>
                     <button _="on click toggle .dark on the next <table/>" class="material-icons">visibility_off</button>
