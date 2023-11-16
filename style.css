@@ -204,6 +204,7 @@ body {
                     height: 30px;
                 }
 
+
                 > td:first-child {
                     /* flex: 1; */
                     align-self: center;

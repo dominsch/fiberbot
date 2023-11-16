@@ -16,10 +16,15 @@
     <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
     <script>
     // htmx.logAll();
-    document.body.addEventListener("htmx:afterSettle", function (evt) {
-        console.log(evt);
+    // document.body.addEventListener("click", function (evt) {
+    //     //alert(evt.detail.value);
+    //     let cl = evt.target.classList
+    //     console.log(cl, typeof(cl))
+    //     console.log(cl[1])
+    //     console.log(evt.target.className.includes("focused"))
+    //     console.log(evt);
         
-    })
+    // })
 
     document.body.addEventListener("keydown", function (evt) {
         if(evt.key == 'e' || evt.key == 'ArrowRight' || evt.key == 'ArrowLeft') {

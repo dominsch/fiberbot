@@ -51,12 +51,13 @@ export function makeRow(d, f, oob = false) {
         `<td>${f}</td>\n`
     for (let e = 1; e <= d.numEnds; e++) {
         for (let i = 1; i <= n; i++) {
-            out += `<td class="cell${(f == d.focusFiber && d.isActive) ? " focused" : ""}" 
-                    _="on click log 'clicked' take .focused" >` + makeCell(d, e, f, d.wavs[i - 1], "IL")
+            //on click log 'clicked' take .focused
+            out += `<td class="${(f == d.focusFiber && d.isActive) ? " focused" : ""}"
+                    _="on click log 'clicked' toggle .focused on me"><div class="cell">` + makeCell(d, e, f, d.wavs[i - 1], "IL")
             if (d.hasrl) {
                 out += makeCell(d, e, f, d.wavs[i - 1], "RL")
             }
-            out += `</td>`
+            out += `</div></td>`
 
         }
     }
