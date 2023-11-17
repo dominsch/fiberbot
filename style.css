@@ -109,13 +109,16 @@ body {
     scroll-behavior: smooth;
     scroll-snap-type: x mandatory;
     overflow: auto;
-    > .card {
+
+    >.card {
         height: 100%;
-        > .buttons {
+
+        >.buttons {
             margin: 8px;
             display: flex;
             justify-content: space-evenly;
-            > button {
+
+            >button {
                 background-color: #2196f3;
                 padding: 4px 8px;
                 border-radius: 5px;
@@ -123,7 +126,8 @@ body {
                 color: white;
             }
         }
-        > table {
+
+        >table {
             background-color: white;
             border-spacing: 0;
             font-size: 22px;
@@ -134,70 +138,83 @@ body {
             max-height: 80%;
             overflow: scroll;
             table-layout: fixed;
-            overflow:  hidden;
-            
-            
+            overflow: hidden;
+
+
             & td {
                 min-width: 50px;
             }
 
-            > thead {
+            >thead {
 
                 display: block;
-                > tr {
+
+                >tr {
                     display: flex;
                     flex-direction: row;
                     flex-wrap: nowrap;
-                    > th {
+
+                    >th {
                         padding: 0 !important;
                     }
-                    
+
                 }
+
                 .sn {
                     background-color: rgb(0, 0, 0);
                     color: white;
-                    > td {
+
+                    >td {
                         flex: 1;
                     }
                 }
+
                 .wl {
                     font-size: 16px;
-                    
-                    > th {
+
+                    >th {
                         flex: 1;
                     }
-                    > th:first-child {
+
+                    >th:first-child {
                         min-width: 50px;
                         flex-grow: 0;
                         padding: 0;
                     }
                 }
+
                 .desc {
-                    > th:first-child {
+                    >th:first-child {
                         min-width: 50px;
                         flex-grow: 0;
                     }
+
                     .cell {
                         display: flex;
                         justify-content: space-around;
-                        > div {
+
+                        >div {
                             flex: 1;
                             width: 50px;
                         }
                     }
                 }
-                
+
             }
-            > tbody {
-                display:block;
+
+            >tbody {
+                /* display:block; */
+                /* display:block; */
                 width: 100%;
                 overflow: auto;
                 max-height: 360px;
+                border-collapse: collapse;
+
                 ::-webkit-scrollbar {
                     display: hidden;
                 }
 
-                > tr {
+                >tr {
                     display: flex;
                     flex-direction: row;
                     align-items: stretch;
@@ -205,29 +222,51 @@ body {
                 }
 
 
-                > td:first-child {
-                    /* flex: 1; */
+                >td:first-child {
+                    flex: 1;
                     align-self: center;
                 }
 
+                /* &td {
+                    padding: 0;
+                } */
                 .focused {
-                    border: 3px dashed lightgrey;
+                    box-sizing: border-box;
+                }
+
+                --brdr: 3px dashed black;
+                .focused:not(:has(+ .focused)) {
+                    border-right: var(--brdr);
+                }
+
+                *:not(.focused)+.focused {
+                    border-left: var(--brdr);
+                }
+
+                *:not(tr:has(.focused))+tr:has(.focused)>.focused,
+                tr:has(.focused):first-of-type>.focused {
+                    border-top: var(--brdr);
+                }
+
+                & tr:has(.focused):not(:has(+ tr > .focused))>.focused{
+                    border-bottom: var(--brdr);
                 }
 
                 .cell {
                     display: flex;
                     padding: 0;
-                    box-sizing: border-box;
+                    
                     justify-content: space-around;
                     align-items: center;
                     width: 100px;
-                    > div {
+
+                    >div {
                         width: 50px;
                         flex: 1;
                     }
                 }
             }
-            
+
 
         }
 
