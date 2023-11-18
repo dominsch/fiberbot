@@ -26,7 +26,8 @@ export function makeTable(d, oob = false) {
                     </th>`
         })
     }
-    out = out + `</tr></thead><tbody id="P${sn}-B" _="on scroll log 'scrolled' remove .focused from .focused">` + makeTBody(d) + `</tbody>`
+    // _="on scroll log 'scrolled' remove .focused from .focused"
+    out = out + `</tr></thead><tbody id="P${sn}-B">` + makeTBody(d) + `</tbody>`
     return out
 }
 
@@ -52,12 +53,12 @@ export function makeRow(d, f, oob = false) {
     for (let e = 1; e <= d.numEnds; e++) {
         for (let i = 1; i <= n; i++) {
             //on click log 'clicked' take .focused
-            out += `<td class="${(f == d.focusFiber && d.isActive) ? " focused" : ""}"
-                    _="on click log 'clicked' toggle .focused on me"><div class="cell">` + makeCell(d, e, f, d.wavs[i - 1], "IL")
+            out += `<td class="cell${(f == d.focusFiber && e == d.focusEnd && d.isActive) ? " focused" : ""}"
+                    _="on click log 'clicked' toggle .focused on me">` + makeCell(d, e, f, d.wavs[i - 1], "IL")
             if (d.hasrl) {
                 out += makeCell(d, e, f, d.wavs[i - 1], "RL")
             }
-            out += `</div></td>`
+            out += `</td>`
 
         }
     }
@@ -78,7 +79,7 @@ export function makeCell(d, e, f, wl, type, oob = false, value) {
     } else {
         (type == "IL" && content > d.maxIL || type == "RL" && content < d.minRL) ? c = "bad" : c = "good"
     }
-    // console.log(type, content, sess.maxIL, sess.minRL, c)
+    // console.log("log", id, d.isActive, e, d.focusEnd, f, d.focusFiber, wl, type, (f == d.focusFiber && e == d.focusEnd && d.isActive))
     return `<div id="${id}" class="${c}" ` +
         `hx-get="/cellForm?end=${e}&fiber=${f}&wl=${wl}&type=${type}" ` +
         `hx-trigger="click[target.className.includes('focused')]"` +

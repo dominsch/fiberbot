@@ -116,13 +116,15 @@ body {
         >.buttons {
             margin: 8px;
             display: flex;
+            row-gap: 10px;
             justify-content: space-evenly;
 
             >button {
+                flex-basis: 30%;
                 background-color: #2196f3;
                 padding: 4px 8px;
                 border-radius: 5px;
-                font-size: 12px;
+                font-size: 20px;
                 color: white;
             }
         }
@@ -204,7 +206,7 @@ body {
 
             >tbody {
                 /* display:block; */
-                /* display:block; */
+                display:block;
                 width: 100%;
                 overflow: auto;
                 max-height: 360px;
@@ -227,35 +229,30 @@ body {
                     align-self: center;
                 }
 
-                /* &td {
-                    padding: 0;
-                } */
-                .focused {
-                    box-sizing: border-box;
-                }
 
-                --brdr: 3px dashed black;
+                --border-A: 2px solid black;
+                --border-B: 2px dashed black;
                 .focused:not(:has(+ .focused)) {
-                    border-right: var(--brdr);
+                    border-right: var(--border-A);
                 }
 
                 *:not(.focused)+.focused {
-                    border-left: var(--brdr);
+                    border-left: var(--border-A);
                 }
 
                 *:not(tr:has(.focused))+tr:has(.focused)>.focused,
                 tr:has(.focused):first-of-type>.focused {
-                    border-top: var(--brdr);
+                    border-top: var(--border-A);
                 }
 
                 & tr:has(.focused):not(:has(+ tr > .focused))>.focused{
-                    border-bottom: var(--brdr);
+                    border-bottom: var(--border-A);
                 }
 
                 .cell {
                     display: flex;
-                    padding: 0;
-                    
+                    padding: 4;
+                    box-sizing: border-box;
                     justify-content: space-around;
                     align-items: center;
                     width: 100px;
