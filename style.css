@@ -251,7 +251,7 @@ body {
 
                 
                 --border-A: 2px solid black;
-                --border-B: 2px dashed black;
+                --border-B: 2px dashed rgb(173, 173, 173);
                 .focused:not(:has(+ .focused)) {
                     border-right: var(--border-A);
                 }
@@ -267,6 +267,25 @@ body {
 
                 & tr:has(.focused):not(:has(+ tr > .focused))>.focused{
                     border-bottom: var(--border-A);
+                }
+
+
+
+                .next:not(:has(+ .next)) {
+                    border-right: var(--border-B);
+                }
+
+                *:not(.next)+.next {
+                    border-left: var(--border-B);
+                }
+
+                *:not(tr:has(.next))+tr:has(.next)>.next,
+                tr:has(.next):first-of-type>.next {
+                    border-top: var(--border-B);
+                }
+
+                & tr:has(.next):not(:has(+ tr > .next))>.next{
+                    border-bottom: var(--border-B);
                 }
 
                 .cell {

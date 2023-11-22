@@ -212,17 +212,23 @@ export function makeRow(d, f, oob = false) {
         </tr>`
 }
 
-export function makeCellOuter(d, e, f, wl, oob = false){
+export function makeCellOuter(d, e, f, wl, oob = false, iscurrent = false, isnext = false){
+    console.log(d.sn, e, f, wl, oob)
+    let c = "" //(f == d.focusFiber && e == d.focusEnd && d.isActive) ? " focused" : ""
+    if (iscurrent) c = " focused"
+    if (isnext) c = " next"
     return /*html*/`
-        <td class="cell${(f == d.focusFiber && e == d.focusEnd && d.isActive) ? " focused" : ""}"
+        <td id="P${d.sn}-E${e}-F${f}-${wl}" class="cell${c}"
             hx-vals='{"end": "${e}", "fiber": ${f}, "wl": "${wl}"}'
-            _="on click if I do not match <:has(>form)/> then toggle .focused on me">
+            _="on click if I do not match <:has(>form)/> then toggle .focused on me"
+            ${(oob) ? ` hx-swap-oob="true" ` : ""}>
             ${makeCellInner(d, e, f, wl, "IL", oob)}
             ${(d.hasrl) ? makeCellInner(d, e, f, wl, "RL", oob) : ""}
         </td>`
 }
 
 export function makeCellInner(d, e, f, wl, type, oob = false, value) {
+    console.log(d.sn, e, f, wl, type,  oob)
     let c, content
     if (value) {
         console.log("value", value)

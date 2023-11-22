@@ -3,9 +3,12 @@ import { copyFileSync } from "fs"
 export class Session {
     constructor(instrument) {
         this.instrument = instrument
-        this.activeDUT = 0
-        this.activeRow = 1
-        this.activeEnd = 1
+        this.currentDUT = 0
+        this.currentFiber = 1
+        this.currentEnd = 1
+        this.nextDUT = 1
+        this.nextFiber = 2
+        this.nextEnd = 1
         this.numEnds = 1
         this.numFibers = 12
         this.firstSN = 1292001
@@ -13,6 +16,9 @@ export class Session {
         this.maxIL = 0.4
         this.minRL = 55
         this.base = 12
+        this.next = "fiber"
+        this.backwards = false
+        this.autoAdvance = true
         this.WL = 1550
         this.IL = -100
         this.RL = -100
@@ -40,7 +46,7 @@ export class Session {
                                     this.minRL,
                                     this.base,
                                     1,
-                                    i==this.activeDUT)
+                                    i==this.currentDUT)
         }
     }
     getDUT(sn) {
@@ -49,21 +55,49 @@ export class Session {
         }
     }
     getActiveDUT() {
-        return this.DUTs[this.activeDUT]
+        return this.DUTs[this.currentDUT]
     }
     nextDUT() {
-        if (this.activeDUT < this.DUTs.length - 1) {
+        if (this.currentDUT < this.DUTs.length - 1) {
             this.getActiveDUT().isActive = false
-            this.activeDUT++
+            this.currentDUT++
             this.getActiveDUT().isActive = true
         }
     }
     prevDUT() {
-        if (this.activeDUT > 0) {
+        if (this.currentDUT > 0) {
             this.getActiveDUT().isActive = false
-            this.activeDUT--
+            this.currentDUT--
             this.getActiveDUT().isActive = true
         }
+    }
+    advance() {
+        if (this.autoAdvance) {
+            console.log("before", this.currentEnd, this.currentFiber, this.nextEnd, this.nextFiber)
+            switch(this.next) {
+                case "end":
+                    this.currentEnd = this.nextEnd
+                    this.nextEnd += 1
+                case "fiber":
+                    this.currentFiber = this.nextFiber
+                    if (!this.backwards) {
+                        this.nextFiber += 1
+                    } else {
+                        this.nextFiber -= 1
+                    }
+                    break;
+                // case "wl":
+                //     this.currentEnd = this.nextEnd
+                //     this.nextEnd += 1
+                // case "dut":
+                //     this.currentEnd = this.nextEnd
+                //     this.nextEnd += 1
+
+            }
+            console.log("after", this.currentEnd, this.currentFiber, this.nextEnd, this.nextFiber)
+            return true
+        }
+        return false
     }
 }
 

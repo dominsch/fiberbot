@@ -81,18 +81,24 @@ const server = Bun.serve({
                 if (sess.RL > d.RL[d.focusEnd][d.focusFiber][d.wavs[0]]) d.RL[d.focusEnd][d.focusFiber][d.wavs[0]] = sess.RL
                 return new Response(makeRow(d, d.focusFiber, true))
             case "/capend":
-                if(sess.numFibers > 2) {
-                    let prevf = d.focusFiber
-                    if (!d.next()) {
-                        res = makeCard(sess.DUTs[sess.activeDUT], true, false)
-                        sess.nextDUT()
-                        res = res + makeCard(sess.DUTs[sess.activeDUT], true)
-                        return new Response(res)
-                    }
-                    res = makeRow(d, prevf, true) + makeRow(d, d.focusFiber, true)
-                    return new Response(res)
+                // if(sess.numFibers > 2) {
+                //     let prevf = d.focusFiber
+                //     if (!d.next()) {
+                //         res = makeCard(sess.DUTs[sess.currentDUT], true, false)
+                //         sess.nextDUT()
+                //         res = res + makeCard(sess.DUTs[sess.currentDUT], true)
+                //         return new Response(res)
+                //     }
+                //     res = makeRow(d, prevf, true) + makeRow(d, d.focusFiber, true)
+                //     return new Response(res)
+                // }
+                // return new Response(makeCellOuter(d, d.focusEnd, d.focusFiber, d.wavs[0], true))
+                if(sess.advance()) {
+                    res += makeCellOuter(d, sess.nextEnd, sess.nextFiber, d.wavs[0], true, false, true)
                 }
-                return new Response(makeCellOuter(d, d.focusEnd, d.focusFiber, d.wavs[0], true))
+                res += makeCellOuter(d, sess.currentEnd, sess.currentFiber, d.wavs[0], true, true)
+                
+                return new Response(res)
             case "/tab":
                 d = sess.getDUT(sp.sn)
                 return new Response(makeTable(d))
