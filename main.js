@@ -1,4 +1,4 @@
-import {makeLive, makeCell, makeCellForm, makeRow, makeTable, makeForm, makeCard} from './templates.js'
+import {makeLive, makeCellInner, makeCellInnerForm, makeRow, makeTable, makeForm, makeCard, makeCompactCard, makeCellOuter} from './templates.js'
 import {InstrumentManager} from './InstrumentManager.js'
 import {Session} from './SessionManager.js'
 import {makeCSV} from './csv.js'
@@ -19,147 +19,123 @@ let sess = new Session("MAP104")
 const server = Bun.serve({
     port: 3000,
     fetch(req) {
-        //console.log(req)
         const url = new URL(req.url);
-        console.log(url.pathname, url.searchParams)
-        let sn = parseInt(url.searchParams.get('sn'))
-        let end = parseInt(url.searchParams.get('end'))
-        let row = parseInt(url.searchParams.get('fiber'))
-        let wl = parseInt(url.searchParams.get('wl'))
-        let type = url.searchParams.get('type')
-        let val = url.searchParams.get('content')
-
-        if (url.pathname === "/") return new Response(Bun.file("table.html"));
-        if (url.pathname === "/style.css") return new Response(Bun.file("style.css"));
-        if (url.pathname === "/digital.woff2") return new Response(Bun.file("media/subset-Digital-7Mono.woff2"));
-        if (url.pathname === "/form") {
-            let firstSN = parseInt(url.searchParams.get('firstSN'))
-            let lastSN = parseInt(url.searchParams.get('lastSN'))
-            let numFibers = parseInt(url.searchParams.get('numFibers'))
-            let base = parseInt(url.searchParams.get('base'))
-            let numEnds = parseInt(url.searchParams.get('numEnds'))
-            let wl = parseInt(url.searchParams.get('wl'))
-            let maxIL = parseFloat(url.searchParams.get('maxIL'))
-            let minRL = parseInt(url.searchParams.get('minRL'))
-            sess.configure(firstSN, lastSN, numFibers, base, numEnds, maxIL, minRL, wl)
-            sess.makeDUTs()
-            sess.startTime = new Date(Date.now())
-            return new Response("", {
-                headers: { "HX-Trigger": "newsettings" }
-            })
-        }
-        if (url.pathname === "/cards") {
-            let res = ""
-            for (let dut of sess.DUTs) {
-                res += makeCard(dut)
-            }
-            return new Response(res)
-        }
-        if (url.pathname === "/settings") {
-            return new Response(makeForm(sess))
-        }
-        if (url.pathname === "/clear") {
-            let scope = url.searchParams.get('scope')
-            let d = sess.getActiveDUT()
-            console.log(scope)
-            switch (scope) {
-                case "row":
-                    d.clearFiber(d.focusFiber)
-                    return new Response(makeRow(d, d.focusFiber, true));
-                case "dut":
-                    if(sn) d = sess.getDUT(url.searchParams.get('sn'))
-                    d.clearAll()
-                    d.focusFiber = 1
-                    return new Response(makeCard(d, true));
-                case "all":
-                    sess.getActiveDUT().focus = 1
-                    sess.getActiveDUT().isActive = false
-                    sess.activeDUT = 0
-                    sess.getActiveDUT().focus = 1
-                    sess.getActiveDUT().isActive = true
-                    let res = ""
-                    for (let d of sess.DUTs) {
-                        d.clearAll()
-                        res = res + makeCard(d, true)
-                    }
-                    return new Response(res)
-            }
-        }
-        if (url.pathname === "/ping") {
-            makeCSV(sess.DUTs, sess)
-            return new Response("pong", {
-                headers: { "HX-Trigger": "pong" }
-            })
-        }
-        if (url.pathname === "/cap") {
-            let d = sess.getActiveDUT()
-            if (sess.IL < Math.abs(d.IL[d.focusEnd][d.focusFiber][d.wavs[0]])) d.IL[d.focusEnd][d.focusFiber][d.wavs[0]] = sess.IL
-            if (sess.RL > d.RL[d.focusEnd][d.focusFiber][d.wavs[0]]) d.RL[d.focusEnd][d.focusFiber][d.wavs[0]] = sess.RL
-            return new Response(makeRow(d, d.focusFiber, true))
-        }
-        if (url.pathname === "/capend") {
-            let d = sess.getActiveDUT()
-            let prevf = d.focusFiber
-            if (!d.next()) {
-                let res = makeCard(sess.DUTs[sess.activeDUT], true, false)
-                sess.nextDUT()
-                res = res + makeCard(sess.DUTs[sess.activeDUT], true)
+        // const [_, base, endpoint] = url.pathname.split("/")
+        // console.log(base, endpoint)
+        
+        const sp = Object.fromEntries(url.searchParams)
+        console.log("url", url.pathname, "params:", sp, url.searchParams)
+        let d = sess.getActiveDUT()
+        let res = ""
+        
+        switch(url.pathname) {
+            case "/": return new Response(Bun.file("table.html"))
+            case "/style.css": return new Response(Bun.file("style.css"))
+            case "/digital.woff2": return new Response(Bun.file("media/subset-Digital-7Mono.woff2"))
+            case "/submit/settings":
+                sess.configure(sp.firstSN, sp.lastSN, sp.numFibers, sp.base, sp.numEnds, sp.maxIL, sp.minRL, sp.wl)
+                sess.makeDUTs()
+                sess.startTime = new Date(Date.now())
+                return new Response("", {headers: { "HX-Trigger": "update-cards" }})
+            case "/submit/cellInnerForm":
+                d =sess.getDUT(sp.sn)
+                return new Response(makeCellInner(d, sp.end, sp.fiber, sp.wl, sp.type, false, sp.value))
+            case "/clear/row":
+                d.clearFiber(d.focusFiber)
+                return new Response(makeRow(d, d.focusFiber, true));
+            case "/clear/dut":
+                d =sess.getDUT(sp.sn)
+                d.clearAll()
+                d.focusFiber = 1
+                return new Response(makeCard(d, true));
+            case "/clear/all":
+                sess.makeDUTs()
+                for (let d of sess.DUTs) {
+                    res = res + makeCard(d, true)
+                }
                 return new Response(res)
-            }
-            let res = makeRow(d, prevf, true) + makeRow(d, d.focusFiber, true)
-            return new Response(res)
-        }
-        if (url.pathname === "/next") {
-            let d = sess.getActiveDUT()
-            console.log("next #1", d.ends, d.focusEnd, d.fibers, d.focusFiber)
-            let prevf = d.focusFiber
-            d.next()
-            let res = makeRow(d, prevf, true) + makeRow(d, d.focusFiber, true)
-            console.log("next #2", d.ends, d.focusEnd, d.fibers, d.focusFiber)
-            return new Response(res)
-        }
-        if (url.pathname === "/nextDUT") {
-            let res = makeCard(sess.DUTs[sess.activeDUT], true, false)
-            sess.nextDUT()
-            res = res + makeCard(sess.DUTs[sess.activeDUT], true)
-            return new Response(res)
-        }
-        if (url.pathname === "/prev") {
-            let d = sess.getActiveDUT()
-            let prevf = d.focusFiber
-            d.prev()
-            let res = makeRow(d, prevf, true) + makeRow(d, d.focusFiber, true)
-            return new Response(res);
-        }
-        if (url.pathname === "/prevDUT") {
-            let res = makeCard(sess.DUTs[sess.activeDUT], true, false)
-            sess.prevDUT()
-            res = res + makeCard(sess.DUTs[sess.activeDUT], true)
-            return new Response(res)
-        }
-        if (url.pathname === "/live") {
-            return new Response(makeLive(sess, im));
-        }
-        if (url.pathname === "/tab") {
-            let d = sess.getDUT(url.searchParams.get('sn'))
-            return new Response(makeTable(d));
-        }
-        if (url.pathname === "/row") {
-            let d = sess.getDUT(url.searchParams.get('sn'))
-            return new Response(makeRow(d, row, true));
-        }
-        if (url.pathname === "/cell") {
-            if (val != null && val != "" && val) console.log("old val", val)
-            let type = url.searchParams.get('type')
-            return new Response(makeCell(d, end, row, wl, type, val));
-        }
-        if (url.pathname === "/cellForm") {
-            return new Response(makeCellForm(end, row, wl, type))
-        }
-        if (url.pathname === "/cellSubmit") {
-            let d =sess.getDUT(sn)
-            return new Response(makeCell(d, end, row, wl, type, true, val))
+            case "/flush/dut":
+                // let sn = sp.id.match(/(\d+)/g)[0]
+                makeCSV([sess.getDUT(sp.sn)], sess)
+                return new Response("")
+            case "/flush/all":
+                makeCSV(sess.DUTs, sess)
+                return new Response("")
+            case "/cards":
+                if(sess.numFibers > 2) {
+                    for (let dut of sess.DUTs) {
+                        res += makeCard(dut)
+                    }
+                } else {
+                    res = makeCompactCard(sess.DUTs)
+                }
+                return new Response(res)
+            case "/settings":
+                return new Response(makeForm(sess))
+            case "/ping":
+                return new Response("pong", { headers: { "HX-Trigger": "pong" }})
+            case "/cap":
+                if (sess.IL < Math.abs(d.IL[d.focusEnd][d.focusFiber][d.wavs[0]])) d.IL[d.focusEnd][d.focusFiber][d.wavs[0]] = sess.IL
+                if (sess.RL > d.RL[d.focusEnd][d.focusFiber][d.wavs[0]]) d.RL[d.focusEnd][d.focusFiber][d.wavs[0]] = sess.RL
+                return new Response(makeRow(d, d.focusFiber, true))
+            case "/capend":
+                if(sess.numFibers > 2) {
+                    let prevf = d.focusFiber
+                    if (!d.next()) {
+                        res = makeCard(sess.DUTs[sess.activeDUT], true, false)
+                        sess.nextDUT()
+                        res = res + makeCard(sess.DUTs[sess.activeDUT], true)
+                        return new Response(res)
+                    }
+                    res = makeRow(d, prevf, true) + makeRow(d, d.focusFiber, true)
+                    return new Response(res)
+                }
+                return new Response(makeCellOuter(d, d.focusEnd, d.focusFiber, d.wavs[0], true))
+            case "/tab":
+                d = sess.getDUT(sp.sn)
+                return new Response(makeTable(d))
+            case "/cellInnerForm":
+                d = sess.getDUT(sp.sn)
+                return new Response(makeCellInnerForm(d, sp.end, sp.fiber, sp.wl, sp.type))
+            case "/live":
+                return new Response(makeLive(sess, im))
+                
         }
     },
 });
 
+function focus() {
+    
+}
+
+
+
+
+// if (url.pathname === "/next") {
+//     let d = sess.getActiveDUT()
+//     console.log("next #1", d.numEnds, d.focusEnd, d.numFibers, d.focusFiber)
+//     let prevf = d.focusFiber
+//     d.next()
+//     let res = makeRow(d, prevf, true) + makeRow(d, d.focusFiber, true)
+//     console.log("next #2", d.numEnds, d.focusEnd, d.numFibers, d.focusFiber)
+//     return new Response(res)
+// }
+// if (url.pathname === "/nextDUT") {
+//     let res = makeCard(sess.DUTs[sess.activeDUT], true, false)
+//     sess.nextDUT()
+//     res = res + makeCard(sess.DUTs[sess.activeDUT], true)
+//     return new Response(res)
+// }
+// if (url.pathname === "/prev") {
+//     let d = sess.getActiveDUT()
+//     let prevf = d.focusFiber
+//     d.prev()
+//     let res = makeRow(d, prevf, true) + makeRow(d, d.focusFiber, true)
+//     return new Response(res);
+// }
+// if (url.pathname === "/prevDUT") {
+//     let res = makeCard(sess.DUTs[sess.activeDUT], true, false)
+//     sess.prevDUT()
+//     res = res + makeCard(sess.DUTs[sess.activeDUT], true)
+//     return new Response(res)
+// }

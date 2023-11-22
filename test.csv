@@ -1,9 +1,9 @@
-PART#,2X12f-1550
+PART#,2X1f-850
 TESTER,Anon
 CHASSIS,MAP104
 MODULE,123
-START,2023-11-02 14:56:59
-FINISH,2023-11-02 14:57:11
+START,2023-11-19 17:44:14
+FINISH,2023-11-19 17:44:20
 CUSTOM1,
 CUSTOM2,
 CUSTOM3,
@@ -12,52 +12,8 @@ CUSTOM5,
 NOTES,
 
 RESULTS,,,IL(dB),RL(dB)
-SERIAL#,INPUT,OUTPUT,1550nm,1550nm
-1292001,Fiber 1 End A,Fiber 1 End B,0.08,65
-1292001,Fiber 2 End A,Fiber 2 End B,0.36,60
-1292001,Fiber 3 End A,Fiber 3 End B,0.23,65
-1292001,Fiber 4 End A,Fiber 4 End B,0.23,65
-1292001,Fiber 5 End A,Fiber 5 End B,0.45,65
-1292001,Fiber 6 End A,Fiber 6 End B,0.45,65
-1292001,Fiber 7 End A,Fiber 7 End B,0.45,63
-1292001,Fiber 8 End A,Fiber 8 End B,0.45,63
-1292001,Fiber 9 End A,Fiber 9 End B,0.33,50
-1292001,Fiber 10 End A,Fiber 10 End B,0.33,50
-1292001,Fiber 11 End A,Fiber 11 End B,0.3,50
-1292001,Fiber 12 End A,Fiber 12 End B,0.3,50
-1292001,Fiber 1 End B,Fiber 1 End A,0.36,60
-1292001,Fiber 2 End B,Fiber 2 End A,0.36,60
-1292001,Fiber 3 End B,Fiber 3 End A,0.23,65
-1292001,Fiber 4 End B,Fiber 4 End A,0.23,65
-1292001,Fiber 5 End B,Fiber 5 End A,0.45,65
-1292001,Fiber 6 End B,Fiber 6 End A,0.45,65
-1292001,Fiber 7 End B,Fiber 7 End A,0.45,63
-1292001,Fiber 8 End B,Fiber 8 End A,0.33,50
-1292001,Fiber 9 End B,Fiber 9 End A,0.33,50
-1292001,Fiber 10 End B,Fiber 10 End A,0.3,50
-1292001,Fiber 11 End B,Fiber 11 End A,0.3,50
-1292001,Fiber 12 End B,Fiber 12 End A,0.3,50
-1292002,Fiber 1 End A,Fiber 1 End B,0.3,50
-1292002,Fiber 2 End A,Fiber 2 End B,0.37,64
-1292002,Fiber 3 End A,Fiber 3 End B,0.11,64
-1292002,Fiber 4 End A,Fiber 4 End B,0.11,64
-1292002,Fiber 5 End A,Fiber 5 End B,0.11,64
-1292002,Fiber 6 End A,Fiber 6 End B,0.11,64
-1292002,Fiber 7 End A,Fiber 7 End B,0.11,57
-1292002,Fiber 8 End A,Fiber 8 End B,0.22,58
-1292002,Fiber 9 End A,Fiber 9 End B,0.22,58
-1292002,Fiber 10 End A,Fiber 10 End B,0.47,59
-1292002,Fiber 11 End A,Fiber 11 End B,0.47,59
-1292002,Fiber 12 End A,Fiber 12 End B,0.13,53
-1292002,Fiber 1 End B,Fiber 1 End A,0.37,64
-1292002,Fiber 2 End B,Fiber 2 End A,0.37,64
-1292002,Fiber 3 End B,Fiber 3 End A,0.11,64
-1292002,Fiber 4 End B,Fiber 4 End A,0.11,64
-1292002,Fiber 5 End B,Fiber 5 End A,0.11,64
-1292002,Fiber 6 End B,Fiber 6 End A,0.11,57
-1292002,Fiber 7 End B,Fiber 7 End A,0.11,57
-1292002,Fiber 8 End B,Fiber 8 End A,0.22,58
-1292002,Fiber 9 End B,Fiber 9 End A,0.22,58
-1292002,Fiber 10 End B,Fiber 10 End A,0.47,59
-1292002,Fiber 11 End B,Fiber 11 End A,0.47,59
-1292002,Fiber 12 End B,Fiber 12 End A,0.26,65
+SERIAL#,INPUT,OUTPUT,850nm,850nm
+1292001,Fiber 1 End A,Fiber 1 End B,,
+1292001,Fiber 1 End B,Fiber 1 End A,,
+1292002,Fiber 1 End A,Fiber 1 End B,,
+1292002,Fiber 1 End B,Fiber 1 End A,,

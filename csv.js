@@ -3,7 +3,7 @@ export async function makeCSV(duts, sess) {
     let chassis = sess.instrument
     let start = sess.startTime
     let end = new Date(Date.now())
-    let partName = "" + duts[0].ends + "X" + duts[0].fibers + "f" 
+    let partName = "" + duts[0].numEnds + "X" + duts[0].numFibers + "f" 
     let wlString = ""
     for (let wl of duts[0].wavs) {
         wlString += `,${wl}nm`
@@ -31,17 +31,20 @@ SERIAL#,INPUT,OUTPUT${wlString}\n`
 
     let results = ""
     for(let d of duts) {
-        for (let e = 1; e <= d.ends; e++) {
-            for (let f = 1; f <= d.fibers; f++) {
+        for (let e = 1; e <= d.numEnds; e++) {
+            for (let f = 1; f <= d.numFibers; f++) {
                 results += `${d.sn},Fiber ${f} End ${(e==1) ? "A" : "B"},Fiber ${f} End ${(e==1) ? "B" : "A"}`
                 for (let wl of d.wavs) {
-                    results += `,${d.IL[e][f][wl]}`
+                    let entry = d.IL[e][f][wl]
+                    results += (entry == "-100") ? "," : `,${entry}`
                 }
-                if (d.hasrl) {
-                    for (let wl of d.wavs) {
-                        results += d.hasrl ? `,${d.RL[e][f][wl]}\n` : "\n"
+                for (let wl of d.wavs) {
+                    if (d.hasrl) {
+                        let entry = d.RL[e][f][wl]
+                        results += (entry == "-100") ? "," : `,${entry}`
                     }
                 }
+                results += "\n"
             }
         }
     }

@@ -1,3 +1,5 @@
+import { copyFileSync } from "fs"
+
 export class Session {
     constructor(instrument) {
         this.instrument = instrument
@@ -17,14 +19,14 @@ export class Session {
         this.DUTs = []
     }
     configure(firstSN, lastSN, numFibers, base, numEnds, maxIL, minRL, wl) {
-        this.firstSN = firstSN
-        this.lastSN = lastSN
-        this.numFibers = numFibers
-        this.base = base
-        this.numEnds = numEnds
-        this.maxIL = maxIL
-        this.minRL = minRL
-        this.WL = wl
+        this.firstSN = parseInt(firstSN)
+        this.lastSN = parseInt(lastSN)
+        this.numFibers = parseInt(numFibers)
+        this.base = parseInt(base)
+        this.numEnds = parseInt(numEnds)
+        this.maxIL = parseFloat(maxIL)
+        this.minRL = parseInt(minRL)
+        this.WL = parseInt(wl)
     }
     makeDUTs() {
         this.DUTs = []
@@ -34,7 +36,6 @@ export class Session {
                                     this.numFibers,
                                     [this.WL],
                                     true,
-                                    this.numEnds,
                                     this.maxIL,
                                     this.minRL,
                                     this.base,
@@ -67,13 +68,12 @@ export class Session {
 }
 
 class DUT {
-    constructor(sn, ends, fibers, wavs, hasrl, numEnds, maxIL, minRL, base, focus, isActive) {
+    constructor(sn, numEnds, numFibers, wavs, hasrl, maxIL, minRL, base, focus, isActive) {
         this.sn = sn
-        this.fibers = fibers
-        this.ends = ends
+        this.numFibers = numFibers
+        this.numEnds = numEnds
         this.wavs = wavs
         this.hasrl = hasrl
-        this.numEnds = numEnds
         this.maxIL = maxIL
         this.minRL = minRL
         this.base = base
@@ -85,14 +85,14 @@ class DUT {
         this.clearAll()
     }
     clearAll() {
-        for (let e = 1; e <= this.ends; e++) {
+        for (let e = 1; e <= this.numEnds; e++) {
             this.clearEnd(e)
         }
     }
     clearEnd(e) {
         this.IL[e] = []
         this.RL[e] = []
-        for (let f = 1; f <= this.fibers; f++) {
+        for (let f = 1; f <= this.numFibers; f++) {
             this.clearFiber(f, e)
         }
     }
@@ -105,8 +105,8 @@ class DUT {
         })
     }
     next() {
-        if (this.focusEnd == this.ends) {
-           if (this.focusFiber >= this.fibers) {
+        if (this.focusEnd == this.numEnds) {
+           if (this.focusFiber >= this.numFibers) {
                 this.focusFiber = 1
                 return false
             }
@@ -123,12 +123,12 @@ class DUT {
     prev() {
         if (this.focusEnd == 1) {
             if (this.focusFiber <= 1) {
-                this.focusFiber = this.fibers
+                this.focusFiber = this.numFibers
                 return false
             }
             else {
                 this.focusFiber--
-                if (this.ends > 1) this.focusEnd++
+                if (this.numEnds > 1) this.focusEnd++
                 return true
             }
         } else {

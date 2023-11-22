@@ -24,6 +24,7 @@
 body {
     margin: 0;
     padding: 0;
+    z-index: 1;
     font-family: 'Roboto';
 }
 
@@ -88,7 +89,7 @@ body {
 
 
 .live {
-    position: absolute;
+    position: fixed;
     bottom: 0;
     font-family: "digital", monospace;
     font-size: 20px;
@@ -109,6 +110,7 @@ body {
     scroll-behavior: smooth;
     scroll-snap-type: x mandatory;
     overflow: auto;
+
 
     >.card {
         height: 100%;
@@ -145,6 +147,15 @@ body {
 
             & td {
                 min-width: 50px;
+            }
+
+            .compact .buttons {
+                display: none;
+            }
+            .compact >tr >*:first-child {
+                min-width: 150px !important;
+                background-color: rgb(0, 0, 0);
+                    color: white;
             }
 
             >thead {
@@ -204,6 +215,8 @@ body {
 
             }
 
+        
+
             >tbody {
                 /* display:block; */
                 display:block;
@@ -211,10 +224,6 @@ body {
                 overflow: auto;
                 max-height: 360px;
                 border-collapse: collapse;
-
-                ::-webkit-scrollbar {
-                    display: hidden;
-                }
 
                 >tr {
                     display: flex;
@@ -230,6 +239,9 @@ body {
                 }
 
 
+
+
+                
                 --border-A: 2px solid black;
                 --border-B: 2px dashed black;
                 .focused:not(:has(+ .focused)) {
@@ -257,10 +269,36 @@ body {
                     align-items: center;
                     width: 100px;
 
-                    >div {
+                    > div, > form {
                         width: 50px;
+                        height: 30px;
                         flex: 1;
+                        
+                        >input{
+                            background-color: inherit;
+                            outline-style: none;
+                            border: inherit;
+                            color: inherit;
+                            font: inherit;
+                            text-align: inherit;
+                            padding: 0;
+                            height: 100%;
+                            width: 100%;
+                        }
+                        > input::-webkit-inner-spin-button {
+                            -webkit-appearance: none;
+                        }
+                        >input[type=submit]{
+                            display: none;
+                        }
                     }
+                }
+
+                .cell_input {
+                    border: none;
+                    margin: 0;
+                    justify-content: center;
+                    width: 45px;
                 }
             }
 
@@ -270,6 +308,7 @@ body {
 
     }
 }
+
 
 #card-container li.center {
     scroll-snap-align: center;
@@ -295,9 +334,9 @@ thead {
     position: sticky;
 }
 
-.cell_form {
+/* .cell_form {
     background-color: #00000000;
-}
+} */
 
 .cell_input {
     border: none;
@@ -314,6 +353,10 @@ thead {
 .bad {
     color: red;
 }
+
+/* *:focus {
+    background-color: black !important;
+  } */
 
 
 
