@@ -71,6 +71,37 @@ export class Session {
             this.getActiveDUT().isActive = true
         }
     }
+    nextFiber() {
+        if (this.currentFiber < this.numFibers) {
+            this.currentFiber++
+        } else {
+            this.currentFiber = 1
+            this.nextDUT()
+        }
+    }
+    prevDUT() {
+        if (this.currentDUT > 0) {
+            this.getActiveDUT().isActive = false
+            this.currentDUT--
+            this.getActiveDUT().isActive = true
+        }
+    }
+    nextEnd() {
+        if (this.currentEnd < this.numEnd) {
+            this.currentEnd++
+        } else {
+            this.currentEnd = 1
+            this.nextDUT()
+        }
+    }
+    prevEnd() {
+        if (this.currentEnd <= 1) {
+            this.currentEnd--
+        } else {
+            this.currentEnd = this.numEnd
+            this.prevDUT()
+        }
+    }
     advance() {
         if (this.autoAdvance) {
             console.log("before", this.currentEnd, this.currentFiber, this.nextEnd, this.nextFiber)
