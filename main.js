@@ -1,4 +1,4 @@
-import {makeLive, makeCellInner, makeCellInnerForm, makeRow, makeTable, makeForm, makeCard, makeCompactCard, makeCellOuter} from './templates.js'
+import {makeLive, makeCellInner, makeCellInnerForm, makeRow, makeTable, makeSettingsForm, makeNavigationForm, makeCard, makeCompactCard, makeCellOuter} from './templates.js'
 import {InstrumentManager} from './InstrumentManager.js'
 import {Session} from './SessionManager.js'
 import {makeCSV} from './csv.js'
@@ -71,7 +71,9 @@ const server = Bun.serve({
                 }
                 return new Response(res)
             case "/settings":
-                return new Response(makeForm(sess))
+                return new Response(makeSettingsForm(sess))
+            case "/navigation":
+                return new Response(makeNavigationForm(sess))
             case "/ping":
                 return new Response("pong", { headers: { "HX-Trigger": "pong" }})
             case "/cap":
@@ -99,6 +101,8 @@ const server = Bun.serve({
                 return new Response(makeCellInnerForm(d, sp.end, sp.fiber, sp.wl, sp.type))
             case "/live":
                 return new Response(makeLive(sess, im))
+            default:
+                console.error("wrong endpoint", url.pathname)
                 
         }
     },

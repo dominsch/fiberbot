@@ -24,16 +24,18 @@
 body {
     margin: 0;
     padding: 0;
-    z-index: 1;
     font-family: 'Roboto';
+    ::-webkit-scrollbar {
+    display: none;
+}
 }
 
-.header>form {
+.header form,
+.footer form {
     display: flex;
     flex-wrap: wrap;
     background-color: #f0f0f0;
     padding: 20px;
-    border-radius: 10px;
     margin: auto;
     gap: 1rem 0;
     align-content: space-between;
@@ -87,18 +89,24 @@ body {
     }
 }
 
-
-.live {
+.footer {
     position: fixed;
     bottom: 0;
-    font-family: "digital", monospace;
-    font-size: 20px;
+    width: 100%;
+    .live {
+        font-family: "digital", monospace;
+        background-color: rgb(73, 73, 73);
+        color: rgb(156, 226, 243);
+        font-size: 24px;
+        padding: 10px;
+        padding-right: 30px;
+        text-align: end;
+    }
 }
 
 
-::-webkit-scrollbar {
-    display: none;
-}
+
+
 
 .card-container {
     display: flex;
@@ -352,6 +360,23 @@ thead {
 
 .bad {
     color: red;
+}
+
+.hidden {
+    display: none;
+}
+
+.arrow::before {
+        content: "+ + +";
+    }
+.arrow:is(.out)::before {
+        content: "- - -";
+    }
+.arrow {
+    width: 100%;
+    background-color: lightgray;
+    color: white !important;
+    text-align: center !important;
 }
 
 /* *:focus {

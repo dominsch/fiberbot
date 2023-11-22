@@ -33,11 +33,19 @@
         }
     </script>
 
-    <div id="settings" class="header" hx-post="/settings" hx-trigger="load" hx-swap="innerHTML"></div>
+    <div class="header">
+        <div id="settings" hx-post="/settings" hx-trigger="load" hx-swap="innerHTML"></div>
+        <div _="on click toggle .hidden on #settings toggle .out on me" class="arrow out"></div>
+    </div>
     
-
     <ol class="card-container" hx-post="/cards" hx-trigger="load, update-cards from:body"></ol>
-    <div hx-post="/live" hx-trigger="load, every 5000ms" hx-swap="innerHTML" class="live"></div>
+
+    <div class="footer">
+        <div _="on click toggle .hidden on #navigation toggle .out on me" class="arrow out"></div>
+        <div id="navigation" hx-post="/navigation" hx-trigger="load" hx-swap="innerHTML"></div>
+        <div hx-post="/live" hx-trigger="load, every 5000ms" hx-swap="innerHTML" class="live"></div>
+    </div>
+    
 
 
     <div hx-get="/next" hx-trigger="keyup[key=='ArrowDown'] from:body"></div>

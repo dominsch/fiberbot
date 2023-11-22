@@ -1,4 +1,4 @@
-export function makeForm(sess) {
+export function makeSettingsForm(sess) {
     return /*html*/`
             <form hx-get="/submit/settings" hx-target=".card-container" hx-swap="innerHTML">
             <div>
@@ -50,6 +50,50 @@ export function makeForm(sess) {
                 <div class="option">
                     <input type="radio" id="1550" name="wl" value="1550" checked/>
                     <label for ="1550">1550</label>
+                </div>
+            </fieldset>
+            <button class ="btn" onclick="this.blur();">Submit</button>
+            </form>`
+}
+
+export function makeNavigationForm(sess) {
+    return /*html*/`
+            <form hx-get="/submit/navigation" hx-target=".card-container" hx-swap="innerHTML">
+            <fieldset>
+                <legend>Direction</legend>
+                <div class="option">
+                    <input type="radio" name="numEnds" value="1" checked />
+                    <label>previous</label>
+                </div>
+                <div class="option">
+                    <input type="radio" name="numEnds" value="2" />
+                    <label>next</label>
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>Auto Advanace</legend>
+                <div class="switch">
+                    <input type="checkbox" id="850" name="wl" value="850" />
+                    <label for ="850">enabled</label>
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>Next</legend>
+                <div class="option">
+                    <input type="radio" name="numEnds" value="1" checked />
+                    <label>End</label>
+                </div>
+                <div class="option">
+                    <input type="radio" name="numEnds" value="2" />
+                    <label>Wavelength</label>
+                </div>
+                <div class="option">
+                    <input type="radio" name="numEnds" value="2" />
+                    <label>Fiber</label>
+                </div>
+                <div class="option">
+                    <input type="radio" name="numEnds" value="2" />
+                    <label>DUT</label>
                 </div>
             </fieldset>
             <button class ="btn" onclick="this.blur();">Submit</button>
