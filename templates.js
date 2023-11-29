@@ -106,7 +106,7 @@ export function makeCard(sess, d, oob = false, active = d.sn-sess.firstSN==sess.
             <div class="buttons">
                 <button _="on click js(me) me.blur(); htmx.ajax('PUT', '/action/flush', {swap:'none', values:{id: me.closest('.card').id}}); end" class="material-icons">save_alt</button>
                 <button _="on click toggle .dark on the next <table/> js(me) me.blur() end" class="material-icons" onclick="this.blur();">visibility_off</button>
-                <button hx-put="/clear/dut" hx-vals='{"scope": "dut"}' class="material-icons" onclick="this.blur();">clear</button>
+                <button hx-get="/clear/dut" hx-vals='{"scope": "dut"}' class="material-icons" onclick="this.blur();">clear</button>
             </div>
             <table hx-get="/tab" hx-trigger="load" hx-swap="innerHTML"></table>
         </li>`
