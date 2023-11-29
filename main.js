@@ -41,18 +41,24 @@ const server = Bun.serve({
                 sess.next = sp.type
                 sess.backwards = (sp.direction == "prev")
                 sess.autoAdvance = (sp.advance == "on")
-                res += makeCellOuter(d, sess.nextEnd, sess.nextFiber, d.wavs[0], true, false, false)
+                res += makeCellOuter(sess.DUTs[sess.nextDUT], sess.nextEnd, sess.nextFiber, d.wavs[0], true, false, false)
                 switch(sess.next) {
                     case "end":
                         sess.nextEnd = sess.getNext(sess.currentEnd, sess.next)
+                        sess.nextDUT = sess.currentDUT
                         sess.nextFiber = sess.currentFiber
                         break;
                     case "fiber":
                         sess.nextFiber = sess.getNext(sess.currentFiber, sess.next)
+                        sess.nextDUT = sess.currentDUT
                         sess.nextEnd = sess.currentEnd
                         break;
+                    case "dut":
+                        sess.nextDUT = sess.getNext(sess.currentDUT, sess.next)
+                        sess.nextEnd = sess.currentEnd
+                        sess.nextFiber = sess.currentFiber
                 }
-                res += makeCellOuter(d, sess.nextEnd, sess.nextFiber, d.wavs[0], true, false, true)
+                res += makeCellOuter(sess.DUTs[sess.nextDUT], sess.nextEnd, sess.nextFiber, d.wavs[0], true, false, true)
                 return new Response(res, {headers: { "HX-Trigger": "update-navigation" }})
             case "/submit/cellInnerForm":
                 d =sess.getDUT(sp.sn)

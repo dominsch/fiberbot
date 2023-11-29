@@ -213,7 +213,7 @@ export function makeRow(sess, d, f, oob = false) {
 }
 
 export function makeCellOuter(d, e, f, wl, oob = false, iscurrent = false, isnext = false){
-    // console.log(d.sn, e, f, wl, oob)
+    // console.log(d, e, f, wl, oob)
     let c = "" //(f == d.focusFiber && e == d.focusEnd && d.isActive) ? " focused" : ""
     if (iscurrent) c = " focused"
     if (isnext) c = " next"

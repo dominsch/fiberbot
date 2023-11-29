@@ -104,7 +104,7 @@ export class Session {
     }
     advance() {
         if (this.autoAdvance) {
-            console.log("advance",this.currentDUT, this.currentEnd, this.currentFiber,this.nextDUT, this.nextEnd, this.nextFiber)
+            console.log("advance", this.next ,this.currentDUT, this.currentEnd, this.currentFiber,this.nextDUT, this.nextEnd, this.nextFiber)
             this.currentEnd = this.nextEnd
             this.currentFiber = this.nextFiber
             this.currentDUT = this.nextDUT
@@ -120,12 +120,11 @@ export class Session {
                     // this.nextEnd += 1
                     break;
                 case "dut":
-                    // this.currentEnd = this.nextEnd
-                    // this.nextEnd += 1
+                    this.nextDUT = this.getNext(this.currentDUT, this.next)
                     break;
 
             }
-            console.log("after", this.currentEnd, this.currentFiber, this.nextEnd, this.nextFiber)
+            console.log("advance after", this.next ,this.currentDUT, this.currentEnd, this.currentFiber,this.nextDUT, this.nextEnd, this.nextFiber)
             return true
         }
         return false
@@ -160,13 +159,13 @@ export class Session {
                 break;
             case "dut":
                 if (!this.backwards) {
-                    console.log("dut forward", n, (n < this.DUTs.length -1))
-                    if (n < this.DUTs.length -1) return ++n
+                    console.log("dut forward", n, (this.DUTs.length-1), (n < (this.DUTs.length-1)))
+                    if (n < (this.DUTs.length-1)) return ++n
                     return 0
                 } else {
                     console.log("dut backwards", n, (n > 1))
                     if (n > 0) return --n
-                    return this.DUTs.length -1
+                    return (this.DUTs.length-1)
                 }
 
         }
@@ -210,36 +209,39 @@ class DUT {
             this.RL[e][f][wl] = -100
         })
     }
-    next() {
-        if (this.focusEnd == this.numEnds) {
-           if (this.focusFiber >= this.numFibers) {
-                this.focusFiber = 1
-                return false
-            }
-            else {
-                this.focusFiber++
-                if (this.focusEnd > 1) this.focusEnd--
-                return true
-            } 
-        } else {
-            this.focusEnd++
-            return true
-        }
-    }
-    prev() {
-        if (this.focusEnd == 1) {
-            if (this.focusFiber <= 1) {
-                this.focusFiber = this.numFibers
-                return false
-            }
-            else {
-                this.focusFiber--
-                if (this.numEnds > 1) this.focusEnd++
-                return true
-            }
-        } else {
-            this.focusEnd--
-            return true
-        }
-    }
 }
+
+
+
+// next() {
+//     if (this.focusEnd == this.numEnds) {
+//        if (this.focusFiber >= this.numFibers) {
+//             this.focusFiber = 1
+//             return false
+//         }
+//         else {
+//             this.focusFiber++
+//             if (this.focusEnd > 1) this.focusEnd--
+//             return true
+//         } 
+//     } else {
+//         this.focusEnd++
+//         return true
+//     }
+// }
+// prev() {
+//     if (this.focusEnd == 1) {
+//         if (this.focusFiber <= 1) {
+//             this.focusFiber = this.numFibers
+//             return false
+//         }
+//         else {
+//             this.focusFiber--
+//             if (this.numEnds > 1) this.focusEnd++
+//             return true
+//         }
+//     } else {
+//         this.focusEnd--
+//         return true
+//     }
+// }
