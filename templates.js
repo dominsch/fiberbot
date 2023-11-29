@@ -197,9 +197,9 @@ export function makeRowCompact(d) {
 
 export function makeRow(sess, d, f, oob = false) {
     let cells = ""
-    for (let e = 1; e <= d.numEnds; e++) {
+    for (let e = 1; e <= sess.numEnds; e++) {
         for(let wl of d.wavs) {
-            cells += makeCellOuter(d, e, f, wl, false, (d.isActive&&f==sess.currentFiber&&e==sess.currentEnd), (d.isActive&&f==sess.nextFiber&&e==sess.nextEnd))
+            cells += makeCellOuter(d, e, f, wl, false, (d.sn-sess.firstSN==sess.currentDUT&&f==sess.currentFiber&&e==sess.currentEnd), (d.sn-sess.firstSN==sess.nextDUT&&f==sess.nextFiber&&e==sess.nextEnd))
         }
     }
     return /*html*/`

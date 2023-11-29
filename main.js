@@ -85,13 +85,13 @@ const server = Bun.serve({
                 makeCSV(sess.DUTs, sess)
                 return new Response("")
             case "/cards":
-                if(sess.numFibers > 2) {
+                // if(sess.numFibers > 2) {
                     for (let dut of sess.DUTs) {
                         res += makeCard(dut)
                     }
-                } else {
-                    res = makeCompactCard(sess.DUTs)
-                }
+                // } else {
+                //     res = makeCompactCard(sess.DUTs)
+                // }
                 return new Response(res)
             case "/settings":
                 return new Response(makeSettingsForm(sess))
@@ -114,6 +114,7 @@ const server = Bun.serve({
                 // return new Response(makeRow(d, d.focusFiber, true))
                 if (sess.IL < Math.abs(d.IL[sess.currentEnd][sess.currentFiber][d.wavs[0]])) d.IL[sess.currentEnd][sess.currentFiber][d.wavs[0]] = sess.IL
                 if (sess.RL > d.RL[sess.currentEnd][sess.currentFiber][d.wavs[0]]) d.RL[sess.currentEnd][sess.currentFiber][d.wavs[0]] = sess.RL
+                console.log("makerow", sess.currentDUT, sess.currentEnd, d.sn, sess.currentFiber)
                 return new Response(makeRow(sess, d, sess.currentFiber, true))
             case "/capend":
                 res += makeCellOuter(sess.DUTs[sess.currentDUT], sess.currentEnd, sess.currentFiber, d.wavs[0], true, false, false)
