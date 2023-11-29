@@ -37,12 +37,29 @@ const server = Bun.serve({
                 sess.makeDUTs()
                 sess.startTime = new Date(Date.now())
                 return new Response("", {headers: { "HX-Trigger": "update-cards" }})
+            case "/submit/navigation":
+                sess.next = sp.type
+                sess.backwards = (sp.direction == "prev")
+                sess.autoAdvance = (sp.advance == "on")
+                res += makeCellOuter(d, sess.nextEnd, sess.nextFiber, d.wavs[0], true, false, false)
+                switch(sess.next) {
+                    case "end":
+                        sess.nextEnd = sess.getNext(sess.currentEnd, sess.next)
+                        sess.nextFiber = sess.currentFiber
+                        break;
+                    case "fiber":
+                        sess.nextFiber = sess.getNext(sess.currentFiber, sess.next)
+                        sess.nextEnd = sess.currentEnd
+                        break;
+                }
+                res += makeCellOuter(d, sess.nextEnd, sess.nextFiber, d.wavs[0], true, false, true)
+                return new Response(res, {headers: { "HX-Trigger": "update-navigation" }})
             case "/submit/cellInnerForm":
                 d =sess.getDUT(sp.sn)
                 return new Response(makeCellInner(d, sp.end, sp.fiber, sp.wl, sp.type, false, sp.value))
             case "/clear/row":
                 d.clearFiber(d.focusFiber)
-                return new Response(makeRow(d, d.focusFiber, true));
+                return new Response(makeRow(sess, d, d.focusFiber, true));
             case "/clear/dut":
                 d =sess.getDUT(sp.sn)
                 d.clearAll()
@@ -76,32 +93,32 @@ const server = Bun.serve({
                 return new Response(makeNavigationForm(sess))
             case "/ping":
                 return new Response("pong", { headers: { "HX-Trigger": "pong" }})
+
+            case "/focus":
+                sess.nextDUT = parseInt(sp.sn) - sess.firstSN
+                sess.nextFiber = parseInt(sp.fiber)
+                sess.nextEnd = parseInt(sp.end)
+                sess.advance()
+                res += makeCellOuter(sess.DUTs[sess.nextDUT], sess.nextEnd, sess.nextFiber, d.wavs[0], true, false, true)
+                res += makeCellOuter(sess.DUTs[sess.currentDUT], sess.currentEnd, sess.currentFiber, d.wavs[0], true, true)
+                return new Response(res)
             case "/cap":
-                if (sess.IL < Math.abs(d.IL[d.focusEnd][d.focusFiber][d.wavs[0]])) d.IL[d.focusEnd][d.focusFiber][d.wavs[0]] = sess.IL
-                if (sess.RL > d.RL[d.focusEnd][d.focusFiber][d.wavs[0]]) d.RL[d.focusEnd][d.focusFiber][d.wavs[0]] = sess.RL
-                return new Response(makeRow(d, d.focusFiber, true))
+                // if (sess.IL < Math.abs(d.IL[d.focusEnd][d.focusFiber][d.wavs[0]])) d.IL[d.focusEnd][d.focusFiber][d.wavs[0]] = sess.IL
+                // if (sess.RL > d.RL[d.focusEnd][d.focusFiber][d.wavs[0]]) d.RL[d.focusEnd][d.focusFiber][d.wavs[0]] = sess.RL
+                // return new Response(makeRow(d, d.focusFiber, true))
+                if (sess.IL < Math.abs(d.IL[sess.currentEnd][sess.currentFiber][d.wavs[0]])) d.IL[sess.currentEnd][sess.currentFiber][d.wavs[0]] = sess.IL
+                if (sess.RL > d.RL[sess.currentEnd][sess.currentFiber][d.wavs[0]]) d.RL[sess.currentEnd][sess.currentFiber][d.wavs[0]] = sess.RL
+                return new Response(makeRow(sess, d, sess.currentFiber, true))
             case "/capend":
-                // if(sess.numFibers > 2) {
-                //     let prevf = d.focusFiber
-                //     if (!d.next()) {
-                //         res = makeCard(sess.DUTs[sess.currentDUT], true, false)
-                //         sess.nextDUT()
-                //         res = res + makeCard(sess.DUTs[sess.currentDUT], true)
-                //         return new Response(res)
-                //     }
-                //     res = makeRow(d, prevf, true) + makeRow(d, d.focusFiber, true)
-                //     return new Response(res)
-                // }
-                // return new Response(makeCellOuter(d, d.focusEnd, d.focusFiber, d.wavs[0], true))
-                if(sess.advance()) {
-                    res += makeCellOuter(d, sess.nextEnd, sess.nextFiber, d.wavs[0], true, false, true)
-                }
-                res += makeCellOuter(d, sess.currentEnd, sess.currentFiber, d.wavs[0], true, true)
+                res += makeCellOuter(sess.DUTs[sess.currentDUT], sess.currentEnd, sess.currentFiber, d.wavs[0], true, false, false)
+                sess.advance()
+                res += makeCellOuter(sess.DUTs[sess.nextDUT], sess.nextEnd, sess.nextFiber, d.wavs[0], true, false, true)
+                res += makeCellOuter(sess.DUTs[sess.currentDUT], sess.currentEnd, sess.currentFiber, d.wavs[0], true, true)
                 
                 return new Response(res)
             case "/tab":
                 d = sess.getDUT(sp.sn)
-                return new Response(makeTable(d))
+                return new Response(makeTable(sess, d))
             case "/cellInnerForm":
                 d = sess.getDUT(sp.sn)
                 return new Response(makeCellInnerForm(d, sp.end, sp.fiber, sp.wl, sp.type))

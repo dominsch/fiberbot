@@ -6,7 +6,7 @@ export class Session {
         this.currentDUT = 0
         this.currentFiber = 1
         this.currentEnd = 1
-        this.nextDUT = 1
+        this.nextDUT = 0
         this.nextFiber = 2
         this.nextEnd = 1
         this.numEnds = 1
@@ -87,7 +87,7 @@ export class Session {
         }
     }
     nextEnd() {
-        if (this.currentEnd < this.numEnd) {
+        if (this.currentEnd < this.numEnds) {
             this.currentEnd++
         } else {
             this.currentEnd = 1
@@ -98,37 +98,78 @@ export class Session {
         if (this.currentEnd <= 1) {
             this.currentEnd--
         } else {
-            this.currentEnd = this.numEnd
+            this.currentEnd = this.numEnds
             this.prevDUT()
         }
     }
     advance() {
         if (this.autoAdvance) {
-            console.log("before", this.currentEnd, this.currentFiber, this.nextEnd, this.nextFiber)
+            console.log("advance",this.currentDUT, this.currentEnd, this.currentFiber,this.nextDUT, this.nextEnd, this.nextFiber)
+            this.currentEnd = this.nextEnd
+            this.currentFiber = this.nextFiber
+            this.currentDUT = this.nextDUT
             switch(this.next) {
                 case "end":
-                    this.currentEnd = this.nextEnd
-                    this.nextEnd += 1
-                case "fiber":
-                    this.currentFiber = this.nextFiber
-                    if (!this.backwards) {
-                        this.nextFiber += 1
-                    } else {
-                        this.nextFiber -= 1
-                    }
+                    this.nextEnd = this.getNext(this.currentEnd, this.next)
                     break;
-                // case "wl":
-                //     this.currentEnd = this.nextEnd
-                //     this.nextEnd += 1
-                // case "dut":
-                //     this.currentEnd = this.nextEnd
-                //     this.nextEnd += 1
+                case "fiber":
+                    this.nextFiber = this.getNext(this.currentFiber, this.next)
+                    break;
+                case "wl":
+                    // this.currentEnd = this.nextEnd
+                    // this.nextEnd += 1
+                    break;
+                case "dut":
+                    // this.currentEnd = this.nextEnd
+                    // this.nextEnd += 1
+                    break;
 
             }
             console.log("after", this.currentEnd, this.currentFiber, this.nextEnd, this.nextFiber)
             return true
         }
         return false
+    }
+    getNext(n, t) {
+        switch(t) {
+            case "end":
+                if (!this.backwards) {
+                    console.log("end forward", n, (n < this.numEnds))
+                    if (n < this.numEnds) return ++n
+                    this.nextFiber = this.getNext(this.currentFiber, "fiber")
+                    return 1
+                } else {
+                    console.log("end backwards", n, (n > 1))
+                    if (n > 1) return --n
+                    this.nextFiber = this.getNext(this.currentFiber, "fiber")
+                    return this.numEnds
+                }
+            case "fiber":
+                if (!this.backwards) {
+                    console.log("fiber forward", n, (n < this.numFibers))
+                    if (n < this.numFibers) return ++n
+                    this.nextDUT = this.getNext(this.currentDUT, "dut")
+                    return 1
+                } else {
+                    console.log("fiber backwards", n, (n > 1))
+                    if (n > 1) return --n
+                    this.nextDUT = this.getNext(this.currentDUT, "dut")
+                    return this.numFibers
+                }
+            case "wl":
+                break;
+            case "dut":
+                if (!this.backwards) {
+                    console.log("dut forward", n, (n < this.DUTs.length -1))
+                    if (n < this.DUTs.length -1) return ++n
+                    return 0
+                } else {
+                    console.log("dut backwards", n, (n > 1))
+                    if (n > 0) return --n
+                    return this.DUTs.length -1
+                }
+
+        }
     }
 }
 

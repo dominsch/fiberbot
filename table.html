@@ -31,6 +31,8 @@
         function updateFocusCells() {
             htmx.ajax("GET", "/flush", {swap:"none", values:{id: me.closest('.card').id}})
         }
+
+        htmx.logAll();
     </script>
 
     <div class="header">
@@ -41,8 +43,8 @@
     <ol class="card-container" hx-post="/cards" hx-trigger="load, update-cards from:body"></ol>
 
     <div class="footer">
-        <div _="on click toggle .hidden on #navigation toggle .out on me" class="arrow out"></div>
-        <div id="navigation" hx-post="/navigation" hx-trigger="load" hx-swap="innerHTML"></div>
+        <div _="on click toggle .hidden on #navigation toggle .out on me" class="arrow"></div>
+        <div id="navigation" hx-post="/navigation" hx-trigger="load" hx-swap="innerHTML" class="hidden"></div>
         <div hx-post="/live" hx-trigger="load, every 5000ms" hx-swap="innerHTML" class="live"></div>
     </div>
     

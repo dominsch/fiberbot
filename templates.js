@@ -58,41 +58,41 @@ export function makeSettingsForm(sess) {
 
 export function makeNavigationForm(sess) {
     return /*html*/`
-            <form hx-get="/submit/navigation" hx-target=".card-container" hx-swap="innerHTML">
+            <form hx-get="/submit/navigation" hx-swap="none">
             <fieldset>
                 <legend>Direction</legend>
                 <div class="option">
-                    <input type="radio" name="numEnds" value="1" checked />
+                    <input type="radio" name="direction" value="prev" ${(sess.backwards) ? "checked" : ""}/>
                     <label>previous</label>
                 </div>
                 <div class="option">
-                    <input type="radio" name="numEnds" value="2" />
+                    <input type="radio" name="direction" value="next" ${(!sess.backwards) ? "checked" : ""}/>
                     <label>next</label>
                 </div>
             </fieldset>
             <fieldset>
                 <legend>Auto Advanace</legend>
                 <div class="switch">
-                    <input type="checkbox" id="850" name="wl" value="850" />
+                    <input type="checkbox" id="advance" name="advance" ${(sess.autoAdvance) ? "checked" : ""}/>
                     <label for ="850">enabled</label>
                 </div>
             </fieldset>
             <fieldset>
                 <legend>Next</legend>
                 <div class="option">
-                    <input type="radio" name="numEnds" value="1" checked />
+                    <input type="radio" name="type" value="end" ${(sess.next == "end") ? "checked" : ""}/>
                     <label>End</label>
                 </div>
                 <div class="option">
-                    <input type="radio" name="numEnds" value="2" />
+                    <input type="radio" name="type" value="wl" ${(sess.next == "wl") ? "checked" : ""}/>
                     <label>Wavelength</label>
                 </div>
                 <div class="option">
-                    <input type="radio" name="numEnds" value="2" />
+                    <input type="radio" name="type" value="fiber" ${(sess.next == "fiber") ? "checked" : ""}/>
                     <label>Fiber</label>
                 </div>
                 <div class="option">
-                    <input type="radio" name="numEnds" value="2" />
+                    <input type="radio" name="type" value="dut" ${(sess.next == "dut") ? "checked" : ""}/>
                     <label>DUT</label>
                 </div>
             </fieldset>
@@ -106,7 +106,7 @@ export function makeCard(d, oob = false, active = d.isActive) {
             <div class="buttons">
                 <button _="on click js(me) me.blur(); htmx.ajax('PUT', '/action/flush', {swap:'none', values:{id: me.closest('.card').id}}); end" class="material-icons">save_alt</button>
                 <button _="on click toggle .dark on the next <table/> js(me) me.blur() end" class="material-icons" onclick="this.blur();">visibility_off</button>
-                <button hx-put="/action/clear" hx-vals='{"scope": "dut"}' class="material-icons" onclick="this.blur();">clear</button>
+                <button hx-put="/clear/dut" hx-vals='{"scope": "dut"}' class="material-icons" onclick="this.blur();">clear</button>
             </div>
             <table hx-get="/tab" hx-trigger="load" hx-swap="innerHTML"></table>
         </li>`
@@ -142,7 +142,7 @@ export function makeCompactCard(duts) {
         </li>`
 }
 
-export function makeTable(d, oob = false) {
+export function makeTable(sess, d, oob = false) {
     let sn = d.sn
     return /*html*/`
         <thead class="full">
@@ -166,14 +166,14 @@ export function makeTable(d, oob = false) {
             </tr>
         </thead>
         <tbody id="P${sn}-B" class="full">
-            ${makeTBody(d)}
+            ${makeTBody(sess, d)}
         </tbody>`
 }
 
-export function makeTBody(d) {
+export function makeTBody(sess, d) {
     let row = ""
     for (let i = 1; i <= d.numFibers; i++) {
-        row += makeRow(d, i)
+        row += makeRow(sess, d, i)
     }
     return row
 }
@@ -187,7 +187,7 @@ export function makeRowCompact(d) {
             }
         }
     }
-    console.log("row", d.numEnds, d.numFibers, d.wavs, cells)
+    // console.log("row", d.numEnds, d.numFibers, d.wavs, cells)
     return /*html*/`
         <tr id="P${d.sn}-C" hx-vals='{"sn": "${d.sn}"}' class="card-compact">
             <td class="sn">${d.sn}</td>
@@ -195,11 +195,11 @@ export function makeRowCompact(d) {
         </tr>`
 }
 
-export function makeRow(d, f, oob = false) {
+export function makeRow(sess, d, f, oob = false) {
     let cells = ""
     for (let e = 1; e <= d.numEnds; e++) {
         for(let wl of d.wavs) {
-            cells += makeCellOuter(d, e, f, wl)
+            cells += makeCellOuter(d, e, f, wl, false, (d.isActive&&f==sess.currentFiber&&e==sess.currentEnd), (d.isActive&&f==sess.nextFiber&&e==sess.nextEnd))
         }
     }
     return /*html*/`
@@ -213,14 +213,15 @@ export function makeRow(d, f, oob = false) {
 }
 
 export function makeCellOuter(d, e, f, wl, oob = false, iscurrent = false, isnext = false){
-    console.log(d.sn, e, f, wl, oob)
+    // console.log(d.sn, e, f, wl, oob)
     let c = "" //(f == d.focusFiber && e == d.focusEnd && d.isActive) ? " focused" : ""
     if (iscurrent) c = " focused"
     if (isnext) c = " next"
+    // _="on click if I do not match <:has(>form)/> then take .focused remove .next from .next send focus to me"
     return /*html*/`
-        <td id="P${d.sn}-E${e}-F${f}-${wl}" class="cell${c}"
+        <td hx-get="/focus" hx-trigger="focus" hx-swap="none" id="P${d.sn}-E${e}-F${f}-${wl}" class="cell${c}"
             hx-vals='{"end": "${e}", "fiber": ${f}, "wl": "${wl}"}'
-            _="on click if I do not match <:has(>form)/> then toggle .focused on me"
+            _="on click if I do not match .focused then take .focused remove .next from .next send focus to me"
             ${(oob) ? ` hx-swap-oob="true" ` : ""}>
             ${makeCellInner(d, e, f, wl, "IL", oob)}
             ${(d.hasrl) ? makeCellInner(d, e, f, wl, "RL", oob) : ""}
@@ -228,7 +229,7 @@ export function makeCellOuter(d, e, f, wl, oob = false, iscurrent = false, isnex
 }
 
 export function makeCellInner(d, e, f, wl, type, oob = false, value) {
-    console.log(d.sn, e, f, wl, type,  oob)
+    // console.log(d.sn, e, f, wl, type,  oob)
     let c, content
     if (value) {
         console.log("value", value)
