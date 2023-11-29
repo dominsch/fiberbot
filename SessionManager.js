@@ -33,6 +33,7 @@ export class Session {
         this.maxIL = parseFloat(maxIL)
         this.minRL = parseInt(minRL)
         this.WL = parseInt(wl)
+        this.DUTs = []
     }
     makeDUTs() {
         this.DUTs = []
@@ -56,51 +57,6 @@ export class Session {
     }
     getActiveDUT() {
         return this.DUTs[this.currentDUT]
-    }
-    nextDUT() {
-        if (this.currentDUT < this.DUTs.length - 1) {
-            this.getActiveDUT().isActive = false
-            this.currentDUT++
-            this.getActiveDUT().isActive = true
-        }
-    }
-    prevDUT() {
-        if (this.currentDUT > 0) {
-            this.getActiveDUT().isActive = false
-            this.currentDUT--
-            this.getActiveDUT().isActive = true
-        }
-    }
-    nextFiber() {
-        if (this.currentFiber < this.numFibers) {
-            this.currentFiber++
-        } else {
-            this.currentFiber = 1
-            this.nextDUT()
-        }
-    }
-    prevDUT() {
-        if (this.currentDUT > 0) {
-            this.getActiveDUT().isActive = false
-            this.currentDUT--
-            this.getActiveDUT().isActive = true
-        }
-    }
-    nextEnd() {
-        if (this.currentEnd < this.numEnds) {
-            this.currentEnd++
-        } else {
-            this.currentEnd = 1
-            this.nextDUT()
-        }
-    }
-    prevEnd() {
-        if (this.currentEnd <= 1) {
-            this.currentEnd--
-        } else {
-            this.currentEnd = this.numEnds
-            this.prevDUT()
-        }
     }
     advance() {
         if (this.autoAdvance) {
@@ -211,7 +167,51 @@ class DUT {
     }
 }
 
-
+// nextDUT() {
+//     if (this.currentDUT < this.DUTs.length - 1) {
+//         this.getActiveDUT().isActive = false
+//         this.currentDUT++
+//         this.getActiveDUT().isActive = true
+//     }
+// }
+// prevDUT() {
+//     if (this.currentDUT > 0) {
+//         this.getActiveDUT().isActive = false
+//         this.currentDUT--
+//         this.getActiveDUT().isActive = true
+//     }
+// }
+// nextFiber() {
+//     if (this.currentFiber < this.numFibers) {
+//         this.currentFiber++
+//     } else {
+//         this.currentFiber = 1
+//         this.nextDUT()
+//     }
+// }
+// prevDUT() {
+//     if (this.currentDUT > 0) {
+//         this.getActiveDUT().isActive = false
+//         this.currentDUT--
+//         this.getActiveDUT().isActive = true
+//     }
+// }
+// nextEnd() {
+//     if (this.currentEnd < this.numEnds) {
+//         this.currentEnd++
+//     } else {
+//         this.currentEnd = 1
+//         this.nextDUT()
+//     }
+// }
+// prevEnd() {
+//     if (this.currentEnd <= 1) {
+//         this.currentEnd--
+//     } else {
+//         this.currentEnd = this.numEnds
+//         this.prevDUT()
+//     }
+// }
 
 // next() {
 //     if (this.focusEnd == this.numEnds) {

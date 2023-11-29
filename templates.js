@@ -100,7 +100,7 @@ export function makeNavigationForm(sess) {
             </form>`
 }
 
-export function makeCard(d, oob = false, active = d.isActive) {
+export function makeCard(sess, d, oob = false, active = d.sn-sess.firstSN==sess.currentDUT) {
     return /*html*/`
         <li id="P${d.sn}-C" ${(oob) ? ` hx-swap-oob="true" ` : ""} hx-vals='{"sn": "${d.sn}"}' class="card">
             <div class="buttons">

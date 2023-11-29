@@ -24,7 +24,8 @@ const server = Bun.serve({
         // console.log(base, endpoint)
         
         const sp = Object.fromEntries(url.searchParams)
-        console.log("url", url.pathname, "params:", sp, url.searchParams)
+        if(url.pathname != "/live") console.log("url", url.pathname, "params:", sp, url.searchParams)
+        
         let d = sess.getActiveDUT()
         let res = ""
         
@@ -70,11 +71,11 @@ const server = Bun.serve({
                 d =sess.getDUT(sp.sn)
                 d.clearAll()
                 d.focusFiber = 1
-                return new Response(makeCard(d, true));
+                return new Response(makeCard(sess, d, true));
             case "/clear/all":
                 sess.makeDUTs()
                 for (let d of sess.DUTs) {
-                    res = res + makeCard(d, true)
+                    res = res + makeCard(sess, d, true)
                 }
                 return new Response(res)
             case "/flush/dut":
@@ -87,7 +88,7 @@ const server = Bun.serve({
             case "/cards":
                 // if(sess.numFibers > 2) {
                     for (let dut of sess.DUTs) {
-                        res += makeCard(dut)
+                        res += makeCard(sess, dut)
                     }
                 // } else {
                 //     res = makeCompactCard(sess.DUTs)
@@ -117,11 +118,12 @@ const server = Bun.serve({
                 console.log("makerow", sess.currentDUT, sess.currentEnd, d.sn, sess.currentFiber)
                 return new Response(makeRow(sess, d, sess.currentFiber, true))
             case "/capend":
-                res += makeCellOuter(sess.DUTs[sess.currentDUT], sess.currentEnd, sess.currentFiber, d.wavs[0], true, false, false)
-                sess.advance()
-                res += makeCellOuter(sess.DUTs[sess.nextDUT], sess.nextEnd, sess.nextFiber, d.wavs[0], true, false, true)
-                res += makeCellOuter(sess.DUTs[sess.currentDUT], sess.currentEnd, sess.currentFiber, d.wavs[0], true, true)
-                
+                if (d.IL[sess.currentEnd][sess.currentFiber][1550] <= sess.maxIL && d.RL[sess.currentEnd][sess.currentFiber][1550] >= sess.minRL) {
+                    res += makeCellOuter(sess.DUTs[sess.currentDUT], sess.currentEnd, sess.currentFiber, d.wavs[0], true, false, false)
+                    sess.advance()
+                    res += makeCellOuter(sess.DUTs[sess.nextDUT], sess.nextEnd, sess.nextFiber, d.wavs[0], true, false, true)
+                    res += makeCellOuter(sess.DUTs[sess.currentDUT], sess.currentEnd, sess.currentFiber, d.wavs[0], true, true)
+                }
                 return new Response(res)
             case "/tab":
                 d = sess.getDUT(sp.sn)
