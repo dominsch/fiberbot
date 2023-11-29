@@ -73,7 +73,7 @@ export function makeNavigationForm(sess) {
             <fieldset>
                 <legend>Auto Advanace</legend>
                 <div class="switch">
-                    <input type="checkbox" id="advance" name="advance" ${(sess.autoAdvance) ? "checked" : ""}/>
+                    <input type="checkbox" id="advance" name="advance" value="enabled" ${(sess.autoAdvance) ? "checked" : ""}/>
                     <label for ="850">enabled</label>
                 </div>
             </fieldset>

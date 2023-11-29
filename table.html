@@ -58,9 +58,9 @@
     <div hx-get="/capend" hx-trigger="keyup[key==' '] from:body"></div>
     <div hx-get="/ping" hx-trigger="keyup[key=='p'] from:body" hx-swap="none"></div>
     <div hx-get="/flush/all" hx-trigger="keyup[key=='f'] from:body" hx-swap="none"></div>
-    <div hx-get="/clear" hx-trigger="keyup[key=='r'] from:body" hx-vals='{"scope": "row"}'></div>
-    <div hx-get="/clear" hx-trigger="keyup[key=='d'] from:body" hx-vals='{"scope": "dut"}'></div>
-    <div hx-get="/clear" hx-trigger="keyup[key=='a'] from:body" hx-vals='{"scope": "all"}'></div>
+    <div hx-get="/clear/row" hx-trigger="keyup[key=='r'] from:body" hx-vals='{"scope": "row"}'></div>
+    <div hx-get="/clear/dut" hx-trigger="keyup[key=='d'] from:body" hx-vals='{"scope": "dut"}'></div>
+    <div hx-get="/clear/all" hx-trigger="keyup[key=='a'] from:body" hx-vals='{"scope": "all"}'></div>
 </body>
 
 </html>
