@@ -16,7 +16,7 @@ export class Session {
         this.maxIL = 0.4
         this.minRL = 55
         this.base = 12
-        this.next = "fiber"
+        this.next = "end"
         this.backwards = false
         this.autoAdvance = true
         this.WL = 1550

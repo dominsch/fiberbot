@@ -1,6 +1,6 @@
 export function makeSettingsForm(sess) {
     return /*html*/`
-        <form hx-get="/submit/setup" hx-target=".card-container" hx-swap="innerHTML">
+        <form hx-get="/submit/setup" hx-target="#card-container" hx-swap="innerHTML">
         <div>
             <legend>Serial Number</legend>
             <label>First</label>
@@ -96,6 +96,7 @@ export function makeNavigationForm(sess) {
                 <label>DUT</label>
             </div>
         </fieldset>
+        <div _="on click toggle .hidden on #advanced">advanced</div>
         <button class ="btn" onclick="this.blur();">Submit</button>
         </form>`
 }
@@ -104,7 +105,7 @@ export function makeAdvancedForm(sess) {
     return /*html*/`
         <form hx-get="/submit/advanced" hx-swap="none">
         <fieldset>
-            <legend>Direction</legend>
+            <legend>Port Map</legend>
             <div class="option">
                 <input type="radio" name="direction" value="prev" ${(sess.backwards) ? "checked" : ""}/>
                 <label>previous</label>
@@ -115,7 +116,7 @@ export function makeAdvancedForm(sess) {
             </div>
         </fieldset>
         <fieldset>
-            <legend>Auto Advanace</legend>
+            <legend>Negative Reading correction</legend>
             <div class="switch">
                 <input type="checkbox" id="advance" name="advance" value="enabled" ${(sess.autoAdvance) ? "checked" : ""}/>
                 <label for ="850">enabled</label>
@@ -140,6 +141,7 @@ export function makeAdvancedForm(sess) {
                 <label>DUT</label>
             </div>
         </fieldset>
+        
         <button class ="btn" onclick="this.blur();">Submit</button>
         </form>`
 }
@@ -249,7 +251,7 @@ export function makeRow(sess, d, f, oob = false) {
     return /*html*/`
         <tr class="r${((f - 1) % d.base + 1)}" id="P${d.sn}-F${f}"' 
             ${(oob) ? `hx-swap-oob="true"` : ""} 
-            _="on htmx:afterSettle if my lastElementChild match .focused then log 'child' go to the middle of me" 
+            _="on htmx:afterSettle if I match <:has(.focused)/> then log 'scroll' js(me) me.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' })" 
             hx-swap="outerHTML">
             <td>${f}</td>
             ${cells}

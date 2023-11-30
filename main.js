@@ -98,7 +98,7 @@ const server = Bun.serve({
                 return new Response(makeSettingsForm(sess))
             case "/settings/navigation":
                 return new Response(makeNavigationForm(sess))
-            case "/settings/navigation":
+            case "/settings/advanced":
                 return new Response(makeAdvancedForm(sess))
             case "/ping":
                 return new Response("pong", { headers: { "HX-Trigger": "pong" }})

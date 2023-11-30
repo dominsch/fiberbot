@@ -32,7 +32,7 @@
             htmx.ajax("GET", "/flush", {swap:"none", values:{id: me.closest('.card').id}})
         }
 
-        htmx.logAll();
+        // htmx.logAll();
     </script>
 
     <div class="header">
@@ -40,7 +40,7 @@
         <div _="on click toggle .hidden on #settings toggle .out on me" class="arrow out"></div>
     </div>
     
-    <ol class="card-container" hx-post="/cards" hx-trigger="load, update-cards from:body"></ol>
+    <ol id="card-container" hx-post="/cards" hx-trigger="load, update-cards from:body"></ol>
 
     <div class="footer">
         <div _="on click toggle .hidden on #navigation toggle .out on me" class="arrow"></div>
@@ -48,7 +48,7 @@
         <div hx-post="/live" hx-trigger="load, every 500ms" hx-swap="innerHTML" class="live"></div>
     </div>
 
-    <div class="advanced hidden" hx-post="/settings/advanced" hx-trigger="load" hx-swap="innerHTML">
+    <div id="advanced" class="hidden" hx-post="/settings/advanced" hx-trigger="load" hx-swap="innerHTML">
         
     </div>
     
