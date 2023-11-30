@@ -1,4 +1,4 @@
-import {makeLive, makeCellInner, makeCellInnerForm, makeRow, makeTable, makeSettingsForm, makeNavigationForm, makeCard, makeCompactCard, makeCellOuter} from './templates.js'
+import {makeLive, makeCellInner, makeCellInnerForm, makeRow, makeTable, makeSettingsForm, makeNavigationForm, makeAdvancedForm, makeCard, makeCompactCard, makeCellOuter} from './templates.js'
 import {InstrumentManager} from './InstrumentManager.js'
 import {Session} from './SessionManager.js'
 import {makeCSV} from './csv.js'
@@ -33,7 +33,7 @@ const server = Bun.serve({
             case "/": return new Response(Bun.file("table.html"))
             case "/style.css": return new Response(Bun.file("style.css"))
             case "/digital.woff2": return new Response(Bun.file("media/subset-Digital-7Mono.woff2"))
-            case "/submit/settings":
+            case "/submit/setup":
                 sess.configure(sp.firstSN, sp.lastSN, sp.numFibers, sp.base, sp.numEnds, sp.maxIL, sp.minRL, sp.wl)
                 sess.makeDUTs()
                 sess.startTime = new Date(Date.now())
@@ -94,10 +94,12 @@ const server = Bun.serve({
                 //     res = makeCompactCard(sess.DUTs)
                 // }
                 return new Response(res)
-            case "/settings":
+            case "/settings/setup":
                 return new Response(makeSettingsForm(sess))
-            case "/navigation":
+            case "/settings/navigation":
                 return new Response(makeNavigationForm(sess))
+            case "/settings/navigation":
+                return new Response(makeAdvancedForm(sess))
             case "/ping":
                 return new Response("pong", { headers: { "HX-Trigger": "pong" }})
 
@@ -123,6 +125,8 @@ const server = Bun.serve({
                     sess.advance()
                     res += makeCellOuter(sess.DUTs[sess.nextDUT], sess.nextEnd, sess.nextFiber, d.wavs[0], true, false, true)
                     res += makeCellOuter(sess.DUTs[sess.currentDUT], sess.currentEnd, sess.currentFiber, d.wavs[0], true, true)
+                } else {
+                    console.log("no advance")
                 }
                 return new Response(res)
             case "/tab":

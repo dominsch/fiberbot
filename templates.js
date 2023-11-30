@@ -1,103 +1,147 @@
 export function makeSettingsForm(sess) {
     return /*html*/`
-            <form hx-get="/submit/settings" hx-target=".card-container" hx-swap="innerHTML">
-            <div>
-                <legend>Serial Number</legend>
-                <label>First</label>
-                <input type="number" name="firstSN" value="${sess.firstSN}">
-                <label>Last</label>
-                <input type="number" name="lastSN" value="${sess.lastSN}">
+        <form hx-get="/submit/setup" hx-target=".card-container" hx-swap="innerHTML">
+        <div>
+            <legend>Serial Number</legend>
+            <label>First</label>
+            <input type="number" name="firstSN" value="${sess.firstSN}">
+            <label>Last</label>
+            <input type="number" name="lastSN" value="${sess.lastSN}">
+        </div>
+        <div>
+            <legend>Characteristics</legend>
+            <label>Number of Fibers</label>
+            <input type="number" name="numFibers" value="${sess.numFibers}">
+            <label>Base</label>
+            <input type="number" name="base" value="${sess.base}">
+        </div>
+        <div>
+            <legend>Spec</legend>
+            <label>Max IL</label>
+            <input type="number" step="0.01" name="maxIL" value="${sess.maxIL}">
+            <label>Min RL</label>
+            <input type="number" name="minRL" value="${sess.minRL}">
+        </div>
+        <fieldset>
+            <legend>Ends</legend>
+            <div class="option">
+                <input type="radio" id="setup-E1" name="numEnds" value="1" checked />
+                <label for="setup-E1">single</label>
             </div>
-            <div>
-                <legend>Characteristics</legend>
-                <label>Number of Fibers</label>
-                <input type="number" name="numFibers" value="${sess.numFibers}">
-                <label>Base</label>
-                <input type="number" name="base" value="${sess.base}">
+            <div class="option">
+                <input type="radio" id="setup-E2" name="numEnds" value="2" />
+                <label for="setup-E2">both</label>
             </div>
-            <div>
-                <legend>Spec</legend>
-                <label>Max IL</label>
-                <input type="number" step="0.01" name="maxIL" value="${sess.maxIL}">
-                <label>Min RL</label>
-                <input type="number" name="minRL" value="${sess.minRL}">
+        </fieldset>
+        <fieldset>
+            <legend>Wavelength</legend>
+            <div class="option">
+                <input type="radio" id="setup-850" name="wl" value="850" />
+                <label for ="setup-850">850</label>
             </div>
-            <fieldset>
-                <legend>Ends</legend>
-                <div class="option">
-                    <input type="radio" name="numEnds" value="1" checked />
-                    <label>single</label>
-                </div>
-                <div class="option">
-                    <input type="radio" name="numEnds" value="2" />
-                    <label>both</label>
-                </div>
-            </fieldset>
-            <fieldset>
-                <legend>Wavelength</legend>
-                <div class="option">
-                    <input type="radio" id="850" name="wl" value="850" />
-                    <label for ="850">850</label>
-                </div>
-                <div class="option">
-                    <input type="radio" id="1300" name="wl" value="1300" />
-                    <label for ="1300">1300</label>
-                </div>
-                <div class="option">
-                    <input type="radio" id="1310" name="wl" value="1310" />
-                <label for ="1310">1310</label>
-                </div>
-                <div class="option">
-                    <input type="radio" id="1550" name="wl" value="1550" checked/>
-                    <label for ="1550">1550</label>
-                </div>
-            </fieldset>
-            <button class ="btn" onclick="this.blur();">Submit</button>
-            </form>`
+            <div class="option">
+                <input type="radio" id="setup-1300" name="wl" value="1300" />
+                <label for ="setup-1300">1300</label>
+            </div>
+            <div class="option">
+                <input type="radio" id="setup-1310" name="wl" value="1310" />
+            <label for ="setup-1310">1310</label>
+            </div>
+            <div class="option">
+                <input type="radio" id="setup-1550" name="wl" value="1550" checked/>
+                <label for ="setup-1550">1550</label>
+            </div>
+        </fieldset>
+        <button class ="btn" onclick="this.blur();">Submit</button>
+        </form>`
 }
 
 export function makeNavigationForm(sess) {
     return /*html*/`
-            <form hx-get="/submit/navigation" hx-swap="none">
-            <fieldset>
-                <legend>Direction</legend>
-                <div class="option">
-                    <input type="radio" name="direction" value="prev" ${(sess.backwards) ? "checked" : ""}/>
-                    <label>previous</label>
-                </div>
-                <div class="option">
-                    <input type="radio" name="direction" value="next" ${(!sess.backwards) ? "checked" : ""}/>
-                    <label>next</label>
-                </div>
-            </fieldset>
-            <fieldset>
-                <legend>Auto Advanace</legend>
-                <div class="switch">
-                    <input type="checkbox" id="advance" name="advance" value="enabled" ${(sess.autoAdvance) ? "checked" : ""}/>
-                    <label for ="850">enabled</label>
-                </div>
-            </fieldset>
-            <fieldset>
-                <legend>Next</legend>
-                <div class="option">
-                    <input type="radio" name="type" value="end" ${(sess.next == "end") ? "checked" : ""}/>
-                    <label>End</label>
-                </div>
-                <div class="option">
-                    <input type="radio" name="type" value="wl" ${(sess.next == "wl") ? "checked" : ""}/>
-                    <label>Wavelength</label>
-                </div>
-                <div class="option">
-                    <input type="radio" name="type" value="fiber" ${(sess.next == "fiber") ? "checked" : ""}/>
-                    <label>Fiber</label>
-                </div>
-                <div class="option">
-                    <input type="radio" name="type" value="dut" ${(sess.next == "dut") ? "checked" : ""}/>
-                    <label>DUT</label>
-                </div>
-            </fieldset>
-            <button class ="btn" onclick="this.blur();">Submit</button>
-            </form>`
+        <form hx-get="/submit/navigation" hx-swap="none">
+        <fieldset>
+            <legend>Direction</legend>
+            <div class="option">
+                <input type="radio" name="direction" value="prev" ${(sess.backwards) ? "checked" : ""}/>
+                <label>previous</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="direction" value="next" ${(!sess.backwards) ? "checked" : ""}/>
+                <label>next</label>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>Auto Advanace</legend>
+            <div class="switch">
+                <input type="checkbox" id="advance" name="advance" ${(sess.autoAdvance) ? "checked" : ""}/>
+                <label for ="850">enabled</label>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>Next</legend>
+            <div class="option">
+                <input type="radio" name="type" value="end" ${(sess.next == "end") ? "checked" : ""}/>
+                <label>End</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="type" value="wl" ${(sess.next == "wl") ? "checked" : ""}/>
+                <label>Wavelength</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="type" value="fiber" ${(sess.next == "fiber") ? "checked" : ""}/>
+                <label>Fiber</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="type" value="dut" ${(sess.next == "dut") ? "checked" : ""}/>
+                <label>DUT</label>
+            </div>
+        </fieldset>
+        <button class ="btn" onclick="this.blur();">Submit</button>
+        </form>`
+}
+
+export function makeAdvancedForm(sess) {
+    return /*html*/`
+        <form hx-get="/submit/advanced" hx-swap="none">
+        <fieldset>
+            <legend>Direction</legend>
+            <div class="option">
+                <input type="radio" name="direction" value="prev" ${(sess.backwards) ? "checked" : ""}/>
+                <label>previous</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="direction" value="next" ${(!sess.backwards) ? "checked" : ""}/>
+                <label>next</label>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>Auto Advanace</legend>
+            <div class="switch">
+                <input type="checkbox" id="advance" name="advance" value="enabled" ${(sess.autoAdvance) ? "checked" : ""}/>
+                <label for ="850">enabled</label>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>Next</legend>
+            <div class="option">
+                <input type="radio" name="type" value="end" ${(sess.next == "end") ? "checked" : ""}/>
+                <label>End</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="type" value="wl" ${(sess.next == "wl") ? "checked" : ""}/>
+                <label>Wavelength</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="type" value="fiber" ${(sess.next == "fiber") ? "checked" : ""}/>
+                <label>Fiber</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="type" value="dut" ${(sess.next == "dut") ? "checked" : ""}/>
+                <label>DUT</label>
+            </div>
+        </fieldset>
+        <button class ="btn" onclick="this.blur();">Submit</button>
+        </form>`
 }
 
 export function makeCard(sess, d, oob = false, active = d.sn-sess.firstSN==sess.currentDUT) {
