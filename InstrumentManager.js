@@ -173,4 +173,17 @@ class SantecInstrument extends Instrument {
     constructor(name, address, netport) {
         super(name, address, netport);
     }
+    async startLive(){
+        while(this.mode == "live") {
+            try{
+                this.IL = await this.query("READ:IL:DET1? " + 1550)
+                await Bun.sleep(100) // santec splits messages
+                this.RL = await this.query("READ:RL? " + 1550)
+            } catch(e){
+                console.error("live error", e)
+                this.disconnect()
+            }
+            await Bun.sleep(500)
+        }
+    }
 }

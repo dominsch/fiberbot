@@ -1,3 +1,5 @@
+//sudo mount -t cifs //[IP_Address]/[share_name] /mnt/TestData -o username=[username]
+
 export async function makeCSV(duts, sess) {
     let tester = "Anon"
     let chassis = sess.instrument

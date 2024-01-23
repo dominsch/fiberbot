@@ -4,11 +4,14 @@ import {Session} from './SessionManager.js'
 import {makeCSV} from './csv.js'
 
 // let configs = {
-//     "MAP104": ["192.168.10.104", 8301, "Viavi"]
+//     "MAP229": ["192.168.10.229", 8100, "Viavi"]
 // }
 let configs = {
     "MAP104": ["localhost", 8301, "Viavi"]
 }
+// let configs = {
+//     "MAP104": ["192.168.10.105", 5025, "Santec"]
+// }
 
 let im = new InstrumentManager(configs)
 await im.initialize()
