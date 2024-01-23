@@ -17,10 +17,14 @@ export function makeSettingsForm(sess) {
         </div>
         <div>
             <legend>Spec</legend>
-            <label>Max IL</label>
-            <input type="number" step="0.01" name="maxIL" value="${sess.maxIL}">
-            <label>Min RL</label>
-            <input type="number" name="minRL" value="${sess.minRL}">
+            <label>End A Max IL</label>
+            <input type="number" step="0.01" name="maxILA" value="${sess.maxIL[1]}">
+            <label>End A Min RL</label>
+            <input type="number" name="minRLA" value="${sess.minRL[1]}">
+            <label>End B Max IL</label>
+            <input type="number" step="0.01" name="maxILB" value="${sess.maxIL[2]}">
+            <label>End B Min RL</label>
+            <input type="number" name="minRLB" value="${sess.minRL[2]}">
         </div>
         <fieldset>
             <legend>Ends</legend>
@@ -146,11 +150,11 @@ export function makeAdvancedForm(sess) {
         </form>`
 }
 
-export function makeCard(sess, d, oob = false, active = d.sn-sess.firstSN==sess.currentDUT) {
+export function makeCard(s, d, oob = false, active = d.sn-s.firstSN==s.currentDUT) {
     return /*html*/`
         <li id="P${d.sn}-C" ${(oob) ? ` hx-swap-oob="true" ` : ""} hx-vals='{"sn": "${d.sn}"}' class="card">
             <div class="buttons">
-                <button _="on click js(me) me.blur(); htmx.ajax('PUT', '/action/flush', {swap:'none', values:{id: me.closest('.card').id}}); end" class="material-icons">save_alt</button>
+                <button _="on click js(me) me.blur(); htmx.ajax('GET', '/action/flush', {swap:'none', values:{id: me.closest('.card').id}}); end" class="material-icons">save_alt</button>
                 <button _="on click toggle .dark on the next <table/> js(me) me.blur() end" class="material-icons" onclick="this.blur();">visibility_off</button>
                 <button hx-get="/clear/dut" hx-vals='{"scope": "dut"}' class="material-icons" onclick="this.blur();">clear</button>
             </div>
@@ -188,7 +192,7 @@ export function makeCompactCard(duts) {
         </li>`
 }
 
-export function makeTable(sess, d, oob = false) {
+export function makeTable(s, d, oob = false) {
     let sn = d.sn
     return /*html*/`
         <thead class="full">
@@ -212,24 +216,24 @@ export function makeTable(sess, d, oob = false) {
             </tr>
         </thead>
         <tbody id="P${sn}-B" class="full">
-            ${makeTBody(sess, d)}
+            ${makeTBody(s, d)}
         </tbody>`
 }
 
-export function makeTBody(sess, d) {
+export function makeTBody(s, d) {
     let row = ""
-    for (let i = 1; i <= d.numFibers; i++) {
-        row += makeRow(sess, d, i)
+    for (let i = 1; i <= s.numFibers; i++) {
+        row += makeRow(s, d, i)
     }
     return row
 }
 
-export function makeRowCompact(d) {
+export function makeRowCompact(s, d) {
     let cells = ""
     for (let e = 1; e <= d.numEnds; e++) {
         for (let f = 1; f <= d.numFibers; f++) {
             for(let wl of d.wavs) {
-                cells += makeCellOuter(d, e, f, wl)
+                cells += makeCellOuter(s, d, e, f, wl)
             }
         }
     }
@@ -241,11 +245,11 @@ export function makeRowCompact(d) {
         </tr>`
 }
 
-export function makeRow(sess, d, f, oob = false) {
+export function makeRow(s, d, f, oob = false) {
     let cells = ""
-    for (let e = 1; e <= sess.numEnds; e++) {
+    for (let e = 1; e <= s.numEnds; e++) {
         for(let wl of d.wavs) {
-            cells += makeCellOuter(d, e, f, wl, false, (d.sn-sess.firstSN==sess.currentDUT&&f==sess.currentFiber&&e==sess.currentEnd), (d.sn-sess.firstSN==sess.nextDUT&&f==sess.nextFiber&&e==sess.nextEnd))
+            cells += makeCellOuter(s, d, e, f, wl, false, (d.sn-s.firstSN==s.currentDUT&&f==s.currentFiber&&e==s.currentEnd), (d.sn-s.firstSN==s.nextDUT&&f==s.nextFiber&&e==s.nextEnd))
         }
     }
     return /*html*/`
@@ -258,7 +262,7 @@ export function makeRow(sess, d, f, oob = false) {
         </tr>`
 }
 
-export function makeCellOuter(d, e, f, wl, oob = false, iscurrent = false, isnext = false){
+export function makeCellOuter(s, d, e, f, wl, oob = false, iscurrent = false, isnext = false){
     // console.log(d, e, f, wl, oob)
     let c = "" //(f == d.focusFiber && e == d.focusEnd && d.isActive) ? " focused" : ""
     if (iscurrent) c = " focused"
@@ -269,12 +273,12 @@ export function makeCellOuter(d, e, f, wl, oob = false, iscurrent = false, isnex
             hx-vals='{"end": "${e}", "fiber": ${f}, "wl": "${wl}"}'
             _="on click if I do not match .focused then take .focused remove .next from .next send focus to me"
             ${(oob) ? ` hx-swap-oob="true" ` : ""}>
-            ${makeCellInner(d, e, f, wl, "IL", oob)}
-            ${(d.hasrl) ? makeCellInner(d, e, f, wl, "RL", oob) : ""}
+            ${makeCellInner(s, d, e, f, wl, "IL", oob)}
+            ${(d.hasrl) ? makeCellInner(s, d, e, f, wl, "RL", oob) : ""}
         </td>`
 }
 
-export function makeCellInner(d, e, f, wl, type, oob = false, value) {
+export function makeCellInner(s, d, e, f, wl, type, oob = false, value) {
     // console.log(d.sn, e, f, wl, type,  oob)
     let c, content
     if (value) {
@@ -290,7 +294,7 @@ export function makeCellInner(d, e, f, wl, type, oob = false, value) {
         content = " "
         c = "empty"
     } else {
-        (type == "IL" && content > d.maxIL || type == "RL" && content < d.minRL) ? c = "bad" : c = "good"
+        (type == "IL" && content > s.maxIL[e] || type == "RL" && content < s.minRL[e]) ? c = "bad" : c = "good"
     }
     // console.log("log", id, d.isActive, e, d.focusEnd, f, d.focusFiber, wl, type, (f == d.focusFiber && e == d.focusEnd && d.isActive))
     return /*html*/`
@@ -313,5 +317,5 @@ export function makeCellInnerForm(d, e, f, wl, type, value) {
 export function makeLive(sess, im) {
     sess.IL = im.getValue(sess.instrument, "IL")
     sess.RL = im.getValue(sess.instrument, "RL")
-    return `WL: ${sess.WL} IL:${sess.IL} RL:${sess.RL}`
+    return `WL: ${sess.WL} IL:${sess.IL} RL:${sess.RL} <button id="upload-button" hx-get="/flush/all" hx-swap="none" onclick="this.blur();">upload all</button>`
 }

@@ -13,8 +13,8 @@ export class Session {
         this.numFibers = 12
         this.firstSN = 1292001
         this.lastSN = 1292002
-        this.maxIL = 0.4
-        this.minRL = 55
+        this.maxIL = [0, 0.4, 0.4]
+        this.minRL = [0, 55, 55]
         this.base = 12
         this.next = "end"
         this.backwards = false
@@ -24,14 +24,16 @@ export class Session {
         this.RL = -100
         this.DUTs = []
     }
-    configure(firstSN, lastSN, numFibers, base, numEnds, maxIL, minRL, wl) {
+    configure(firstSN, lastSN, numFibers, base, numEnds, maxILA, maxILB, minRLA, minRLB, wl) {
         this.firstSN = parseInt(firstSN)
         this.lastSN = parseInt(lastSN)
         this.numFibers = parseInt(numFibers)
         this.base = parseInt(base)
         this.numEnds = parseInt(numEnds)
-        this.maxIL = parseFloat(maxIL)
-        this.minRL = parseInt(minRL)
+        this.maxIL[1] = parseFloat(maxILA)
+        this.maxIL[2] = parseFloat(maxILB)
+        this.minRL[1] = parseInt(minRLA)
+        this.minRL[2] = parseInt(minRLB)
         this.WL = parseInt(wl)
         this.DUTs = []
     }
@@ -43,8 +45,8 @@ export class Session {
                                     this.numFibers,
                                     [this.WL],
                                     true,
-                                    this.maxIL,
-                                    this.minRL,
+                                    // this.maxIL,
+                                    // this.minRL,
                                     this.base,
                                     1,
                                     i==this.currentDUT)
@@ -129,14 +131,14 @@ export class Session {
 }
 
 class DUT {
-    constructor(sn, numEnds, numFibers, wavs, hasrl, maxIL, minRL, base, focus, isActive) {
+    constructor(sn, numEnds, numFibers, wavs, hasrl, base, focus, isActive) {
         this.sn = sn
         this.numFibers = numFibers
         this.numEnds = numEnds
         this.wavs = wavs
         this.hasrl = hasrl
-        this.maxIL = maxIL
-        this.minRL = minRL
+        // this.maxIL = maxIL
+        // this.minRL = minRL
         this.base = base
         this.focusFiber = focus
         this.focusEnd = 1

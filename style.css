@@ -47,6 +47,8 @@ body {
         flex-direction: column;
         justify-content: space-evenly;
         min-width: 100px;
+        /* max-height: 100px; */
+        flex-wrap: wrap;
         align-items: start;
         border: none;
         border-right: 1px solid #d3d3d3;
@@ -95,7 +97,11 @@ body {
     bottom: 0;
     width: 100%;
 
+    
+
     .live {
+        display: flex;
+        justify-content: end;
         font-family: "digital", monospace;
         background-color: rgb(73, 73, 73);
         color: rgb(156, 226, 243);
@@ -103,6 +109,18 @@ body {
         padding: 10px;
         padding-right: 30px;
         text-align: end;
+        #upload-button {
+            background-color: #2196f3;
+            color: white;
+            padding: 5px;
+            border-radius: 5px;
+            height: 30px;
+            width: 100px;
+            margin-left: 15px;
+            font-family: Digital, monospace;
+            font-weight: bold;
+            float: right;
+        }
     }
 }
 

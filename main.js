@@ -34,7 +34,7 @@ const server = Bun.serve({
             case "/style.css": return new Response(Bun.file("style.css"))
             case "/digital.woff2": return new Response(Bun.file("media/subset-Digital-7Mono.woff2"))
             case "/submit/setup":
-                sess.configure(sp.firstSN, sp.lastSN, sp.numFibers, sp.base, sp.numEnds, sp.maxIL, sp.minRL, sp.wl)
+                sess.configure(sp.firstSN, sp.lastSN, sp.numFibers, sp.base, sp.numEnds, sp.maxILA, sp.maxILB, sp.minRLA, sp.minRLB, sp.wl)
                 sess.makeDUTs()
                 sess.startTime = new Date(Date.now())
                 return new Response("", {headers: { "HX-Trigger": "update-cards" }})
@@ -42,7 +42,7 @@ const server = Bun.serve({
                 sess.next = sp.type
                 sess.backwards = (sp.direction == "prev")
                 sess.autoAdvance = (sp.advance == "on")
-                res += makeCellOuter(sess.DUTs[sess.nextDUT], sess.nextEnd, sess.nextFiber, d.wavs[0], true, false, false)
+                res += makeCellOuter(sess, sess.DUTs[sess.nextDUT], sess.nextEnd, sess.nextFiber, d.wavs[0], true, false, false)
                 switch(sess.next) {
                     case "end":
                         sess.nextEnd = sess.getNext(sess.currentEnd, sess.next)
@@ -59,11 +59,11 @@ const server = Bun.serve({
                         sess.nextEnd = sess.currentEnd
                         sess.nextFiber = sess.currentFiber
                 }
-                res += makeCellOuter(sess.DUTs[sess.nextDUT], sess.nextEnd, sess.nextFiber, d.wavs[0], true, false, true)
+                res += makeCellOuter(sess, sess.DUTs[sess.nextDUT], sess.nextEnd, sess.nextFiber, d.wavs[0], true, false, true)
                 return new Response(res, {headers: { "HX-Trigger": "update-navigation" }})
             case "/submit/cellInnerForm":
                 d =sess.getDUT(sp.sn)
-                return new Response(makeCellInner(d, sp.end, sp.fiber, sp.wl, sp.type, false, sp.value))
+                return new Response(makeCellInner(sess, d, sp.end, sp.fiber, sp.wl, sp.type, false, sp.value))
             case "/clear/row":
                 d.clearFiber(d.focusFiber)
                 return new Response(makeRow(sess, d, d.focusFiber, true));
@@ -108,8 +108,8 @@ const server = Bun.serve({
                 sess.nextFiber = parseInt(sp.fiber)
                 sess.nextEnd = parseInt(sp.end)
                 sess.advance()
-                res += makeCellOuter(sess.DUTs[sess.nextDUT], sess.nextEnd, sess.nextFiber, d.wavs[0], true, false, true)
-                res += makeCellOuter(sess.DUTs[sess.currentDUT], sess.currentEnd, sess.currentFiber, d.wavs[0], true, true)
+                res += makeCellOuter(sess, sess.DUTs[sess.nextDUT], sess.nextEnd, sess.nextFiber, d.wavs[0], true, false, true)
+                res += makeCellOuter(sess, sess.DUTs[sess.currentDUT], sess.currentEnd, sess.currentFiber, d.wavs[0], true, true)
                 return new Response(res)
             case "/cap":
                 // if (sess.IL < Math.abs(d.IL[d.focusEnd][d.focusFiber][d.wavs[0]])) d.IL[d.focusEnd][d.focusFiber][d.wavs[0]] = sess.IL
@@ -120,11 +120,11 @@ const server = Bun.serve({
                 console.log("makerow", sess.currentDUT, sess.currentEnd, d.sn, sess.currentFiber)
                 return new Response(makeRow(sess, d, sess.currentFiber, true))
             case "/capend":
-                if (d.IL[sess.currentEnd][sess.currentFiber][1550] <= sess.maxIL && d.RL[sess.currentEnd][sess.currentFiber][1550] >= sess.minRL) {
-                    res += makeCellOuter(sess.DUTs[sess.currentDUT], sess.currentEnd, sess.currentFiber, d.wavs[0], true, false, false)
+                if (d.IL[sess.currentEnd][sess.currentFiber][1550] <= sess.maxIL[sess.currentEnd] && d.RL[sess.currentEnd][sess.currentFiber][1550] >= sess.minRL[sess.currentEnd]) {
+                    res += makeCellOuter(sess, sess.DUTs[sess.currentDUT], sess.currentEnd, sess.currentFiber, d.wavs[0], true, false, false)
                     sess.advance()
-                    res += makeCellOuter(sess.DUTs[sess.nextDUT], sess.nextEnd, sess.nextFiber, d.wavs[0], true, false, true)
-                    res += makeCellOuter(sess.DUTs[sess.currentDUT], sess.currentEnd, sess.currentFiber, d.wavs[0], true, true)
+                    res += makeCellOuter(sess, sess.DUTs[sess.nextDUT], sess.nextEnd, sess.nextFiber, d.wavs[0], true, false, true)
+                    res += makeCellOuter(sess, sess.DUTs[sess.currentDUT], sess.currentEnd, sess.currentFiber, d.wavs[0], true, true)
                 } else {
                     console.log("no advance")
                 }
