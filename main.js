@@ -4,7 +4,7 @@ import {Session} from './SessionManager.js'
 import {makeCSV} from './csv.js'
 
 let configs = {
-    "MAP104": ["192.168.10.229", 8100, "Viavi"]
+    "MAP104": ["192.168.10.224", 8100, "Viavi"]
 }
 // let configs = {
 //     "MAP104": ["localhost", 8301, "Viavi"]
