@@ -119,7 +119,13 @@ const server = Bun.serve({
                 // if (sess.RL > d.RL[d.focusEnd][d.focusFiber][d.wavs[0]]) d.RL[d.focusEnd][d.focusFiber][d.wavs[0]] = sess.RL
                 // return new Response(makeRow(d, d.focusFiber, true))
                 if (sess.IL < Math.abs(d.IL[sess.currentEnd][sess.currentFiber][d.wavs[0]])) d.IL[sess.currentEnd][sess.currentFiber][d.wavs[0]] = sess.IL
-                if (sess.RL > d.RL[sess.currentEnd][sess.currentFiber][d.wavs[0]]) d.RL[sess.currentEnd][sess.currentFiber][d.wavs[0]] = sess.RL
+                if (sess.RL > d.RL[sess.currentEnd][sess.currentFiber][d.wavs[0]]) {
+                    let newrl = sess.RL
+                    console.log(newrl)
+                    newrl = newrl.trunc()
+                    console.log(newrl)
+                    d.RL[sess.currentEnd][sess.currentFiber][d.wavs[0]] = newrl
+                }
                 console.log("makerow", sess.currentDUT, sess.currentEnd, d.sn, sess.currentFiber)
                 return new Response(makeRow(sess, d, sess.currentFiber, true))
             case "/capend":
