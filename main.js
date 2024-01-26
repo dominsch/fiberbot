@@ -120,7 +120,7 @@ const server = Bun.serve({
                 // return new Response(makeRow(d, d.focusFiber, true))
                 if (sess.IL < Math.abs(d.IL[sess.currentEnd][sess.currentFiber][d.wavs[0]])) d.IL[sess.currentEnd][sess.currentFiber][d.wavs[0]] = sess.IL
                 if (sess.RL > d.RL[sess.currentEnd][sess.currentFiber][d.wavs[0]]) {
-                    let newrl = sess.RL
+                    let newrl = parseFloat(sess.RL)
                     console.log(newrl, typeof(newrl))
                     newrl = newrl.trunc()
                     console.log(newrl)
