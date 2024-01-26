@@ -121,7 +121,7 @@ const server = Bun.serve({
                 if (sess.IL < Math.abs(d.IL[sess.currentEnd][sess.currentFiber][d.wavs[0]])) d.IL[sess.currentEnd][sess.currentFiber][d.wavs[0]] = sess.IL
                 if (sess.RL > d.RL[sess.currentEnd][sess.currentFiber][d.wavs[0]]) {
                     let newrl = sess.RL
-                    console.log(newrl)
+                    console.log(newrl, typeof(newrl))
                     newrl = newrl.trunc()
                     console.log(newrl)
                     d.RL[sess.currentEnd][sess.currentFiber][d.wavs[0]] = newrl
