@@ -11,7 +11,7 @@ let configs = {
 }
 // let configs = {
 //     "MAP104": ["192.168.10.105", 5025, "Santec"]
-// }
+// }dvx
 
 let im = new InstrumentManager(configs)
 await im.initialize()
