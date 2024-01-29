@@ -46,30 +46,40 @@ class Instrument {
     async connect() {
         while(!this.connected) {
             console.log("try to connect ", this.name, this.address, this.netport)
-            this.socket = await Bun.connect({
-                hostname: this.address,
-                port: this.netport,
-                data: {instrument: this},
-                socket: {
-                    open(socket) {
-                        console.log("open")
-                        socket.data.instrument.connected = true
-                        
-                    },
-                    data(socket, buffer) {
-                        let res = String.fromCharCode.apply(null, buffer).trim()
-                        // console.log("data in: ", res)
-                        socket.data.resolver(res)
-                    },
-                    close(socket) {
-                        console.log("close")
-                        socket.data.rejector("disconnect")
-                        socket.data.instrument.connected = false
-                    },
-                    drain(socket) {console.log("drain")},
-                    error(socket, error) {console.log("socket error:", error)}
-                }
-            })
+            try {
+                this.socket = await Bun.connect({
+                    hostname: this.address,
+                    port: this.netport,
+                    data: {instrument: this},
+                    socket: {
+                        open(socket) {
+                            console.log("open")
+                            socket.data.instrument.connected = true
+                            socket.data.buffer = ""
+                            
+                        },
+                        data(socket, buffer) {
+                            socket.data.buffer += String.fromCharCode.apply(null, buffer).trim()
+                            // console.log("data in: ", res)
+                            let res = socket.data.buffer.split(",")
+                            if (res.length >= socket.data.rsps-1) {
+                                socket.data.resolver(res)
+                                socket.data.buffer = ""
+                            }
+                            
+                        },
+                        close(socket) {
+                            console.log("close")
+                            socket.data.rejector("disconnect")
+                            socket.data.instrument.connected = false
+                        },
+                        drain(socket) {console.log("drain")},
+                        error(socket, error) {console.log("socket error:", error)}
+                    }
+                })
+            } catch(e) {
+                console.error("connect error", e)
+            }
             await Bun.sleep(2000)
             if(!this.connected) await Bun.sleep(2000)
         }
@@ -81,8 +91,9 @@ class Instrument {
         this.connected = false
         await this.connect()
     }
-    async query(q) {
+    async query(q, rsps = 1) {
         // console.log("data out: from ", this.name, " query: ", q)
+        this.socket.data.rsps = rsps
         let written = this.socket.write(q+'\n')
         // console.log(written)
         let tries = 1

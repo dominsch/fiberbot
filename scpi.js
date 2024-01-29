@@ -31,10 +31,10 @@ devices.forEach(async d => {
                     socket.write(d[0] + ending)
                 }
                 if (data.toString().search(/:FETCH:LOSS\?/g) != -1){
-                    socket.write(Math.trunc(Math.random()*50)/100 + ending)
+                    socket.write((Math.random()*0.5).toFixed(3) + ending)
                 }
                 if (data.toString().search(/:FETCH:ORL\?/g) != -1){
-                    socket.write(Math.trunc(Math.random()*20 + 50) + ending)
+                    socket.write(((Math.random()*20) + 50).toFixed(2) + ending)
                 }
             }, // message received from client
             open(socket) {console.log("open ", d[0])}, // socket opened

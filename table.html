@@ -37,7 +37,7 @@
 
     <div class="header">
         <div id="settings" hx-post="/settings/setup" hx-trigger="load" hx-swap="innerHTML"></div>
-        <div _="on click toggle .hidden on #settings toggle .out on me" class="arrow out"></div>
+        <div _="on click toggle .hidden on #settings toggle .down on me" class="arrow"></div>
     </div>
     
     <ol id="card-container" hx-post="/cards" hx-trigger="load, update-cards from:body"></ol>
@@ -46,7 +46,7 @@
 
     <div class="footer">
         
-        <div _="on click toggle .hidden on #navigation toggle .out on me" class="arrow"></div>
+        <div _="on click toggle .hidden on #navigation toggle .down on me" class="arrow"></div>
         <div id="navigation" hx-post="/settings/navigation" hx-trigger="load" hx-swap="innerHTML" class="hidden"></div>
         <div hx-post="/live" hx-trigger="load, every 500ms" hx-swap="innerHTML" class="live"></div>
         
