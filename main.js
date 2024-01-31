@@ -4,14 +4,14 @@ import {Session} from './SessionManager.js'
 import {makeCSV} from './csv.js'
 
 // let configs = {
-//     "MAP104": ["192.168.10.224", 8100, "Viavi"]
+//     "MAP104": ["192.168.10.229", 8100, "Viavi"]
+// }
+// let configs = {
+//     "MAP104": ["localhost", 8301, "Viavi"]
 // }
 let configs = {
-    "MAP104": ["localhost", 8301, "Viavi"]
+    "MAP104": ["192.168.10.105", 5025, "Santec"]
 }
-// let configs = {
-//     "MAP104": ["192.168.10.105", 5025, "Santec"]
-// }dvx
 
 let im = new InstrumentManager(configs)
 await im.initialize()
@@ -128,6 +128,9 @@ const server = Bun.serve({
                     sess.advance()
                     res += makeCellOuter(sess, sess.DUTs[sess.nextDUT], sess.nextEnd, sess.nextFiber, d.wavs[0], true, false, true)
                     res += makeCellOuter(sess, sess.DUTs[sess.currentDUT], sess.currentEnd, sess.currentFiber, d.wavs[0], true, true)
+                    if (sess.switchAdvance) {
+                        im.setChannel(sess.currentFiber%sess.base)
+                    }
                 } else {
                     console.log("no advance")
                 }

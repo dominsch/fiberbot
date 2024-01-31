@@ -22,6 +22,9 @@ export class InstrumentManager {
         let inst = this.instruments[instrument]
         return inst[value]
     }
+    setChannel(channel) {
+        this.instruments[instrument].setChannel(channel)
+    }
     readChannels(instrument, channels) {
         return this.instruments[instrument].readChannels(channels)
     }
@@ -63,6 +66,7 @@ class Instrument {
                             // console.log("data in: ", res)
                             let res = socket.data.buffer.split(",")
                             if (res.length >= socket.data.rsps-1) {
+                                console.log("res: ", res.length, socket.data.rsps, res, typeof(res))
                                 socket.data.resolver(res)
                                 socket.data.buffer = ""
                             }
@@ -86,7 +90,7 @@ class Instrument {
     }
     async disconnect() {
         console.log(this.name, "disconnect")
-        this.socket.data.rejector("disconnect")
+        if (this.socket.data.rejector) this.socket.data.rejector("disconnect")
         this.socket.end()
         this.connected = false
         await this.connect()
@@ -116,7 +120,7 @@ class Instrument {
             let timeoutId = setTimeout((e) => {
                     console.error("rejecting ", q)
                     reject(e)
-            }, 1000, `ERROR:  got no response`);
+            }, 2000, `ERROR:  got no response`);
             this.socket.data.resolver = resolver
             this.socket.data.rejector = reject
         });
@@ -138,6 +142,8 @@ class ViaviInstrument extends Instrument {
     }
     async startLive(){
         while(this.mode == "live") {
+            let idn = await this.query("*IDN?",4)
+            console.log("name ", idn[0])
             try{
                 this.IL = await this.query(":FETCH:LOSS? 1,1")
                 this.RL = await this.query(":FETCH:ORL? 1,1")
@@ -185,16 +191,21 @@ class SantecInstrument extends Instrument {
         super(name, address, netport);
     }
     async startLive(){
+        let idn = (await this.query("*IDN?",4))[0]
+        console.log("name ", idn)
         while(this.mode == "live") {
             try{
                 this.IL = await this.query("READ:IL:DET1? " + 1550)
-                await Bun.sleep(100) // santec splits messages
-                this.RL = await this.query("READ:RL? " + 1550)
+                this.RL = (await this.query("READ:RL? " + 1550, 4))[0]
             } catch(e){
                 console.error("live error", e)
                 this.disconnect()
             }
-            await Bun.sleep(500)
+            await Bun.sleep(800)
         }
+    }
+    async switchChannel(c) {
+        res = await this.query(`SW1:CLOSE ${c};*OPC?`)
+        console.log("channel switch success? ", res)
     }
 }

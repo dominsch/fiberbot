@@ -19,6 +19,7 @@ export class Session {
         this.next = "end"
         this.backwards = false
         this.autoAdvance = true
+        this.switchAdvance = false
         this.WL = 1550
         this.IL = -100
         this.RL = -100
