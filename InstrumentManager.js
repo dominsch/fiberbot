@@ -192,7 +192,8 @@ class SantecInstrument extends Instrument {
         while(this.mode == "live") {
             try{
                 this.IL = await this.query("READ:IL:DET1? " + 1550)
-                this.RL = (await this.query("READ:RL? " + 1550, 4))[0]
+                let rl = (await this.query("READ:RL? " + 1550, 4))[0]
+                this.RL = (rl.match(/(\d+\.\d+)/g))[0] || -100
             } catch(e){
                 console.error("live error", e)
                 this.disconnect()
