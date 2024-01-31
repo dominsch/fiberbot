@@ -44,7 +44,8 @@ const server = Bun.serve({
             case "/submit/navigation":
                 sess.next = sp.type
                 sess.backwards = (sp.direction == "prev")
-                sess.autoAdvance = (sp.advance == "on")
+                (sp.advance == "channel") ? sess.autoAdvance = "passing" : sess.autoAdvance = sp.advance
+                sess.switchAdvance = (sp.advance == "channel")
                 res += makeCellOuter(sess, sess.DUTs[sess.nextDUT], sess.nextEnd, sess.nextFiber, d.wavs[0], true, false, false)
                 switch(sess.next) {
                     case "end":
@@ -125,14 +126,12 @@ const server = Bun.serve({
             case "/capend":
                 if (d.IL[sess.currentEnd][sess.currentFiber][1550] <= sess.maxIL[sess.currentEnd] && d.RL[sess.currentEnd][sess.currentFiber][1550] >= sess.minRL[sess.currentEnd]) {
                     res += makeCellOuter(sess, sess.DUTs[sess.currentDUT], sess.currentEnd, sess.currentFiber, d.wavs[0], true, false, false)
-                    sess.advance()
+                    if (sess.autoAdvance == "passing") sess.advance()
                     res += makeCellOuter(sess, sess.DUTs[sess.nextDUT], sess.nextEnd, sess.nextFiber, d.wavs[0], true, false, true)
                     res += makeCellOuter(sess, sess.DUTs[sess.currentDUT], sess.currentEnd, sess.currentFiber, d.wavs[0], true, true)
-                    if (sess.switchAdvance) {
-                        im.setChannel(sess.currentFiber%sess.base)
-                    }
+                    if (sess.switchAdvance) im.setChannel(sess.currentFiber%sess.base)
                 } else {
-                    console.log("no advance")
+                    if (sess.autoAdvance == "always") sess.advance()
                 }
                 return new Response(res)
             case "/tab":

@@ -76,10 +76,27 @@ export function makeNavigationForm(sess) {
         </fieldset>
         <fieldset>
             <legend>Auto Advanace</legend>
-            <div class="switch">
-                <input type="checkbox" id="advance" name="advance" ${(sess.autoAdvance) ? "checked" : ""}/>
-                <label for ="850">enabled</label>
+            <div class="option">
+                <input type="radio" name="advance" value="never" />
+                <label>disabled</label>
             </div>
+            <div class="option">
+                <input type="radio" name="advance" value="passing" />
+                <label>passing</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="advance" value="channel" />
+                <label>passing + switch channel</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="advance" value="always" />
+                <label>always</label>
+            </div>
+
+
+
+
+            
         </fieldset>
         <fieldset>
             <legend>Next</legend>
@@ -104,6 +121,11 @@ export function makeNavigationForm(sess) {
         <button class ="btn" onclick="this.blur();">Submit</button>
         </form>`
 }
+
+{/* <div class="switch">
+                <input type="checkbox" id="advance" name="advance" ${(sess.autoAdvance) ? "checked" : ""}/>
+                <label for ="850">enabled</label>
+            </div> */}
 
 export function makeAdvancedForm(sess) {
     return /*html*/`
