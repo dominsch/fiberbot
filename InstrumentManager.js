@@ -22,9 +22,7 @@ export class InstrumentManager {
         let inst = this.instruments[instrument]
         return inst[value]
     }
-    setChannel(channel) {
-        this.instruments[instrument].setChannel(channel)
-    }
+    
     readChannels(instrument, channels) {
         return this.instruments[instrument].readChannels(channels)
     }
@@ -33,6 +31,9 @@ export class InstrumentManager {
     }
     setMode(instrument, mode) {
         this.instruments[instrument].setMode(mode)
+    }
+    setChannel(instrument, channel) {
+        this.instruments[instrument].switchChannel(channel)
     }
 }
 
@@ -66,7 +67,7 @@ class Instrument {
                             // console.log("data in: ", res)
                             let res = socket.data.buffer.split(",")
                             if (res.length >= socket.data.rsps-1) {
-                                console.log("res: ", res.length, socket.data.rsps, res, typeof(res))
+                                //console.log("res: ", res.length, socket.data.rsps, res, typeof(res))
                                 socket.data.resolver(res)
                                 socket.data.buffer = ""
                             }
@@ -143,7 +144,6 @@ class ViaviInstrument extends Instrument {
     async startLive(){
         while(this.mode == "live") {
             let idn = await this.query("*IDN?",4)
-            console.log("name ", idn[0])
             try{
                 this.IL = await this.query(":FETCH:LOSS? 1,1")
                 this.RL = await this.query(":FETCH:ORL? 1,1")
@@ -155,12 +155,8 @@ class ViaviInstrument extends Instrument {
         }
     }
     async switchChannel(c) {
-        res = await this.query(`:PATH:CHAN 1,1,1,${c};:PATH:CHAN? 1,1,1`)
-        if(res != c) {
-            console.error("Channel Change Failed")
-            return false
-        }
-        return true
+        let res = await this.query(`:PATH:CHAN 1,1,1,${c};*OPC?`)
+        console.log("channel switch success? ", res)
     }
     async readChannels(channels) {
         let ILs = []
@@ -205,7 +201,7 @@ class SantecInstrument extends Instrument {
         }
     }
     async switchChannel(c) {
-        res = await this.query(`SW1:CLOSE ${c};*OPC?`)
+        let res = await this.query(`SW1:CLOSE ${c};*OPC?`)
         console.log("channel switch success? ", res)
     }
 }

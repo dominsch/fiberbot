@@ -6,12 +6,12 @@ import {makeCSV} from './csv.js'
 // let configs = {
 //     "MAP104": ["192.168.10.229", 8100, "Viavi"]
 // }
-// let configs = {
-//     "MAP104": ["localhost", 8301, "Viavi"]
-// }
 let configs = {
-    "MAP104": ["192.168.10.105", 5025, "Santec"]
+    "MAP104": ["localhost", 8301, "Viavi"]
 }
+// let configs = {
+//     "MAP104": ["192.168.10.105", 5025, "Santec"]
+// }
 
 let im = new InstrumentManager(configs)
 await im.initialize()
@@ -44,7 +44,11 @@ const server = Bun.serve({
             case "/submit/navigation":
                 sess.next = sp.type
                 sess.backwards = (sp.direction == "prev")
-                (sp.advance == "channel") ? sess.autoAdvance = "passing" : sess.autoAdvance = sp.advance
+                if (sp.advance == "channel") {
+                    sess.autoAdvance = "passing"
+                } else {
+                    sess.autoAdvance = sp.advance
+                }
                 sess.switchAdvance = (sp.advance == "channel")
                 res += makeCellOuter(sess, sess.DUTs[sess.nextDUT], sess.nextEnd, sess.nextFiber, d.wavs[0], true, false, false)
                 switch(sess.next) {
@@ -125,12 +129,14 @@ const server = Bun.serve({
                 return new Response(makeRow(sess, d, sess.currentFiber, true))
             case "/capend":
                 if (d.IL[sess.currentEnd][sess.currentFiber][1550] <= sess.maxIL[sess.currentEnd] && d.RL[sess.currentEnd][sess.currentFiber][1550] >= sess.minRL[sess.currentEnd]) {
+                    console.log("if            ", sess.autoAdvance, sess.autoAdvance == "always")
                     res += makeCellOuter(sess, sess.DUTs[sess.currentDUT], sess.currentEnd, sess.currentFiber, d.wavs[0], true, false, false)
-                    if (sess.autoAdvance == "passing") sess.advance()
+                    if (sess.autoAdvance != "never") sess.advance()
                     res += makeCellOuter(sess, sess.DUTs[sess.nextDUT], sess.nextEnd, sess.nextFiber, d.wavs[0], true, false, true)
                     res += makeCellOuter(sess, sess.DUTs[sess.currentDUT], sess.currentEnd, sess.currentFiber, d.wavs[0], true, true)
-                    if (sess.switchAdvance) im.setChannel(sess.currentFiber%sess.base)
+                    if (sess.switchAdvance) im.setChannel(sess.instrument, sess.currentFiber%sess.base)
                 } else {
+            console.log("else              ", sess.autoAdvance, sess.autoAdvance == "always")
                     if (sess.autoAdvance == "always") sess.advance()
                 }
                 return new Response(res)

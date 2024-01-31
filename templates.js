@@ -75,9 +75,9 @@ export function makeNavigationForm(sess) {
             </div>
         </fieldset>
         <fieldset>
-            <legend>Auto Advanace</legend>
+            <legend>Auto Advance</legend>
             <div class="option">
-                <input type="radio" name="advance" value="never" />
+                <input type="radio" name="advance" value="never" checked/>
                 <label>disabled</label>
             </div>
             <div class="option">
@@ -92,11 +92,6 @@ export function makeNavigationForm(sess) {
                 <input type="radio" name="advance" value="always" />
                 <label>always</label>
             </div>
-
-
-
-
-            
         </fieldset>
         <fieldset>
             <legend>Next</legend>

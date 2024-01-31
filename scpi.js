@@ -28,13 +28,16 @@ devices.forEach(async d => {
                     return 0
                 }
                 if (data.toString().search(/\*IDN\?/g) != -1){
-                    socket.write(d[0] + ending)
+                    socket.write(d[0] + ",1,1,1" + ending)
                 }
                 if (data.toString().search(/:FETCH:LOSS\?/g) != -1){
                     socket.write((Math.random()*0.5).toFixed(3) + ending)
                 }
                 if (data.toString().search(/:FETCH:ORL\?/g) != -1){
                     socket.write(((Math.random()*20) + 50).toFixed(2) + ending)
+                }
+                if (data.toString().search(/OPC\?/g) != -1){
+                    socket.write("1" + ending)
                 }
             }, // message received from client
             open(socket) {console.log("open ", d[0])}, // socket opened
