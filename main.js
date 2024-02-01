@@ -3,12 +3,12 @@ import {InstrumentManager} from './InstrumentManager.js'
 import {Session} from './SessionManager.js'
 import {makeCSV} from './csv.js'
 
-// let configs = {
-//     "MAP104": ["192.168.10.229", 8100, "Viavi"]
-// }
 let configs = {
-    "MAP104": ["localhost", 8301, "Viavi"]
+    "MAP104": ["192.168.10.224", 8100, "Viavi"]
 }
+// let configs = {
+//     "MAP104": ["localhost", 8301, "Viavi"]
+// }
 // let configs = {
 //     "MAP104": ["192.168.10.105", 5025, "Santec"]
 // }
@@ -136,9 +136,11 @@ const server = Bun.serve({
                     res += makeCellOuter(sess, sess.DUTs[sess.currentDUT], sess.currentEnd, sess.currentFiber, d.wavs[0], true, true)
                     if (sess.switchAdvance) im.setChannel(sess.instrument, sess.currentFiber%sess.base)
                 } else {
-            console.log("else              ", sess.autoAdvance, sess.autoAdvance == "always")
+                    console.log("else              ", sess.autoAdvance, sess.autoAdvance == "always")
                     if (sess.autoAdvance == "always") sess.advance()
                 }
+                sess.IL = -100
+                sess.RL = -100
                 return new Response(res)
             case "/tab":
                 d = sess.getDUT(sp.sn)
