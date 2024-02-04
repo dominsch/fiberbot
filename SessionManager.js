@@ -19,6 +19,7 @@ export class Session {
         this.next = "end"
         this.backwards = false
         this.autoAdvance = true
+        this.switchAdvance = false
         this.WL = 1550
         this.IL = -100
         this.RL = -100
@@ -61,31 +62,29 @@ export class Session {
         return this.DUTs[this.currentDUT]
     }
     advance() {
-        if (this.autoAdvance) {
-            console.log("advance", this.next ,this.currentDUT, this.currentEnd, this.currentFiber,this.nextDUT, this.nextEnd, this.nextFiber)
-            this.currentEnd = this.nextEnd
-            this.currentFiber = this.nextFiber
-            this.currentDUT = this.nextDUT
-            switch(this.next) {
-                case "end":
-                    this.nextEnd = this.getNext(this.currentEnd, this.next)
-                    break;
-                case "fiber":
-                    this.nextFiber = this.getNext(this.currentFiber, this.next)
-                    break;
-                case "wl":
-                    // this.currentEnd = this.nextEnd
-                    // this.nextEnd += 1
-                    break;
-                case "dut":
-                    this.nextDUT = this.getNext(this.currentDUT, this.next)
-                    break;
+        
+        console.log("advance", this.next ,this.currentDUT, this.currentEnd, this.currentFiber,this.nextDUT, this.nextEnd, this.nextFiber)
+        this.currentEnd = this.nextEnd
+        this.currentFiber = this.nextFiber
+        this.currentDUT = this.nextDUT
+        switch(this.next) {
+            case "end":
+                this.nextEnd = this.getNext(this.currentEnd, this.next)
+                break;
+            case "fiber":
+                this.nextFiber = this.getNext(this.currentFiber, this.next)
+                break;
+            case "wl":
+                // this.currentEnd = this.nextEnd
+                // this.nextEnd += 1
+                break;
+            case "dut":
+                this.nextDUT = this.getNext(this.currentDUT, this.next)
+                break;
 
-            }
-            console.log("advance after", this.next ,this.currentDUT, this.currentEnd, this.currentFiber,this.nextDUT, this.nextEnd, this.nextFiber)
-            return true
         }
-        return false
+        console.log("advance after", this.next ,this.currentDUT, this.currentEnd, this.currentFiber,this.nextDUT, this.nextEnd, this.nextFiber)
+          
     }
     getNext(n, t) {
         switch(t) {
