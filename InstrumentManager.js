@@ -1,39 +1,34 @@
 export class InstrumentManager {
-    constructor(configs) {
-        this.instruments = {}
-        for (const [name, params] of Object.entries(configs)) {
-            switch(params[2]){
-                case "Viavi": 
-                    this.instruments[name] = new ViaviInstrument(name, ...params)
-                    break;
+    constructor(config) {
+            switch(config[3]){
                 case "Santec": 
-                    this.instruments[name] = new SantecInstrument(name, ...params)
+                    this.instrument = new SantecInstrument(...config)
+                    break;
+                default: 
+                    this.instrument = new ViaviInstrument(...config)
                     break;
             }
-        }
+        
     }
     async initialize() {
-        for (const name in this.instruments) {
-            await this.instruments[name].connect()
-            await this.instruments[name].setMode("live")
-        }
+        await this.instrument.connect()
+        await this.instrument.setMode("live")
     }
     getValue(instrument, value){
-        let inst = this.instruments[instrument]
-        return inst[value]
+        return this.instrument[value]
     }
     
     readChannels(instrument, channels) {
-        return this.instruments[instrument].readChannels(channels)
+        return this.instrument.readChannels(channels)
     }
     readChannelsLive(instrument, channels) {
-        return this.instruments[instrument].readChannelsLive(channels)
+        return this.instrument.readChannelsLive(channels)
     }
     setMode(instrument, mode) {
-        this.instruments[instrument].setMode(mode)
+        this.instrument.setMode(mode)
     }
     setChannel(instrument, channel) {
-        this.instruments[instrument].switchChannel(channel)
+        this.instrument.switchChannel(channel)
     }
 }
 

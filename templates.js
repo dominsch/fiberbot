@@ -21,19 +21,22 @@ export function makeSettingsForm(sess) {
             <input type="number" step="0.01" name="maxILA" value="${sess.maxIL[1]}">
             <label>End A Min RL</label>
             <input type="number" name="minRLA" value="${sess.minRL[1]}">
-            <label>End B Max IL</label>
-            <input type="number" step="0.01" name="maxILB" value="${sess.maxIL[2]}">
-            <label>End B Min RL</label>
-            <input type="number" name="minRLB" value="${sess.minRL[2]}">
+            
+                <label class="spec-b hidden">End B Max IL</label>
+                <input class="spec-b hidden" type="number" step="0.01" name="maxILB" value="${sess.maxIL[2]}">
+                <label class="spec-b hidden">End B Min RL</label>
+                <input class="spec-b hidden" type="number" name="minRLB" value="${sess.minRL[2]}">
+            
+            
         </div>
         <fieldset>
             <legend>Ends</legend>
             <div class="option">
-                <input type="radio" id="setup-E1" name="numEnds" value="1" checked />
+                <input type="radio" id="setup-E1" name="numEnds" value="1" _="on click add .hidden to .spec-b" checked />
                 <label for="setup-E1">single</label>
             </div>
             <div class="option">
-                <input type="radio" id="setup-E2" name="numEnds" value="2" />
+                <input type="radio" id="setup-E2" name="numEnds" value="2" _="on click remove .hidden from .spec-b"/>
                 <label for="setup-E2">both</label>
             </div>
         </fieldset>

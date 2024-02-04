@@ -3,9 +3,7 @@ import {InstrumentManager} from './InstrumentManager.js'
 import {Session} from './SessionManager.js'
 import {makeCSV} from './csv.js'
 
-let configs = {
-    "MAP104": ["192.168.10.224", 8100, "Viavi"]
-}
+let config = ["MAP104", "192.168.10.224", 8100, "Viavi"]
 // let configs = {
 //     "MAP104": ["localhost", 8301, "Viavi"]
 // }
@@ -13,10 +11,15 @@ let configs = {
 //     "MAP104": ["192.168.10.105", 5025, "Santec"]
 // }
 
-let im = new InstrumentManager(configs)
+if (Bun.argv[2]) {
+    let f = Bun.argv[2].match( /.*\.json/g )
+    config = await Bun.file(f[0]).json();
+}
+
+let im = new InstrumentManager(config)
 await im.initialize()
 
-let sess = new Session("MAP104")
+let sess = new Session(config[0])
 
 
 const server = Bun.serve({
