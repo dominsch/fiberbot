@@ -21,8 +21,10 @@ export class Session {
         this.autoAdvance = true
         this.switchAdvance = false
         this.WL = 1550
+        this.CH = 1
         this.IL = -100
         this.RL = -100
+        this.valid = false
         this.DUTs = []
     }
     configure(firstSN, lastSN, numFibers, base, numEnds, maxILA, maxILB, minRLA, minRLB, wl) {
@@ -62,7 +64,7 @@ export class Session {
         return this.DUTs[this.currentDUT]
     }
     advance() {
-        
+        this.valid = false
         console.log("advance", this.next ,this.currentDUT, this.currentEnd, this.currentFiber,this.nextDUT, this.nextEnd, this.nextFiber)
         this.currentEnd = this.nextEnd
         this.currentFiber = this.nextFiber

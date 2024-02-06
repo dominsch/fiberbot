@@ -28,7 +28,7 @@ export class InstrumentManager {
         this.instrument.setMode(mode)
     }
     setChannel(instrument, channel) {
-        this.instrument.switchChannel(channel)
+        this.instrument.setChannel(channel)
     }
 }
 
@@ -39,8 +39,10 @@ class Instrument {
         this.netport = netport
         this.connected = false
         this.activeWL = []
+        this.activeCH = 1
         this.IL = -100
         this.RL = -100
+        this.busy = false
     }
     async connect() {
         while(!this.connected) {
@@ -52,7 +54,7 @@ class Instrument {
                     data: {instrument: this},
                     socket: {
                         open(socket) {
-                            console.log("open")
+                            console.log("socket open")
                             socket.data.instrument.connected = true
                             socket.data.buffer = ""
                             
@@ -69,20 +71,25 @@ class Instrument {
                             
                         },
                         close(socket) {
-                            console.log("close")
+                            console.log("socket close")
                             socket.data.rejector("disconnect")
                             socket.data.instrument.connected = false
                         },
-                        drain(socket) {console.log("drain")},
-                        error(socket, error) {console.log("socket error:", error)}
+                        drain(socket) {console.log("socket drain")},
+                        error(socket, error) {console.log("socket error:", error)},
+                        connectError(socket, error) {console.log("socket connection error:", error)}, // connection failed
+                        end(socket) {console.log("socket end")}, // connection closed by server
+                        timeout(socket) {console.log("socket timeout")}
                     }
                 })
             } catch(e) {
                 console.error("connect error", e)
             }
-            await Bun.sleep(2000)
-            if(!this.connected) await Bun.sleep(2000)
+            //await Bun.sleep(2000)
+            if(!this.connected) await Bun.sleep(1000)
         }
+        let idn = (await this.query("*IDN?",4))[0]
+        console.log("Connection established with ", idn)
     }
     async disconnect() {
         console.log(this.name, "disconnect")
@@ -92,29 +99,31 @@ class Instrument {
         await this.connect()
     }
     async query(q, rsps = 1) {
-        // console.log("data out: from ", this.name, " query: ", q)
+        while (this.busy) await Bun.sleep(10)
+        this.busy = true
         this.socket.data.rsps = rsps
-        let written = this.socket.write(q+'\n')
-        // console.log(written)
-        let tries = 1
+        let written = 0
+        let tries = 0
         while (written < 1) {
-            if (tries > 5) {
-                this.disconnect()
-                
-            }
+            if (tries > 5) this.disconnect()
+            written = this.socket.write(q+'\n')
+            //console.log(q, "#", written)
+            this.socket.flush()
+            if (written) break
+            tries++
             console.error("writing error")
             await Bun.sleep(200)
             console.error("retry")
-            written = this.socket.write(q+'\n')
-            tries++
         }
         return new Promise((resolve, reject) => {
             const resolver = (val) => {
                 clearTimeout(timeoutId)
+                this.busy = false
                 resolve(val)
             }
             let timeoutId = setTimeout((e) => {
                     console.error("rejecting ", q)
+                    this.busy = false
                     reject(e)
             }, 2000, `ERROR:  got no response`);
             this.socket.data.resolver = resolver
@@ -138,10 +147,11 @@ class ViaviInstrument extends Instrument {
     }
     async startLive(){
         while(this.mode == "live") {
-            let idn = await this.query("*IDN?",4)
-            try{
-                this.IL = await this.query(":FETCH:LOSS? 1,1")
-                this.RL = await this.query(":FETCH:ORL? 1,1")
+            try {
+                let il = (await this.query(":FETCH:LOSS? 1,1 " + 1550))[0]
+                this.IL = (il.match(/(-?\d+\.\d+)/g))[0] || -100
+                let rl = (await this.query(":FETCH:ORL? 1,1"))[0]
+                this.RL = (rl.match(/(-?\d+\.\d+)/g))[0] || -100
             } catch(e){
                 console.error("live error", e)
                 this.disconnect()
@@ -149,15 +159,19 @@ class ViaviInstrument extends Instrument {
             await Bun.sleep(500)
         }
     }
-    async switchChannel(c) {
+    async setChannel(c) {
         let res = await this.query(`:PATH:CHAN 1,1,1,${c};*OPC?`)
-        console.log("channel switch success? ", res)
+        if (res = 1) {
+            console.log("channel switch success")
+            this.activeCH = c
+        }
+        
     }
     async readChannels(channels) {
         let ILs = []
         let RLs = []
         for (chan of channels) {
-            await this.switchChannel(chan)
+            await this.setChannel(chan)
             IL[chan] = await this.query(":MEAS:IL? 1,1")
             RL[chan] = await this.query(":MEAS:ORL? 1,1")
         }
@@ -167,7 +181,7 @@ class ViaviInstrument extends Instrument {
         let ILs = []
         let RLs = []
         for (chan of channels) {
-            await this.switchChannel(chan)
+            await this.setChannel(chan)
             IL[chan] = await this.query(":FETCH:LOSS? 1,1")
             RL[chan] = await this.query(":FETCH:ORL? 1,1")
         }
@@ -182,11 +196,10 @@ class SantecInstrument extends Instrument {
         super(name, address, netport);
     }
     async startLive(){
-        let idn = (await this.query("*IDN?",4))[0]
-        console.log("name ", idn)
         while(this.mode == "live") {
             try{
-                this.IL = await this.query("READ:IL:DET1? " + 1550)
+                let il = (await this.query("READ:IL:DET1? " + 1550))[0]
+                this.IL = (il.match(/(\d+\.\d+)/g))[0] || -100
                 let rl = (await this.query("READ:RL? " + 1550, 4))[0]
                 this.RL = (rl.match(/(\d+\.\d+)/g))[0] || -100
             } catch(e){
@@ -196,8 +209,11 @@ class SantecInstrument extends Instrument {
             await Bun.sleep(800)
         }
     }
-    async switchChannel(c) {
+    async setChannel(c) {
         let res = await this.query(`SW1:CLOSE ${c};*OPC?`)
-        console.log("channel switch success? ", res)
+        if (res = 1) {
+            console.log("channel switch success")
+            this.activeCH = c
+        }
     }
 }

@@ -337,5 +337,7 @@ export function makeCellInnerForm(d, e, f, wl, type, value) {
 export function makeLive(sess, im) {
     sess.IL = im.getValue(sess.instrument, "IL")
     sess.RL = im.getValue(sess.instrument, "RL")
-    return `WL: ${sess.WL} IL:${sess.IL} RL:${sess.RL} <button id="upload-button" hx-get="/flush/all" hx-swap="none" onclick="this.blur();">upload all</button>`
+    sess.CH = im.getValue(sess.instrument, "activeCH")
+    sess.valid = true
+    return `WL: ${sess.WL} CH: ${sess.CH} IL:${sess.IL} RL:${sess.RL} <button id="upload-button" hx-get="/flush/all" hx-swap="none" onclick="this.blur();">upload all</button>`
 }

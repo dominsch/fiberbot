@@ -11,7 +11,7 @@ if (path) {
     devices = await file.json();
     console.log(devices)
 } else {
-    devices[0] = ["tester", "localhost", parseInt(Bun.argv[2]) || 8301]
+    devices[0] = ["tester", "localhost", parseInt(Bun.argv[2]) || 8100]
 }
 
 devices.forEach(async d => {
@@ -21,24 +21,28 @@ devices.forEach(async d => {
         port: d[2],
         socket: {
             async data(socket, data) {
-                console.log(d[0], data.toString())
-                await Bun.sleep(Math.random()*200)
+                console.log("> ", d[0], data.toString().trim(), " #", data.length)
+                await Bun.sleep(Math.random()*1000)
+                let res = ""
                 if(Math.random() <= 0.0005) {
                     console.log("oops")
                     return 0
                 }
                 if (data.toString().search(/\*IDN\?/g) != -1){
-                    socket.write(d[0] + ",1,1,1" + ending)
+
+                    res = d[0] + ",1,1,1"
                 }
                 if (data.toString().search(/:FETCH:LOSS\?/g) != -1){
-                    socket.write((Math.random()*0.5).toFixed(3) + ending)
+                    res = (Math.random()*0.5-0.1).toFixed(2)
                 }
                 if (data.toString().search(/:FETCH:ORL\?/g) != -1){
-                    socket.write(((Math.random()*20) + 50).toFixed(2) + ending)
+                    res = ((Math.random()*20) + 50).toFixed(1)
                 }
                 if (data.toString().search(/OPC\?/g) != -1){
-                    socket.write("1" + ending)
+                    res = 1
                 }
+                console.log("< ", res + ending)
+                socket.write(res + ending)
             }, // message received from client
             open(socket) {console.log("open ", d[0])}, // socket opened
             close(socket) {console.log("close ", d[0])}, // socket closed

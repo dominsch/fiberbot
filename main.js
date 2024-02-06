@@ -34,9 +34,9 @@ const server = Bun.serve({
         
         let d = sess.getActiveDUT()
         let res = ""
-        
+
         switch(url.pathname) {
-            case "/": return new Response(Bun.file("table.html"))
+            case "/": return new Response(Bun.file("index.html"))
             case "/style.css": return new Response(Bun.file("style.css"))
             case "/digital.woff2": return new Response(Bun.file("media/subset-Digital-7Mono.woff2"))
             case "/submit/setup":
@@ -126,24 +126,26 @@ const server = Bun.serve({
                 // if (sess.IL < Math.abs(d.IL[d.focusEnd][d.focusFiber][d.wavs[0]])) d.IL[d.focusEnd][d.focusFiber][d.wavs[0]] = sess.IL
                 // if (sess.RL > d.RL[d.focusEnd][d.focusFiber][d.wavs[0]]) d.RL[d.focusEnd][d.focusFiber][d.wavs[0]] = sess.RL
                 // return new Response(makeRow(d, d.focusFiber, true))
-                if (sess.IL < Math.abs(d.IL[sess.currentEnd][sess.currentFiber][d.wavs[0]])) d.IL[sess.currentEnd][sess.currentFiber][d.wavs[0]] = Number.parseFloat(sess.IL).toFixed(1)
-                if (sess.RL > d.RL[sess.currentEnd][sess.currentFiber][d.wavs[0]]) d.RL[sess.currentEnd][sess.currentFiber][d.wavs[0]] = Math.trunc(parseFloat(sess.RL))
+                if (sess.valid) {
+                    if (sess.IL < Math.abs(d.IL[sess.currentEnd][sess.currentFiber][d.wavs[0]])) d.IL[sess.currentEnd][sess.currentFiber][d.wavs[0]] = Number.parseFloat(sess.IL).toFixed(1)
+                    if (sess.RL > d.RL[sess.currentEnd][sess.currentFiber][d.wavs[0]]) d.RL[sess.currentEnd][sess.currentFiber][d.wavs[0]] = Math.trunc(parseFloat(sess.RL))
+                }
                 console.log("makerow", sess.currentDUT, sess.currentEnd, d.sn, sess.currentFiber)
                 return new Response(makeRow(sess, d, sess.currentFiber, true))
             case "/capend":
                 if (d.IL[sess.currentEnd][sess.currentFiber][1550] <= sess.maxIL[sess.currentEnd] && d.RL[sess.currentEnd][sess.currentFiber][1550] >= sess.minRL[sess.currentEnd]) {
-                    console.log("if            ", sess.autoAdvance, sess.autoAdvance == "always")
                     res += makeCellOuter(sess, sess.DUTs[sess.currentDUT], sess.currentEnd, sess.currentFiber, d.wavs[0], true, false, false)
                     if (sess.autoAdvance != "never") sess.advance()
                     res += makeCellOuter(sess, sess.DUTs[sess.nextDUT], sess.nextEnd, sess.nextFiber, d.wavs[0], true, false, true)
                     res += makeCellOuter(sess, sess.DUTs[sess.currentDUT], sess.currentEnd, sess.currentFiber, d.wavs[0], true, true)
-                    if (sess.switchAdvance) im.setChannel(sess.instrument, sess.currentFiber%sess.base)
+                    if (sess.switchAdvance) {
+                        let chan = sess.currentFiber%sess.base
+                        if (chan == 0) chan = sess.base
+                        im.setChannel(sess.instrument, chan)
+                    }
                 } else {
-                    console.log("else              ", sess.autoAdvance, sess.autoAdvance == "always")
                     if (sess.autoAdvance == "always") sess.advance()
                 }
-                sess.IL = -100
-                sess.RL = -100
                 return new Response(res)
             case "/tab":
                 d = sess.getDUT(sp.sn)
