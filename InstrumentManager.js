@@ -148,9 +148,9 @@ class ViaviInstrument extends Instrument {
     async startLive(){
         while(this.mode == "live") {
             try {
-                let il = (await this.query(":FETCH:LOSS? 1,1 " + 1550))[0]
+                let il = (await this.query(":FETCH:LOSS? 1"))[0]
                 this.IL = (il.match(/(-?\d+\.\d+)/g))[0] || -100
-                let rl = (await this.query(":FETCH:ORL? 1,1"))[0]
+                let rl = (await this.query(":FETCH:ORL? 1"))[0]
                 this.RL = (rl.match(/(-?\d+\.\d+)/g))[0] || -100
             } catch(e){
                 console.error("live error", e)
