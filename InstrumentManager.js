@@ -149,9 +149,9 @@ class ViaviInstrument extends Instrument {
         while(this.mode == "live") {
             try {
                 let il = (await this.query(":FETCH:LOSS? 1"))[0]
-                this.IL = (il.match(/(-?\d+\.\d+)/g))[0] || -100
+                this.IL = (il.match(/(-?\d+\.\d+)/g) || [-100])[0]
                 let rl = (await this.query(":FETCH:ORL? 1"))[0]
-                this.RL = (rl.match(/(-?\d+\.\d+)/g))[0] || -100
+                this.RL = (rl.match(/(-?\d+\.\d+)/g) || [-100])[0]
             } catch(e){
                 console.error("live error", e)
                 this.disconnect()
@@ -199,9 +199,9 @@ class SantecInstrument extends Instrument {
         while(this.mode == "live") {
             try{
                 let il = (await this.query("READ:IL:DET1? " + 1550))[0]
-                this.IL = (il.match(/(\d+\.\d+)/g))[0] || -100
+                this.IL = (il.match(/(\d+\.\d+)/g) || [-100])[0]
                 let rl = (await this.query("READ:RL? " + 1550, 4))[0]
-                this.RL = (rl.match(/(\d+\.\d+)/g))[0] || -100
+                this.RL = (rl.match(/(\d+\.\d+)/g) || [-100])[0]
             } catch(e){
                 console.error("live error", e)
                 this.disconnect()
