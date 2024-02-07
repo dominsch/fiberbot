@@ -206,7 +206,7 @@ class SantecInstrument extends Instrument {
                 console.error("live error", e)
                 this.disconnect()
             }
-            await Bun.sleep(800)
+            await Bun.sleep(100)
         }
     }
     async setChannel(c) {
