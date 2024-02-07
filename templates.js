@@ -339,5 +339,5 @@ export function makeLive(sess, im) {
     sess.RL = im.getValue(sess.instrument, "RL")
     sess.CH = im.getValue(sess.instrument, "activeCH")
     sess.valid = true
-    return `WL: ${sess.WL} CH: ${sess.CH} IL:${sess.IL} RL:${sess.RL} <button id="upload-button" hx-get="/flush/all" hx-swap="none" onclick="this.blur();">upload all</button>`
+    return `WL: ${sess.WL} CH: ${sess.CH} IL:${(sess.IL == -100) ? "---" : sess.IL} RL:${(sess.RL == -100) ? "---" : sess.RL} <button id="upload-button" hx-get="/flush/all" hx-swap="none" onclick="this.blur();">upload all</button>`
 }
