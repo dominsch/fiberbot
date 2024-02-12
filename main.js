@@ -1,36 +1,24 @@
-import {makeLive, makeCellInner, makeCellInnerForm, makeRow, makeTable, makeSettingsForm, makeNavigationForm, makeAdvancedForm, makeCard, makeCompactCard, makeCellOuter} from './templates.js'
-import {InstrumentManager} from './InstrumentManager.js'
-import {Session} from './SessionManager.js'
+import {makeLive, makeStatus, makeCellInner, makeCellInnerForm, makeRow, makeTable, makeSettingsForm, makeNavigationForm, makeAdvancedForm, makeCard, makeCompactCard, makeCellOuter} from './templates.js'
+import {SantecInstrument, ViaviInstrument} from './instrument.js'
+import {Session} from './session.js'
 import {makeCSV} from './csv.js'
 
-let config = ["MAP104", "192.168.10.224", 8100, "Viavi"]
-// let configs = {
-//     "MAP104": ["localhost", 8301, "Viavi"]
-// }
-// let configs = {
-//     "MAP104": ["192.168.10.105", 5025, "Santec"]
-// }
-
-if (Bun.argv[2]) {
-    let f = Bun.argv[2].match( /.*\.json/g )
-    config = await Bun.file(f[0]).json();
-}
-
-let im = new InstrumentManager(config)
-await im.initialize()
+let config = (Bun.argv[2]?.match( /.*\.json/g )) ? await Bun.file(Bun.argv[2].match( /.*\.json/g )[0]).json() : ["Local", "localhost", 8100, "Viavi"]
+let serverPort = (config[1] == "localhost") ? 7000 : "7" + (config[1]?.match(/\d{3}$/g))[0]
+let inst = (config[3] == "Santec") ? new SantecInstrument(...config) : new ViaviInstrument(...config)
+await inst.connect()
+inst.setMode("live")
 
 let sess = new Session(config[0])
 
 
 const server = Bun.serve({
-    port: 3000,
+    port: serverPort,
     fetch(req) {
         const url = new URL(req.url);
-        // const [_, base, endpoint] = url.pathname.split("/")
-        // console.log(base, endpoint)
         
         const sp = Object.fromEntries(url.searchParams)
-        if(url.pathname != "/live") console.log("url", url.pathname, "params:", sp, url.searchParams)
+        if(url.pathname != "/live" && url.pathname != "/status") console.log("url", url.pathname, "params:", sp, url.searchParams)
         
         let d = sess.getActiveDUT()
         let res = ""
@@ -39,6 +27,7 @@ const server = Bun.serve({
             case "/": return new Response(Bun.file("index.html"))
             case "/style.css": return new Response(Bun.file("style.css"))
             case "/digital.woff2": return new Response(Bun.file("media/subset-Digital-7Mono.woff2"))
+            case "/status": return new Response(makeStatus(sess, inst, server.port), {headers: { "Access-Control-Allow-Origin": "*" }})
             case "/submit/setup":
                 sess.configure(sp.firstSN, sp.lastSN, sp.numFibers, sp.base, sp.numEnds, sp.maxILA, sp.maxILB, sp.minRLA, sp.minRLB, sp.wl)
                 sess.makeDUTs()
@@ -90,8 +79,8 @@ const server = Bun.serve({
                 }
                 return new Response(res)
             case "/flush/dut":
-                // let sn = sp.id.match(/(\d+)/g)[0]
-                makeCSV([sess.getDUT(sp.sn)], sess)
+                let sn = sp.id.match(/(\d+)/g)[0]
+                makeCSV([sess.getDUT(sn)], sess)
                 return new Response("")
             case "/flush/all":
                 makeCSV(sess.DUTs, sess)
@@ -141,7 +130,7 @@ const server = Bun.serve({
                     if (sess.switchAdvance) {
                         let chan = sess.currentFiber%sess.base
                         if (chan == 0) chan = sess.base
-                        im.setChannel(sess.instrument, chan)
+                        inst.setChannel(chan)
                     }
                 } else {
                     if (sess.autoAdvance == "always") sess.advance()
@@ -154,7 +143,7 @@ const server = Bun.serve({
                 d = sess.getDUT(sp.sn)
                 return new Response(makeCellInnerForm(d, sp.end, sp.fiber, sp.wl, sp.type))
             case "/live":
-                return new Response(makeLive(sess, im))
+                return new Response(makeLive(sess, inst))
             default:
                 console.error("wrong endpoint", url.pathname)
                 

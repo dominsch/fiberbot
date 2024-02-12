@@ -1,9 +1,9 @@
-PART#,1X12f-1550
+PART#,1x12F
 TESTER,Anon
-CHASSIS,MAP104
+CHASSIS,Local
 MODULE,123
-START,2023-12-14 12:32:30
-FINISH,2023-12-14 12:32:32
+START,2024-02-11 19:46:54
+FINISH,2024-02-11 19:47:00
 CUSTOM1,
 CUSTOM2,
 CUSTOM3,
@@ -25,15 +25,3 @@ SERIAL#,INPUT,OUTPUT,1550nm,1550nm
 1292001,Fiber 10 End A,Fiber 10 End B,,
 1292001,Fiber 11 End A,Fiber 11 End B,,
 1292001,Fiber 12 End A,Fiber 12 End B,,
-1292002,Fiber 1 End A,Fiber 1 End B,,
-1292002,Fiber 2 End A,Fiber 2 End B,,
-1292002,Fiber 3 End A,Fiber 3 End B,,
-1292002,Fiber 4 End A,Fiber 4 End B,,
-1292002,Fiber 5 End A,Fiber 5 End B,,
-1292002,Fiber 6 End A,Fiber 6 End B,,
-1292002,Fiber 7 End A,Fiber 7 End B,,
-1292002,Fiber 8 End A,Fiber 8 End B,,
-1292002,Fiber 9 End A,Fiber 9 End B,,
-1292002,Fiber 10 End A,Fiber 10 End B,,
-1292002,Fiber 11 End A,Fiber 11 End B,,
-1292002,Fiber 12 End A,Fiber 12 End B,,

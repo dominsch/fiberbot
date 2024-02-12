@@ -1,15 +1,16 @@
 //sudo mount -t cifs //[IP_Address]/[share_name] /mnt/TestData -o username=[username]
 
+import { file } from "bun"
+
 export async function makeCSV(duts, sess) {
     let tester = "Anon"
     let chassis = sess.instrument
     let start = sess.startTime
     let end = new Date(Date.now())
-    let partName = "" + sess.numEnds + "X" + sess.numFibers + "f" 
+    let partName = "" + sess.numEnds + "x" + sess.numFibers + "F" 
     let wlString = ""
     for (let wl of duts[0].wavs) {
         wlString += `,${wl}nm`
-        partName += "-" + wl
     }
     if (duts[0].hasrl) wlString += wlString
     console.log(tester, chassis, start, end, partName, wlString)
@@ -51,5 +52,6 @@ SERIAL#,INPUT,OUTPUT${wlString}\n`
         }
     }
     const csv = header + results
-    await Bun.write("test.csv", csv);
+    const fileName = chassis + "_" + partName + "_P" + duts[0].sn + ((duts.length > 1) ? ("-P" + duts[duts.length-1].sn) : "") + ".csv"
+    await Bun.write("./TestData/" + fileName, csv);
 }

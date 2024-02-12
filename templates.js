@@ -174,7 +174,7 @@ export function makeCard(s, d, oob = false, active = d.sn-s.firstSN==s.currentDU
     return /*html*/`
         <li id="P${d.sn}-C" ${(oob) ? ` hx-swap-oob="true" ` : ""} hx-vals='{"sn": "${d.sn}"}' class="card">
             <div class="buttons">
-                <button _="on click js(me) me.blur(); htmx.ajax('GET', '/flush/dut', {swap:'none', values:{id: me.closest('.card').id}}); end" class="material-icons">save_alt</button>
+                <button _="on click toggle .dark on the next <table/> js(me) me.blur(); htmx.ajax('GET', '/flush/dut', {swap:'none', values:{id: me.closest('.card').id}}); end" class="material-icons">save_alt</button>
                 <button _="on click toggle .dark on the next <table/> js(me) me.blur() end" class="material-icons" onclick="this.blur();">visibility_off</button>
                 <button hx-get="/clear/dut" hx-vals='{"scope": "dut"}' class="material-icons" onclick="this.blur();">clear</button>
             </div>
@@ -334,10 +334,22 @@ export function makeCellInnerForm(d, e, f, wl, type, value) {
 
 
 
-export function makeLive(sess, im) {
-    sess.IL = im.getValue(sess.instrument, "IL")
-    sess.RL = im.getValue(sess.instrument, "RL")
-    sess.CH = im.getValue(sess.instrument, "activeCH")
-    sess.valid = true
-    return `WL: ${sess.WL} CH: ${sess.CH} IL:${(sess.IL == -100) ? "---" : sess.IL} RL:${(sess.RL == -100) ? "---" : sess.RL} <button id="upload-button" hx-get="/flush/all" hx-swap="none" onclick="this.blur();">upload all</button>`
+export function makeLive(sess, inst) {
+    if (sess.IL != inst.IL || sess.RL != inst.RL) sess.valid = true
+    sess.IL = inst.IL
+    sess.RL = inst.RL
+    sess.CH = inst.activeCH
+    return `WL: ${sess.WL} CH: ${sess.CH} IL:${(sess.IL == -100) ? "---" : sess.IL} RL:${(sess.RL == -100) ? "---" : sess.RL}`
+}
+
+export function makeStatus(sess, inst, port) {
+    return /*html*/`
+        <td><a href="http://localhost:${port}">${inst.name}</a></td>
+        <td><a href="http://${inst.address}">${inst.address}</a></td>
+        <td>${inst.netport}</td>
+        <td>${(inst.connected) ? "🟢 OK" : "🔴 NC"}</td>
+        <td>${(inst.busy) ? "YES" : "NO"}</td>
+        <td>${sess.WL}</td><td>${sess.CH}</td>
+        <td>${(sess.IL == -100) ? "---" : sess.IL}</td>
+        <td>${(sess.RL == -100) ? "---" : sess.RL}</td>`
 }

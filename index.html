@@ -11,12 +11,12 @@
     <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
 </head>
 
-<body style="background-color: rgb(255, 255, 255)">
+<body>
     <script src="https://unpkg.com/htmx.org@1.9.5"></script>
     <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
     <script>
         document.body.addEventListener("keydown", function (evt) {
-            if(evt.key == 'e' || evt.key == 'ArrowRight' || evt.key == 'ArrowLeft') {
+            if (evt.key == 'e' || evt.key == 'ArrowRight' || evt.key == 'ArrowLeft') {
                 evt.preventDefault();
             }
             console.log(evt);
@@ -29,7 +29,7 @@
         })
 
         function updateFocusCells() {
-            htmx.ajax("GET", "/flush", {swap:"none", values:{id: me.closest('.card').id}})
+            htmx.ajax("GET", "/flush", { swap: "none", values: { id: me.closest('.card').id } })
         }
 
         // htmx.logAll();
@@ -48,8 +48,10 @@
 
         <div _="on click toggle .hidden on #navigation toggle .down on me" class="arrow"></div>
         <div id="navigation" hx-post="/settings/navigation" hx-trigger="load" hx-swap="innerHTML" class="hidden"></div>
-        <div hx-post="/live" hx-trigger="load, every 500ms" hx-swap="innerHTML" class="live"></div>
-
+        <div class="live">
+            <div hx-post="/live" hx-trigger="load, every 100ms" hx-swap="innerHTML"></div>
+            <button id="upload-button" hx-get="/flush/all" hx-swap="none" onclick="this.blur();">upload all</button>
+        </div>
     </div>
 
     <div id="advanced" class="hidden" hx-post="/settings/advanced" hx-trigger="load" hx-swap="innerHTML">
@@ -58,18 +60,8 @@
 
 
 
-
-    <div hx-get="/next" hx-trigger="keyup[key=='ArrowDown'] from:body"></div>
-    <div hx-get="/prev" hx-trigger="keyup[key=='ArrowUp'] from:body"></div>
-    <div hx-get="/nextDUT" hx-trigger="keyup[key=='ArrowRight'] from:body" hx-swap="none"></div>
-    <div hx-get="/prevDUT" hx-trigger="keyup[key=='ArrowLeft'] from:body" hx-swap="none"></div>
     <div hx-get="/cap" hx-trigger="keydown[key=='b'] queue:none from:body"></div>
     <div hx-get="/capend" hx-trigger="keyup[key=='b'] from:body"></div>
-    <div hx-get="/ping" hx-trigger="keyup[key=='p'] from:body" hx-swap="none"></div>
-    <div hx-get="/flush/all" hx-trigger="keyup[key=='f'] from:body" hx-swap="none"></div>
-    <div hx-get="/clear/row" hx-trigger="keyup[key=='r'] from:body" hx-vals='{"scope": "row"}'></div>
-    <div hx-get="/clear/dut" hx-trigger="keyup[key=='d'] from:body" hx-vals='{"scope": "dut"}'></div>
-    <div hx-get="/clear/all" hx-trigger="keyup[key=='a'] from:body" hx-vals='{"scope": "all"}'></div>
 </body>
 
 </html>

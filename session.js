@@ -1,5 +1,3 @@
-import { copyFileSync } from "fs"
-
 export class Session {
     constructor(instrument) {
         this.instrument = instrument
@@ -21,7 +19,7 @@ export class Session {
         this.autoAdvance = true
         this.switchAdvance = false
         this.WL = 1550
-        this.CH = 1
+        this.CH = 0
         this.IL = -100
         this.RL = -100
         this.valid = false
@@ -138,8 +136,6 @@ class DUT {
         this.numEnds = numEnds
         this.wavs = wavs
         this.hasrl = hasrl
-        // this.maxIL = maxIL
-        // this.minRL = minRL
         this.base = base
         this.focusFiber = focus
         this.focusEnd = 1
@@ -169,82 +165,3 @@ class DUT {
         })
     }
 }
-
-// nextDUT() {
-//     if (this.currentDUT < this.DUTs.length - 1) {
-//         this.getActiveDUT().isActive = false
-//         this.currentDUT++
-//         this.getActiveDUT().isActive = true
-//     }
-// }
-// prevDUT() {
-//     if (this.currentDUT > 0) {
-//         this.getActiveDUT().isActive = false
-//         this.currentDUT--
-//         this.getActiveDUT().isActive = true
-//     }
-// }
-// nextFiber() {
-//     if (this.currentFiber < this.numFibers) {
-//         this.currentFiber++
-//     } else {
-//         this.currentFiber = 1
-//         this.nextDUT()
-//     }
-// }
-// prevDUT() {
-//     if (this.currentDUT > 0) {
-//         this.getActiveDUT().isActive = false
-//         this.currentDUT--
-//         this.getActiveDUT().isActive = true
-//     }
-// }
-// nextEnd() {
-//     if (this.currentEnd < this.numEnds) {
-//         this.currentEnd++
-//     } else {
-//         this.currentEnd = 1
-//         this.nextDUT()
-//     }
-// }
-// prevEnd() {
-//     if (this.currentEnd <= 1) {
-//         this.currentEnd--
-//     } else {
-//         this.currentEnd = this.numEnds
-//         this.prevDUT()
-//     }
-// }
-
-// next() {
-//     if (this.focusEnd == this.numEnds) {
-//        if (this.focusFiber >= this.numFibers) {
-//             this.focusFiber = 1
-//             return false
-//         }
-//         else {
-//             this.focusFiber++
-//             if (this.focusEnd > 1) this.focusEnd--
-//             return true
-//         } 
-//     } else {
-//         this.focusEnd++
-//         return true
-//     }
-// }
-// prev() {
-//     if (this.focusEnd == 1) {
-//         if (this.focusFiber <= 1) {
-//             this.focusFiber = this.numFibers
-//             return false
-//         }
-//         else {
-//             this.focusFiber--
-//             if (this.numEnds > 1) this.focusEnd++
-//             return true
-//         }
-//     } else {
-//         this.focusEnd--
-//         return true
-//     }
-// }

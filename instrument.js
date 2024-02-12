@@ -1,45 +1,12 @@
-export class InstrumentManager {
-    constructor(config) {
-            switch(config[3]){
-                case "Santec": 
-                    this.instrument = new SantecInstrument(...config)
-                    break;
-                default: 
-                    this.instrument = new ViaviInstrument(...config)
-                    break;
-            }
-        
-    }
-    async initialize() {
-        await this.instrument.connect()
-        await this.instrument.setMode("live")
-    }
-    getValue(instrument, value){
-        return this.instrument[value]
-    }
-    
-    readChannels(instrument, channels) {
-        return this.instrument.readChannels(channels)
-    }
-    readChannelsLive(instrument, channels) {
-        return this.instrument.readChannelsLive(channels)
-    }
-    setMode(instrument, mode) {
-        this.instrument.setMode(mode)
-    }
-    setChannel(instrument, channel) {
-        this.instrument.setChannel(channel)
-    }
-}
-
-class Instrument {
+export class Instrument {
     constructor(name, address, netport) {
         this.name = name
         this.address = address
         this.netport = netport
         this.connected = false
         this.activeWL = []
-        this.activeCH = 1
+        this.activeCH = 0
+        this.targetCH = 0
         this.IL = -100
         this.RL = -100
         this.busy = false
@@ -141,13 +108,14 @@ class Instrument {
     }
 }
 
-class ViaviInstrument extends Instrument {
+export class ViaviInstrument extends Instrument {
     constructor(name, address, netport) {
         super(name, address, netport);
     }
     async startLive(){
         while(this.mode == "live") {
             try {
+                if(this.activeCH != this.targetCH) await this.setChannel(this.targetCH)
                 let il = (await this.query(":FETCH:LOSS? 1"))[0]
                 this.IL = (il.match(/(-?\d+\.\d+)/g) || [-100])[0]
                 let rl = (await this.query(":FETCH:ORL? 1"))[0]
@@ -161,7 +129,7 @@ class ViaviInstrument extends Instrument {
     }
     async setChannel(c) {
         let res = await this.query(`:PATH:CHAN 1,1,1,${c};*OPC?`)
-        if (res = 1) {
+        if (res == 1) {
             console.log("channel switch success")
             this.activeCH = c
         }
@@ -191,7 +159,7 @@ class ViaviInstrument extends Instrument {
 
 }
 
-class SantecInstrument extends Instrument {
+export class SantecInstrument extends Instrument {
     constructor(name, address, netport) {
         super(name, address, netport);
     }
@@ -211,7 +179,7 @@ class SantecInstrument extends Instrument {
     }
     async setChannel(c) {
         let res = await this.query(`SW1:CLOSE ${c};*OPC?`)
-        if (res = 1) {
+        if (res == 1) {
             console.log("channel switch success")
             this.activeCH = c
         }
