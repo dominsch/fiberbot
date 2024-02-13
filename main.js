@@ -116,8 +116,8 @@ const server = Bun.serve({
                 // if (sess.RL > d.RL[d.focusEnd][d.focusFiber][d.wavs[0]]) d.RL[d.focusEnd][d.focusFiber][d.wavs[0]] = sess.RL
                 // return new Response(makeRow(d, d.focusFiber, true))
                 if (sess.valid) {
-                    if (sess.IL < Math.abs(d.IL[sess.currentEnd][sess.currentFiber][d.wavs[0]])) d.IL[sess.currentEnd][sess.currentFiber][d.wavs[0]] = Number.parseFloat(sess.IL).toFixed(2)
-                    if (sess.RL > d.RL[sess.currentEnd][sess.currentFiber][d.wavs[0]]) d.RL[sess.currentEnd][sess.currentFiber][d.wavs[0]] = Math.trunc(parseFloat(sess.RL))
+                    if (sess.IL != -100 && sess.IL < Math.abs(d.IL[sess.currentEnd][sess.currentFiber][d.wavs[0]])) d.IL[sess.currentEnd][sess.currentFiber][d.wavs[0]] = Number.parseFloat(sess.IL).toFixed(2)
+                    if (sess.RL != -100 && sess.RL > d.RL[sess.currentEnd][sess.currentFiber][d.wavs[0]]) d.RL[sess.currentEnd][sess.currentFiber][d.wavs[0]] = Math.trunc(parseFloat(sess.RL))
                 }
                 console.log("makerow", sess.currentDUT, sess.currentEnd, d.sn, sess.currentFiber)
                 return new Response(makeRow(sess, d, sess.currentFiber, true))
