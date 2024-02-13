@@ -4,14 +4,14 @@ import {Session} from './session.js'
 import {makeCSV} from './csv.js'
 
 let config = (Bun.argv[2]?.match( /.*\.json/g )) ? await Bun.file(Bun.argv[2].match( /.*\.json/g )[0]).json() : ["Local", "localhost", 8100, "Viavi"]
-let serverPort = (config[1] == "localhost") ? 7000 : "7" + (config[1]?.match(/\d{3}$/g))[0]
+let serverPort = (config[1] == "localhost") ? 7000 : 7000 + parseInt((config[1]?.match(/\d+$/g))[0])
 let inst = (config[3] == "Santec") ? new SantecInstrument(...config) : new ViaviInstrument(...config)
 await inst.connect()
 inst.setMode("live")
 
 let sess = new Session(config[0])
 
-
+console.log("starting server at ", serverPort)
 const server = Bun.serve({
     port: serverPort,
     fetch(req) {

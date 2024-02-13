@@ -113,6 +113,7 @@ export class ViaviInstrument extends Instrument {
         super(name, address, netport);
     }
     async startLive(){
+        //:SENSe:POWer:MODE? has to return 1
         while(this.mode == "live") {
             try {
                 if(this.activeCH != this.targetCH) await this.setChannel(this.targetCH)

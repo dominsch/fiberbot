@@ -350,6 +350,6 @@ export function makeStatus(sess, inst, port) {
         <td>${(inst.connected) ? "🟢 OK" : "🔴 NC"}</td>
         <td>${(inst.busy) ? "YES" : "NO"}</td>
         <td>${sess.WL}</td><td>${sess.CH}</td>
-        <td>${(sess.IL == -100) ? "---" : sess.IL}</td>
-        <td>${(sess.RL == -100) ? "---" : sess.RL}</td>`
+        <td>${(inst.IL == -100) ? "---" : inst.IL}</td>
+        <td>${(inst.RL == -100) ? "---" : inst.RL}</td>`
 }

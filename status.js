@@ -61,10 +61,13 @@ Bun.serve({
             </tr>
         </thead>
         <tbody>
-            <tr hx-post="http://localhost:7000/status" hx-trigger="load, every 200ms" hx-swap="innerHTML" hx-request='"noHeaders":"true"'></tr>
+            <tr hx-post="http://localhost:7004/status" hx-trigger="load, every 200ms" hx-swap="innerHTML" hx-request='"noHeaders":"true"'></tr>
+            <tr hx-post="http://localhost:7099/status" hx-trigger="load, every 200ms" hx-swap="innerHTML" hx-request='"noHeaders":"true"'></tr>
             <tr hx-post="http://localhost:7104/status" hx-trigger="load, every 200ms" hx-swap="innerHTML" hx-request='"noHeaders":"true"'></tr>
+            <tr hx-post="http://localhost:7105/status" hx-trigger="load, every 200ms" hx-swap="innerHTML" hx-request='"noHeaders":"true"'></tr>
+            <tr hx-post="http://localhost:7137/status" hx-trigger="load, every 200ms" hx-swap="innerHTML" hx-request='"noHeaders":"true"'></tr>
             <tr hx-post="http://localhost:7224/status" hx-trigger="load, every 200ms" hx-swap="innerHTML" hx-request='"noHeaders":"true"'></tr>
-            <tr hx-post="http://localhost:7229/status" hx-trigger="load, every 200ms" hx-swap="innerHTML" hx-request='"noHeaders":"true"'></tr>
+            <tr hx-post="http://localhost:7226/status" hx-trigger="load, every 200ms" hx-swap="innerHTML" hx-request='"noHeaders":"true"'></tr>
         </tbody>
     </table>
 </body>
