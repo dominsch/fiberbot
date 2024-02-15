@@ -4,6 +4,7 @@ export class Session {
         this.currentDUT = 0
         this.currentFiber = 1
         this.currentEnd = 1
+        this.currentWL = 1550
         this.nextDUT = 0
         this.nextFiber = 2
         this.nextEnd = 1
@@ -18,7 +19,7 @@ export class Session {
         this.backwards = false
         this.autoAdvance = true
         this.switchAdvance = false
-        this.WL = 1550
+        
         this.CH = 0
         this.IL = -100
         this.RL = -100
@@ -35,7 +36,7 @@ export class Session {
         this.maxIL[2] = parseFloat(maxILB)
         this.minRL[1] = parseInt(minRLA)
         this.minRL[2] = parseInt(minRLB)
-        this.WL = parseInt(wl)
+        this.currentWL = parseInt(wl)
         this.DUTs = []
     }
     makeDUTs() {
@@ -44,7 +45,7 @@ export class Session {
             this.DUTs[i] = new DUT( this.firstSN + i,
                                     this.numEnds,
                                     this.numFibers,
-                                    [this.WL],
+                                    [this.currentWL],
                                     true,
                                     // this.maxIL,
                                     // this.minRL,

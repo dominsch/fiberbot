@@ -31,6 +31,7 @@ const server = Bun.serve({
             case "/submit/setup":
                 sess.configure(sp.firstSN, sp.lastSN, sp.numFibers, sp.base, sp.numEnds, sp.maxILA, sp.maxILB, sp.minRLA, sp.minRLB, sp.wl)
                 sess.makeDUTs()
+                inst.activeWL = sp.wl
                 sess.startTime = new Date(Date.now())
                 return new Response("", {headers: { "HX-Trigger": "update-cards" }})
             case "/submit/navigation":
@@ -108,6 +109,13 @@ const server = Bun.serve({
                 sess.nextFiber = parseInt(sp.fiber)
                 sess.nextEnd = parseInt(sp.end)
                 sess.advance()
+                if (sess.switchAdvance) {
+                    let chan = sess.currentFiber%sess.base
+                    if (chan == 0) chan = sess.base
+                    console.log("")
+                    inst.targetCH = chan
+                    //inst.setChannel(chan)
+                }
                 res += makeCellOuter(sess, sess.DUTs[sess.nextDUT], sess.nextEnd, sess.nextFiber, d.wavs[0], true, false, true)
                 res += makeCellOuter(sess, sess.DUTs[sess.currentDUT], sess.currentEnd, sess.currentFiber, d.wavs[0], true, true)
                 return new Response(res)
@@ -119,10 +127,11 @@ const server = Bun.serve({
                     if (sess.IL != -100 && sess.IL < Math.abs(d.IL[sess.currentEnd][sess.currentFiber][d.wavs[0]])) d.IL[sess.currentEnd][sess.currentFiber][d.wavs[0]] = Number.parseFloat(sess.IL).toFixed(2)
                     if (sess.RL != -100 && sess.RL > d.RL[sess.currentEnd][sess.currentFiber][d.wavs[0]]) d.RL[sess.currentEnd][sess.currentFiber][d.wavs[0]] = Math.trunc(parseFloat(sess.RL))
                 }
-                console.log("makerow", sess.currentDUT, sess.currentEnd, d.sn, sess.currentFiber)
+                //console.log("makerow", sess.currentDUT, sess.currentEnd, d.sn, sess.currentFiber)
                 return new Response(makeRow(sess, d, sess.currentFiber, true))
             case "/capend":
-                if (d.IL[sess.currentEnd][sess.currentFiber][1550] <= sess.maxIL[sess.currentEnd] && d.RL[sess.currentEnd][sess.currentFiber][1550] >= sess.minRL[sess.currentEnd]) {
+                if ((d.IL[sess.currentEnd][sess.currentFiber][sess.currentWL] <= sess.maxIL[sess.currentEnd] && d.RL[sess.currentEnd][sess.currentFiber][sess.currentWL] >= sess.minRL[sess.currentEnd]) || sess.autoAdvance == "always") {
+                    console.log("advancing")
                     res += makeCellOuter(sess, sess.DUTs[sess.currentDUT], sess.currentEnd, sess.currentFiber, d.wavs[0], true, false, false)
                     if (sess.autoAdvance != "never") sess.advance()
                     res += makeCellOuter(sess, sess.DUTs[sess.nextDUT], sess.nextEnd, sess.nextFiber, d.wavs[0], true, false, true)
@@ -130,10 +139,9 @@ const server = Bun.serve({
                     if (sess.switchAdvance) {
                         let chan = sess.currentFiber%sess.base
                         if (chan == 0) chan = sess.base
-                        inst.setChannel(chan)
+                        sess.valid = false
+                        inst.targetCH = chan
                     }
-                } else {
-                    if (sess.autoAdvance == "always") sess.advance()
                 }
                 return new Response(res)
             case "/tab":
@@ -151,38 +159,6 @@ const server = Bun.serve({
     },
 });
 
-function focus() {
-    
-}
 
 
 
-
-// if (url.pathname === "/next") {
-//     let d = sess.getActiveDUT()
-//     console.log("next #1", d.numEnds, d.focusEnd, d.numFibers, d.focusFiber)
-//     let prevf = d.focusFiber
-//     d.next()
-//     let res = makeRow(d, prevf, true) + makeRow(d, d.focusFiber, true)
-//     console.log("next #2", d.numEnds, d.focusEnd, d.numFibers, d.focusFiber)
-//     return new Response(res)
-// }
-// if (url.pathname === "/nextDUT") {
-//     let res = makeCard(sess.DUTs[sess.activeDUT], true, false)
-//     sess.nextDUT()
-//     res = res + makeCard(sess.DUTs[sess.activeDUT], true)
-//     return new Response(res)
-// }
-// if (url.pathname === "/prev") {
-//     let d = sess.getActiveDUT()
-//     let prevf = d.focusFiber
-//     d.prev()
-//     let res = makeRow(d, prevf, true) + makeRow(d, d.focusFiber, true)
-//     return new Response(res);
-// }
-// if (url.pathname === "/prevDUT") {
-//     let res = makeCard(sess.DUTs[sess.activeDUT], true, false)
-//     sess.prevDUT()
-//     res = res + makeCard(sess.DUTs[sess.activeDUT], true)
-//     return new Response(res)
-// }

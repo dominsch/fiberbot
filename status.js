@@ -1,5 +1,5 @@
 Bun.serve({
-    port: 8080,
+    port: 80,
     fetch(req) {
         return new Response(
 /*html*/`

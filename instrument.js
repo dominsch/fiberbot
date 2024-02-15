@@ -4,7 +4,7 @@ export class Instrument {
         this.address = address
         this.netport = netport
         this.connected = false
-        this.activeWL = []
+        this.activeWL = 1550
         this.activeCH = 0
         this.targetCH = 0
         this.IL = -100
@@ -116,7 +116,11 @@ export class ViaviInstrument extends Instrument {
         //:SENSe:POWer:MODE? has to return 1
         while(this.mode == "live") {
             try {
-                if(this.activeCH != this.targetCH) await this.setChannel(this.targetCH)
+                
+                if(this.activeCH != this.targetCH) {
+                    console.log("current, next", this.activeCH, this.targetCH)
+                    await this.setChannel(this.targetCH)
+                }
                 let il = (await this.query(":FETCH:LOSS? 1"))[0]
                 this.IL = (il.match(/(-?\d+\.\d+)/g) || [-100])[0]
                 let rl = (await this.query(":FETCH:ORL? 1"))[0]
@@ -129,10 +133,11 @@ export class ViaviInstrument extends Instrument {
         }
     }
     async setChannel(c) {
-        let res = await this.query(`:PATH:CHAN 1,1,1,${c};*OPC?`)
+        let res = await this.query(`:PATH:CHAN 1,1,${c};*OPC?`)
         if (res == 1) {
-            console.log("channel switch success")
+            await Bun.sleep(400) //needed?
             this.activeCH = c
+            console.log("channel switched to ",c)
         }
         
     }
@@ -167,9 +172,10 @@ export class SantecInstrument extends Instrument {
     async startLive(){
         while(this.mode == "live") {
             try{
-                let il = (await this.query("READ:IL:DET1? " + 1550))[0]
+                if(this.activeCH != this.targetCH) await this.setChannel(this.targetCH)
+                let il = (await this.query("READ:IL:DET1? " + activeWL))[0]
                 this.IL = (il.match(/(\d+\.\d+)/g) || [-100])[0]
-                let rl = (await this.query("READ:RL? " + 1550, 4))[0]
+                let rl = (await this.query("READ:RL? " + activeWL, 4))[0]
                 this.RL = (rl.match(/(\d+\.\d+)/g) || [-100])[0]
             } catch(e){
                 console.error("live error", e)
@@ -181,8 +187,9 @@ export class SantecInstrument extends Instrument {
     async setChannel(c) {
         let res = await this.query(`SW1:CLOSE ${c};*OPC?`)
         if (res == 1) {
-            console.log("channel switch success")
+            await Bun.sleep(600) //needed?
             this.activeCH = c
+            console.log("channel switched to ",c)
         }
     }
 }

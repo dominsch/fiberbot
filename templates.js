@@ -273,7 +273,7 @@ export function makeRow(s, d, f, oob = false) {
         }
     }
     return /*html*/`
-        <tr class="r${((f - 1) % d.base + 1)}" id="P${d.sn}-F${f}"' 
+        <tr class="r${(((f - 1) % d.base) % 12+ 1)}" id="P${d.sn}-F${f}"' 
             ${(oob) ? `hx-swap-oob="true"` : ""} 
             _="on htmx:afterSettle if I match <:has(.focused)/> then log 'scroll' js(me) me.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' })" 
             hx-swap="outerHTML">
@@ -302,7 +302,7 @@ export function makeCellInner(s, d, e, f, wl, type, oob = false, value) {
     // console.log(d.sn, e, f, wl, type,  oob)
     let c, content
     if (value) {
-        console.log("value", value)
+        //console.log("value", value)
         if (type == "IL") { 
             d.IL[e][f][wl] = value
         } else { 
@@ -335,11 +335,11 @@ export function makeCellInnerForm(d, e, f, wl, type, value) {
 
 
 export function makeLive(sess, inst) {
-    if (sess.IL != inst.IL || sess.RL != inst.RL) sess.valid = true
+    if ((sess.IL != inst.IL || sess.RL != inst.RL) && sess.CH == inst.activeCH) sess.valid = true
     sess.IL = inst.IL
     sess.RL = inst.RL
     sess.CH = inst.activeCH
-    return `WL: ${sess.WL} CH: ${sess.CH} IL:${(sess.IL == -100) ? "---" : sess.IL} RL:${(sess.RL == -100) ? "---" : sess.RL}`
+    return `WL: ${sess.currentWL} CH: ${sess.CH} IL:${(sess.IL == -100) ? "---" : sess.IL} RL:${(sess.RL == -100) ? "---" : sess.RL}`
 }
 
 export function makeStatus(sess, inst, port) {
@@ -349,7 +349,8 @@ export function makeStatus(sess, inst, port) {
         <td>${inst.netport}</td>
         <td>${(inst.connected) ? "🟢 OK" : "🔴 NC"}</td>
         <td>${(inst.busy) ? "YES" : "NO"}</td>
-        <td>${sess.WL}</td><td>${sess.CH}</td>
+        <td>${inst.WL}</td>
+        <td>${inst.activeCH}</td>
         <td>${(inst.IL == -100) ? "---" : inst.IL}</td>
         <td>${(inst.RL == -100) ? "---" : inst.RL}</td>`
 }
