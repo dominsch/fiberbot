@@ -35,32 +35,28 @@ const server = Bun.serve({
                 sess.startTime = new Date(Date.now())
                 return new Response("", {headers: { "HX-Trigger": "update-cards" }})
             case "/submit/navigation":
-                sess.next = sp.type
-                sess.backwards = (sp.direction == "prev")
                 if (sp.advance == "channel") {
                     sess.autoAdvance = "passing"
                 } else {
                     sess.autoAdvance = sp.advance
                 }
                 sess.switchAdvance = (sp.advance == "channel")
-                res += makeCellOuter(sess, sess.DUTs[sess.nextDUT], sess.nextEnd, sess.nextFiber, d.wavs[0], true, false, false)
-                switch(sess.next) {
-                    case "end":
-                        sess.nextEnd = sess.getNext(sess.currentEnd, sess.next)
-                        sess.nextDUT = sess.currentDUT
-                        sess.nextFiber = sess.currentFiber
-                        break;
-                    case "fiber":
-                        sess.nextFiber = sess.getNext(sess.currentFiber, sess.next)
-                        sess.nextDUT = sess.currentDUT
-                        sess.nextEnd = sess.currentEnd
-                        break;
-                    case "dut":
-                        sess.nextDUT = sess.getNext(sess.currentDUT, sess.next)
-                        sess.nextEnd = sess.currentEnd
-                        sess.nextFiber = sess.currentFiber
+                if(sess.next != sp.type || sess.backwards != (sp.direction == "prev")){
+                    sess.next = sp.type
+                    sess.backwards = (sp.direction == "prev")
+                    res += makeCellOuter(sess, sess.DUTs[sess.nextDUT], sess.nextEnd, sess.nextFiber, d.wavs[0], true, false, false)
+                    switch(sess.next) {
+                        case "end":
+                            sess.nextEnd = sess.getNext(sess.currentEnd, sess.next)
+                            break;
+                        case "fiber":
+                            sess.nextFiber = sess.getNext(sess.currentFiber, sess.next)
+                            break;
+                        case "dut":
+                            sess.nextDUT = sess.getNext(sess.currentDUT, sess.next)
+                    }
+                    res += makeCellOuter(sess, sess.DUTs[sess.nextDUT], sess.nextEnd, sess.nextFiber, d.wavs[0], true, false, true)
                 }
-                res += makeCellOuter(sess, sess.DUTs[sess.nextDUT], sess.nextEnd, sess.nextFiber, d.wavs[0], true, false, true)
                 return new Response(res, {headers: { "HX-Trigger": "update-navigation" }})
             case "/submit/cellInnerForm":
                 d =sess.getDUT(sp.sn)
@@ -112,22 +108,16 @@ const server = Bun.serve({
                 if (sess.switchAdvance) {
                     let chan = sess.currentFiber%sess.base
                     if (chan == 0) chan = sess.base
-                    console.log("")
                     inst.targetCH = chan
-                    //inst.setChannel(chan)
                 }
                 res += makeCellOuter(sess, sess.DUTs[sess.nextDUT], sess.nextEnd, sess.nextFiber, d.wavs[0], true, false, true)
                 res += makeCellOuter(sess, sess.DUTs[sess.currentDUT], sess.currentEnd, sess.currentFiber, d.wavs[0], true, true)
                 return new Response(res)
             case "/cap":
-                // if (sess.IL < Math.abs(d.IL[d.focusEnd][d.focusFiber][d.wavs[0]])) d.IL[d.focusEnd][d.focusFiber][d.wavs[0]] = sess.IL
-                // if (sess.RL > d.RL[d.focusEnd][d.focusFiber][d.wavs[0]]) d.RL[d.focusEnd][d.focusFiber][d.wavs[0]] = sess.RL
-                // return new Response(makeRow(d, d.focusFiber, true))
                 if (sess.valid) {
                     if (sess.IL != -100 && sess.IL < Math.abs(d.IL[sess.currentEnd][sess.currentFiber][d.wavs[0]])) d.IL[sess.currentEnd][sess.currentFiber][d.wavs[0]] = Number.parseFloat(sess.IL).toFixed(2)
                     if (sess.RL != -100 && sess.RL > d.RL[sess.currentEnd][sess.currentFiber][d.wavs[0]]) d.RL[sess.currentEnd][sess.currentFiber][d.wavs[0]] = Math.trunc(parseFloat(sess.RL))
                 }
-                //console.log("makerow", sess.currentDUT, sess.currentEnd, d.sn, sess.currentFiber)
                 return new Response(makeRow(sess, d, sess.currentFiber, true))
             case "/capend":
                 if ((d.IL[sess.currentEnd][sess.currentFiber][sess.currentWL] <= sess.maxIL[sess.currentEnd] && d.RL[sess.currentEnd][sess.currentFiber][sess.currentWL] >= sess.minRL[sess.currentEnd]) || sess.autoAdvance == "always") {

@@ -64,7 +64,6 @@ export class Session {
     }
     advance() {
         this.valid = false
-        console.log("advance", this.next ,this.currentDUT, this.currentEnd, this.currentFiber,this.nextDUT, this.nextEnd, this.nextFiber)
         this.currentEnd = this.nextEnd
         this.currentFiber = this.nextFiber
         this.currentDUT = this.nextDUT
@@ -83,32 +82,26 @@ export class Session {
                 this.nextDUT = this.getNext(this.currentDUT, this.next)
                 break;
 
-        }
-        console.log("advance after", this.next ,this.currentDUT, this.currentEnd, this.currentFiber,this.nextDUT, this.nextEnd, this.nextFiber)
-          
+        }     
     }
     getNext(n, t) {
         switch(t) {
             case "end":
                 if (!this.backwards) {
-                    console.log("end forward", n, (n < this.numEnds))
                     if (n < this.numEnds) return ++n
                     this.nextFiber = this.getNext(this.currentFiber, "fiber")
                     return 1
                 } else {
-                    console.log("end backwards", n, (n > 1))
                     if (n > 1) return --n
                     this.nextFiber = this.getNext(this.currentFiber, "fiber")
                     return this.numEnds
                 }
             case "fiber":
                 if (!this.backwards) {
-                    console.log("fiber forward", n, (n < this.numFibers))
                     if (n < this.numFibers) return ++n
                     this.nextDUT = this.getNext(this.currentDUT, "dut")
                     return 1
                 } else {
-                    console.log("fiber backwards", n, (n > 1))
                     if (n > 1) return --n
                     this.nextDUT = this.getNext(this.currentDUT, "dut")
                     return this.numFibers
@@ -117,11 +110,9 @@ export class Session {
                 break;
             case "dut":
                 if (!this.backwards) {
-                    console.log("dut forward", n, (this.DUTs.length-1), (n < (this.DUTs.length-1)))
                     if (n < (this.DUTs.length-1)) return ++n
                     return 0
                 } else {
-                    console.log("dut backwards", n, (n > 1))
                     if (n > 0) return --n
                     return (this.DUTs.length-1)
                 }
