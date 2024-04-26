@@ -3,13 +3,20 @@ import {SantecInstrument, ViaviInstrument} from './instrument.js'
 import {Session} from './session.js'
 import {makeCSV} from './csv.js'
 
-let config = (Bun.argv[2]?.match( /.*\.json/g )) ? await Bun.file(Bun.argv[2].match( /.*\.json/g )[0]).json() : ["Local", "localhost", 8100, "Viavi"]
-let serverPort = (config[1] == "localhost") ? 7000 : 7000 + parseInt((config[1]?.match(/\d+$/g))[0])
-let inst = (config[3] == "Santec") ? new SantecInstrument(...config) : new ViaviInstrument(...config)
+//let config = (Bun.argv[2]?.match( /.*\.json/g )) ? await Bun.file(Bun.argv[2].match( /.*\.json/g )[0]).json() : ["Local", "localhost", 8100, "Viavi"]
+//let serverPort = (config[1] == "localhost") ? 7000 : 7000 + parseInt((config[1]?.match(/\d+$/g))[0])
+//let inst = (config[3] == "Santec") ? new SantecInstrument(...config) : new ViaviInstrument(...config)
+
+let config = (Bun.argv[2]?.match( /.*\.json/g )) ? await Bun.file(Bun.argv[2].match( /.*\.json/g )[0]).json() : ["Local", "192.168.10.104", 8100, "Viavi"]
+console.log("config = ", config)
+let serverPort = (config.ip == "localhost") ? 7000 : 7000 + parseInt(config.port % 1000)
+console.log(config, config.port, serverPort)
+let inst = (config.manufacturer == "Santec") ? new SantecInstrument(...config) : new ViaviInstrument(config)
+
 await inst.connect()
 inst.setMode("live")
 
-let sess = new Session(config[0])
+let sess = new Session(config.name)
 
 console.log("starting server at ", serverPort)
 const server = Bun.serve({

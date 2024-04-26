@@ -1,10 +1,23 @@
 export class Instrument {
-    constructor(name, address, netport) {
-        this.name = name
-        this.address = address
-        this.netport = netport
+    // constructor(name, address, netport) {
+    //     this.name = name
+    //     this.address = address
+    //     this.netport = netport
+    //     this.connected = false
+    //     this.activeWL = 1550
+    //     this.activeCH = 0
+    //     this.targetCH = 0
+    //     this.IL = -100
+    //     this.RL = -100
+    //     this.busy = false
+    // }
+    constructor(config) {
+        this.name = config.name
+        this.address = config.ip
+        this.netport = config.port
+        this.wavelengths = config.wavelengths
         this.connected = false
-        this.activeWL = 1550
+        this.activeWL = 1550 //config.wavelengths[1]
         this.activeCH = 0
         this.targetCH = 0
         this.IL = -100
@@ -146,8 +159,8 @@ export class ViaviInstrument extends Instrument {
         let RLs = []
         for (chan of channels) {
             await this.setChannel(chan)
-            IL[chan] = await this.query(":MEAS:IL? 1,1")
-            RL[chan] = await this.query(":MEAS:ORL? 1,1")
+            IL[chan] = await this.query(":MEAS:IL? 1")
+            RL[chan] = await this.query(":MEAS:ORL? 1")
         }
         return [ILs, RLs]
     }
@@ -156,8 +169,8 @@ export class ViaviInstrument extends Instrument {
         let RLs = []
         for (chan of channels) {
             await this.setChannel(chan)
-            IL[chan] = await this.query(":FETCH:LOSS? 1,1")
-            RL[chan] = await this.query(":FETCH:ORL? 1,1")
+            IL[chan] = await this.query(":FETCH:LOSS? 1")
+            RL[chan] = await this.query(":FETCH:ORL? 1")
         }
         return [ILs, RLs]
     }

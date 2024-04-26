@@ -1,0 +1,35 @@
+PART#,1x2F
+TESTER,Anon
+CHASSIS,MAP5
+MODULE,123
+START,2024-04-24 16:04:04
+FINISH,2024-04-24 16:04:34
+CUSTOM1,
+CUSTOM2,
+CUSTOM3,
+CUSTOM4,
+CUSTOM5,
+NOTES,
+
+RESULTS,,,IL(dB),RL(dB)
+SERIAL#,INPUT,OUTPUT,1550nm,1550nm
+1292001,Fiber 1 End A,Fiber 1 End B,47.32,79
+1292001,Fiber 2 End A,Fiber 2 End B,47.32,76
+1292002,Fiber 1 End A,Fiber 1 End B,47.32,83
+1292002,Fiber 2 End A,Fiber 2 End B,47.32,77
+1292003,Fiber 1 End A,Fiber 1 End B,47.32,75
+1292003,Fiber 2 End A,Fiber 2 End B,47.32,75
+1292004,Fiber 1 End A,Fiber 1 End B,,
+1292004,Fiber 2 End A,Fiber 2 End B,47.32,79
+1292005,Fiber 1 End A,Fiber 1 End B,47.32,76
+1292005,Fiber 2 End A,Fiber 2 End B,47.32,75
+1292006,Fiber 1 End A,Fiber 1 End B,47.32,77
+1292006,Fiber 2 End A,Fiber 2 End B,47.31,77
+1292007,Fiber 1 End A,Fiber 1 End B,47.32,78
+1292007,Fiber 2 End A,Fiber 2 End B,47.32,78
+1292008,Fiber 1 End A,Fiber 1 End B,47.31,80
+1292008,Fiber 2 End A,Fiber 2 End B,47.32,75
+1292009,Fiber 1 End A,Fiber 1 End B,47.32,75
+1292009,Fiber 2 End A,Fiber 2 End B,47.32,76
+1292010,Fiber 1 End A,Fiber 1 End B,47.31,78
+1292010,Fiber 2 End A,Fiber 2 End B,47.32,78
