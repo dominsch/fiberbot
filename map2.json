@@ -5,55 +5,15 @@
     "manufacturer": "Viavi",
     "wavelengths": [
         1310,
-        1500
+        1550
     ],
-    "phy": {
-        "orl": [
-            {
-                "address": 1,
-                "wavelengths": [
-                    850,
-                    1300
-                ],
-                "core": 50,
-                "outputs": 2
-            },
-            {
-                "address": 2,
-                "wavelengths": [
-                    1310,
-                    1550
-                ],
-                "core": 9
-            }
-        ],
-        "switches": [
-            {
-                "address": 3,
-                "wavelengths": [
-                    850,
-                    1300
-                ],
-                "core": 50
-            },
-            {
-                "address": 5,
-                "wavelengths": [
-                    1310,
-                    1550
-                ],
-                "core": 9
-            },
-            {
-                "address": 7,
-                "wavelengths": [
-                    850,
-                    1300,
-                    1310,
-                    1500
-                ],
-                "core": 100
-            }
-        ]
-    }
+    "orl": [
+        {
+            "address": 1,
+            "wavelengths": [
+                1310,
+                1550
+            ]
+        }
+    ]
 }

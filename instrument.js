@@ -1,25 +1,13 @@
 export class Instrument {
-    // constructor(name, address, netport) {
-    //     this.name = name
-    //     this.address = address
-    //     this.netport = netport
-    //     this.connected = false
-    //     this.activeWL = 1550
-    //     this.activeCH = 0
-    //     this.targetCH = 0
-    //     this.IL = -100
-    //     this.RL = -100
-    //     this.busy = false
-    // }
     constructor(config) {
         this.name = config.name
         this.address = config.ip
         this.netport = config.port
         this.wavelengths = config.wavelengths
-        this.orl = config.phy.orl
+        this.orl = config.orl
         this.connected = false
-        this.activeWL = this.wavelengths[0] //config.wavelengths[1]
-        this.activeORL = config.phy.orl[0].address
+        this.activeWL = this.wavelengths[0]
+        this.activeORL = config.orl[0].address
         this.activeCH = 0
         this.targetCH = 0
         this.IL = -100
@@ -148,7 +136,7 @@ export class ViaviInstrument extends Instrument {
         }
     }
     async setChannel(c) {
-        let res = await this.query(`:PATH:CHAN 1,1,${c};*OPC?`)
+        let res = await this.query(`:PATH:CHAN 1,${this.activeORL},${c};*OPC?`)
         if (res == 1) {
             await Bun.sleep(400) //needed?
             this.activeCH = c
