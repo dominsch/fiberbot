@@ -117,6 +117,8 @@ export class ViaviInstrument extends Instrument {
     }
     async startLive(){
         //:SENSe:POWer:MODE? has to return 1
+        this.activeWL = parseInt(await this.query(":SOURCE:WAV? "+ this.activeORL))
+        console.log("WL", this.activeWL)
         while(this.mode == "live") {
             try {
                 
