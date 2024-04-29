@@ -3,7 +3,7 @@ import {SantecInstrument, ViaviInstrument} from './instrument.js'
 import {Session} from './session.js'
 import {makeCSV} from './csv.js'
 import { $ } from "bun"
-let ip = await $`ip addr show eth0 | grep "inet\\b" | awk '{print $2}' | cut -d/ -f1`.text()
+let ip = "127.0.0.1"//await $`ip addr show eth0 | grep "inet\\b" | awk '{print $2}' | cut -d/ -f1`?.text() || "127.0.0.1"
 
 //let config = (Bun.argv[2]?.match( /.*\.json/g )) ? await Bun.file(Bun.argv[2].match( /.*\.json/g )[0]).json() : ["Local", "localhost", 8100, "Viavi"]
 //let serverPort = (config[1] == "localhost") ? 7000 : 7000 + parseInt((config[1]?.match(/\d+$/g))[0])
@@ -41,13 +41,13 @@ const server = Bun.serve({
                 sess.configure(sp.firstSN, sp.lastSN, sp.numFibers, sp.base, sp.numEnds, sp.maxILA, sp.maxILB, sp.minRLA, sp.minRLB, sp.wl)
                 sess.makeDUTs()
                 inst.activeWL = sp.wl
-                inst.phy.orl.forEach(o,i => { 
-                    if(o.wavelenths.includes(inst.activeWL)) {
+                console.log(inst)
+                inst.orl.forEach((o,i) => { 
+                    console.log(o.wavelengths)
+                    if(o.wavelengths.includes(inst.activeWL)) {
                         inst.activeORL = i
                     }   
                 });
-                while(inst.phy.orl[inst.activeORL].wavelengths != inst.activeWL)
-                inst.activeORL = 
                 sess.startTime = new Date(Date.now())
                 return new Response("", {headers: { "HX-Trigger": "update-cards" }})
             case "/submit/navigation":

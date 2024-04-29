@@ -16,6 +16,7 @@ export class Instrument {
         this.address = config.ip
         this.netport = config.port
         this.wavelengths = config.wavelengths
+        this.orl = config.phy.orl
         this.connected = false
         this.activeWL = this.wavelengths[0] //config.wavelengths[1]
         this.activeORL = config.phy.orl[0].address
