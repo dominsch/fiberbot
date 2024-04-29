@@ -1,3 +1,7 @@
+import { $ } from "bun"
+let ip = await $`ip addr show eth0 | grep "inet\\b" | awk '{print $2}' | cut -d/ -f1`.text()
+
+
 Bun.serve({
     port: 80,
     fetch(req) {
@@ -61,13 +65,14 @@ Bun.serve({
             </tr>
         </thead>
         <tbody>
-            <tr hx-post="http://localhost:7004/status" hx-trigger="load, every 200ms" hx-swap="innerHTML" hx-request='"noHeaders":"true"'></tr>
-            <tr hx-post="http://localhost:7099/status" hx-trigger="load, every 200ms" hx-swap="innerHTML" hx-request='"noHeaders":"true"'></tr>
-            <tr hx-post="http://localhost:7104/status" hx-trigger="load, every 200ms" hx-swap="innerHTML" hx-request='"noHeaders":"true"'></tr>
-            <tr hx-post="http://localhost:7105/status" hx-trigger="load, every 200ms" hx-swap="innerHTML" hx-request='"noHeaders":"true"'></tr>
-            <tr hx-post="http://localhost:7137/status" hx-trigger="load, every 200ms" hx-swap="innerHTML" hx-request='"noHeaders":"true"'></tr>
-            <tr hx-post="http://localhost:7224/status" hx-trigger="load, every 200ms" hx-swap="innerHTML" hx-request='"noHeaders":"true"'></tr>
-            <tr hx-post="http://localhost:7226/status" hx-trigger="load, every 200ms" hx-swap="innerHTML" hx-request='"noHeaders":"true"'></tr>
+            <tr hx-post="http://${ip}:7004/status" hx-trigger="load, every 200ms" hx-swap="innerHTML" hx-request='"noHeaders":"true"'></tr>
+            <tr hx-post="http://${ip}:7099/status" hx-trigger="load, every 200ms" hx-swap="innerHTML" hx-request='"noHeaders":"true"'></tr>
+            <tr hx-post="http://${ip}:7104/status" hx-trigger="load, every 200ms" hx-swap="innerHTML" hx-request='"noHeaders":"true"'></tr>
+            <tr hx-post="http://${ip}:7105/status" hx-trigger="load, every 200ms" hx-swap="innerHTML" hx-request='"noHeaders":"true"'></tr>
+            <tr hx-post="http://${ip}:7137/status" hx-trigger="load, every 200ms" hx-swap="innerHTML" hx-request='"noHeaders":"true"'></tr>
+            <tr hx-post="http://${ip}:7152/status" hx-trigger="load, every 200ms" hx-swap="innerHTML" hx-request='"noHeaders":"true"'></tr>
+            <tr hx-post="http://${ip}:7224/status" hx-trigger="load, every 200ms" hx-swap="innerHTML" hx-request='"noHeaders":"true"'></tr>
+            <tr hx-post="http://${ip}:7226/status" hx-trigger="load, every 200ms" hx-swap="innerHTML" hx-request='"noHeaders":"true"'></tr>
         </tbody>
     </table>
 </body>

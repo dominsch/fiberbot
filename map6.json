@@ -1,13 +1,11 @@
 {
-    "name": "MAP5",
-    "ip": "192.168.10.104",
+    "name": "MAP6",
+    "ip": "192.168.10.152",
     "port": 8100,
     "manufacturer": "Viavi",
     "wavelengths": [
         850,
-        1300,
-        1310,
-        1500
+        1300
     ],
     "phy": {
         "orl": [

@@ -186,9 +186,9 @@ export class SantecInstrument extends Instrument {
         while(this.mode == "live") {
             try{
                 if(this.activeCH != this.targetCH) await this.setChannel(this.targetCH)
-                let il = (await this.query("READ:IL:DET1? " + activeWL))[0]
+                let il = (await this.query("READ:IL:DET1? " + this.activeWL))[0]
                 this.IL = (il.match(/(\d+\.\d+)/g) || [-100])[0]
-                let rl = (await this.query("READ:RL? " + activeWL, 4))[0]
+                let rl = (await this.query("READ:RL? " + this.activeWL, 4))[0]
                 this.RL = (rl.match(/(\d+\.\d+)/g) || [-100])[0]
             } catch(e){
                 console.error("live error", e)

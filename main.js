@@ -2,16 +2,18 @@ import {makeLive, makeStatus, makeCellInner, makeCellInnerForm, makeRow, makeTab
 import {SantecInstrument, ViaviInstrument} from './instrument.js'
 import {Session} from './session.js'
 import {makeCSV} from './csv.js'
+import { $ } from "bun"
+let ip = await $`ip addr show eth0 | grep "inet\\b" | awk '{print $2}' | cut -d/ -f1`.text()
 
 //let config = (Bun.argv[2]?.match( /.*\.json/g )) ? await Bun.file(Bun.argv[2].match( /.*\.json/g )[0]).json() : ["Local", "localhost", 8100, "Viavi"]
 //let serverPort = (config[1] == "localhost") ? 7000 : 7000 + parseInt((config[1]?.match(/\d+$/g))[0])
 //let inst = (config[3] == "Santec") ? new SantecInstrument(...config) : new ViaviInstrument(...config)
 
-let config = (Bun.argv[2]?.match( /.*\.json/g )) ? await Bun.file(Bun.argv[2].match( /.*\.json/g )[0]).json() : ["Local", "192.168.10.104", 8100, "Viavi"]
+let config = await Bun.file(Bun.argv[2].match( /.*\.json/g )[0]).json()
 console.log("config = ", config)
-let serverPort = (config.ip == "localhost") ? 7000 : 7000 + parseInt(config.port % 1000)
+let serverPort = (config.ip == "localhost") ? 7000 : 7000 + parseInt(config.ip.match( /\d+$/g )[0])
 console.log(config, config.port, serverPort)
-let inst = (config.manufacturer == "Santec") ? new SantecInstrument(...config) : new ViaviInstrument(config)
+let inst = (config.manufacturer == "Santec") ? new SantecInstrument(config) : new ViaviInstrument(config)
 
 await inst.connect()
 inst.setMode("live")
@@ -34,7 +36,7 @@ const server = Bun.serve({
             case "/": return new Response(Bun.file("index.html"))
             case "/style.css": return new Response(Bun.file("style.css"))
             case "/digital.woff2": return new Response(Bun.file("media/subset-Digital-7Mono.woff2"))
-            case "/status": return new Response(makeStatus(sess, inst, server.port), {headers: { "Access-Control-Allow-Origin": "*" }})
+            case "/status": return new Response(makeStatus(sess, ip, inst, server.port), {headers: { "Access-Control-Allow-Origin": "*" }})
             case "/submit/setup":
                 sess.configure(sp.firstSN, sp.lastSN, sp.numFibers, sp.base, sp.numEnds, sp.maxILA, sp.maxILB, sp.minRLA, sp.minRLB, sp.wl)
                 sess.makeDUTs()
@@ -99,7 +101,7 @@ const server = Bun.serve({
                 // }
                 return new Response(res)
             case "/settings/setup":
-                return new Response(makeSettingsForm(sess))
+                return new Response(makeSettingsForm(sess, inst))
             case "/settings/navigation":
                 return new Response(makeNavigationForm(sess))
             case "/settings/advanced":

@@ -1,4 +1,4 @@
-export function makeSettingsForm(sess) {
+export function makeSettingsForm(sess, inst) {
     return /*html*/`
         <form hx-get="/submit/setup" hx-target="#card-container" hx-swap="innerHTML">
         <div>
@@ -42,22 +42,12 @@ export function makeSettingsForm(sess) {
         </fieldset>
         <fieldset>
             <legend>Wavelength</legend>
+            ${inst.wavelengths.map((wl) => `
             <div class="option">
-                <input type="radio" id="setup-850" name="wl" value="850" />
-                <label for ="setup-850">850</label>
+                <input type="radio" id="setup-${wl}" name="wl" value="${wl}" ${(wl==inst.currentWL)?"checked":""}/>
+                <label for ="setup-${wl}">${wl}</label>
             </div>
-            <div class="option">
-                <input type="radio" id="setup-1300" name="wl" value="1300" />
-                <label for ="setup-1300">1300</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="setup-1310" name="wl" value="1310" />
-            <label for ="setup-1310">1310</label>
-            </div>
-            <div class="option">
-                <input type="radio" id="setup-1550" name="wl" value="1550" checked/>
-                <label for ="setup-1550">1550</label>
-            </div>
+          `).join('')}
         </fieldset>
         <button class ="btn" onclick="this.blur();">Submit</button>
         </form>`
@@ -342,9 +332,9 @@ export function makeLive(sess, inst) {
     return `WL: ${sess.currentWL} CH: ${sess.CH} IL:${(sess.IL == -100) ? "---" : sess.IL} RL:${(sess.RL == -100) ? "---" : sess.RL}`
 }
 
-export function makeStatus(sess, inst, port) {
+export function makeStatus(sess, ip, inst, port) {
     return /*html*/`
-        <td><a href="http://localhost:${port}">${inst.name}</a></td>
+        <td><a href="http://${ip}:${port}">${inst.name}</a></td>
         <td><a href="http://${inst.address}">${inst.address}</a></td>
         <td>${inst.netport}</td>
         <td>${(inst.connected) ? "🟢 OK" : "🔴 NC"}</td>
