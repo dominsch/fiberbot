@@ -18,7 +18,7 @@ let inst = (config.manufacturer == "Santec") ? new SantecInstrument(config) : ne
 await inst.connect()
 inst.setMode("live")
 
-let sess = new Session(config.name)
+let sess = new Session(inst)
 
 console.log("starting server at ", serverPort)
 const server = Bun.serve({
@@ -41,6 +41,13 @@ const server = Bun.serve({
                 sess.configure(sp.firstSN, sp.lastSN, sp.numFibers, sp.base, sp.numEnds, sp.maxILA, sp.maxILB, sp.minRLA, sp.minRLB, sp.wl)
                 sess.makeDUTs()
                 inst.activeWL = sp.wl
+                inst.phy.orl.forEach(o,i => { 
+                    if(o.wavelenths.includes(inst.activeWL)) {
+                        inst.activeORL = i
+                    }   
+                });
+                while(inst.phy.orl[inst.activeORL].wavelengths != inst.activeWL)
+                inst.activeORL = 
                 sess.startTime = new Date(Date.now())
                 return new Response("", {headers: { "HX-Trigger": "update-cards" }})
             case "/submit/navigation":

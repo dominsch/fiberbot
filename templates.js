@@ -44,7 +44,7 @@ export function makeSettingsForm(sess, inst) {
             <legend>Wavelength</legend>
             ${inst.wavelengths.map((wl) => `
             <div class="option">
-                <input type="radio" id="setup-${wl}" name="wl" value="${wl}" ${(wl==inst.currentWL)?"checked":""}/>
+                <input type="radio" id="setup-${wl}" name="wl" value="${wl}" ${(wl==inst.activeWL)?"checked":""}/>
                 <label for ="setup-${wl}">${wl}</label>
             </div>
           `).join('')}

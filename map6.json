@@ -10,21 +10,13 @@
     "phy": {
         "orl": [
             {
-                "address": 1,
+                "address": 2,
                 "wavelengths": [
                     850,
                     1300
                 ],
                 "core": 50,
                 "outputs": 2
-            },
-            {
-                "address": 2,
-                "wavelengths": [
-                    1310,
-                    1550
-                ],
-                "core": 9
             }
         ],
         "switches": [

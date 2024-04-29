@@ -4,7 +4,7 @@ export class Session {
         this.currentDUT = 0
         this.currentFiber = 1
         this.currentEnd = 1
-        this.currentWL = 1550
+        this.currentWL = instrument.activeWL
         this.nextDUT = 0
         this.nextFiber = 2
         this.nextEnd = 1

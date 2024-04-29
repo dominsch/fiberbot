@@ -13,4 +13,4 @@ module.exports = {
   }]
 }
 
-//pm2 start main.js --name "map4" --interpreter "/home/admin/.bun/bin/bun" -- map137.json
+//pm2 start main.js --name "map3" --interpreter "/home/admin/.bun/bin/bun" -- map3.json

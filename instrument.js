@@ -17,7 +17,8 @@ export class Instrument {
         this.netport = config.port
         this.wavelengths = config.wavelengths
         this.connected = false
-        this.activeWL = 1550 //config.wavelengths[1]
+        this.activeWL = this.wavelengths[0] //config.wavelengths[1]
+        this.activeORL = config.phy.orl[0].address
         this.activeCH = 0
         this.targetCH = 0
         this.IL = -100
@@ -134,9 +135,9 @@ export class ViaviInstrument extends Instrument {
                     console.log("current, next", this.activeCH, this.targetCH)
                     await this.setChannel(this.targetCH)
                 }
-                let il = (await this.query(":FETCH:LOSS? 1"))[0]
+                let il = (await this.query(":FETCH:LOSS? " + this.activeORL))[0]
                 this.IL = (il.match(/(-?\d+\.\d+)/g) || [-100])[0]
-                let rl = (await this.query(":FETCH:ORL? 1"))[0]
+                let rl = (await this.query(":FETCH:ORL? " + this.activeORL))[0]
                 this.RL = (rl.match(/(-?\d+\.\d+)/g) || [-100])[0]
             } catch(e){
                 console.error("live error", e)
@@ -174,8 +175,6 @@ export class ViaviInstrument extends Instrument {
         }
         return [ILs, RLs]
     }
-    
-
 }
 
 export class SantecInstrument extends Instrument {
