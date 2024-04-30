@@ -70,7 +70,7 @@ export class Instrument {
         await this.connect()
     }
     async query(q, rsps = 1) {
-        console.log(q)
+        //console.log(q)
         while (this.busy) await Bun.sleep(10)
         this.busy = true
         this.socket.data.rsps = rsps
@@ -125,7 +125,7 @@ export class ViaviInstrument extends Instrument {
                 if(this.activeWL != this.targetWL) {
                     await this.setWL(this.targetWL)
                 }
-                this.activeCH = parseInt(await this.query(`:PATH:CHAN? ${this.activeORL}, 1`))
+                //this.activeCH = parseInt(await this.query(`:PATH:CHAN? ${this.activeORL}, 1`))
                 if(this.activeCH != this.targetCH) {
                     console.log("current, next", this.activeCH, this.targetCH)
                     await this.setChannel(this.targetCH)
@@ -187,7 +187,7 @@ export class SantecInstrument extends Instrument {
     async startLive(){
         while(this.mode == "live") {
             try{
-                if(this.activeCH != this.targetCH) await this.setChannel(this.targetCH)
+                //if(this.activeCH != this.targetCH) await this.setChannel(this.targetCH)
                 let il = (await this.query("READ:IL:DET1? " + this.activeWL))[0]
                 this.IL = (il.match(/(\d+\.\d+)/g) || [-100])[0]
                 let rl = (await this.query("READ:RL? " + this.activeWL, 4))[0]
