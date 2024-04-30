@@ -40,14 +40,15 @@ const server = Bun.serve({
             case "/submit/setup":
                 sess.configure(sp.firstSN, sp.lastSN, sp.numFibers, sp.base, sp.numEnds, sp.maxILA, sp.maxILB, sp.minRLA, sp.minRLB, sp.wl)
                 sess.makeDUTs()
-                inst.activeWL = sp.wl
+                inst.targetWL = sp.wl
                 console.log(inst)
-                inst.orl.forEach((o,i) => { 
+                inst.orl.forEach((o) => { 
                     console.log(o.wavelengths)
                     if(o.wavelengths.includes(inst.activeWL)) {
-                        inst.activeORL = i
+                        inst.activeORL = o.address
                     }   
                 });
+                sess.valid = false
                 sess.startTime = new Date(Date.now())
                 return new Response("", {headers: { "HX-Trigger": "update-cards" }})
             case "/submit/navigation":
@@ -125,7 +126,9 @@ const server = Bun.serve({
                     let chan = sess.currentFiber%sess.base
                     if (chan == 0) chan = sess.base
                     inst.targetCH = chan
+                    inst.targetWL = sess.currentWL
                 }
+                inst.targetWL = sess.currentWL
                 res += makeCellOuter(sess, sess.DUTs[sess.nextDUT], sess.nextEnd, sess.nextFiber, d.wavs[0], true, false, true)
                 res += makeCellOuter(sess, sess.DUTs[sess.currentDUT], sess.currentEnd, sess.currentFiber, d.wavs[0], true, true)
                 return new Response(res)
@@ -147,6 +150,7 @@ const server = Bun.serve({
                         if (chan == 0) chan = sess.base
                         sess.valid = false
                         inst.targetCH = chan
+                        inst.targetWL = sess.currentWL
                     }
                 }
                 return new Response(res)

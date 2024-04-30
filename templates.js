@@ -325,11 +325,10 @@ export function makeCellInnerForm(d, e, f, wl, type, value) {
 
 
 export function makeLive(sess, inst) {
-    if ((sess.IL != inst.IL || sess.RL != inst.RL) && sess.CH == inst.activeCH) sess.valid = true
+    if ((sess.IL != inst.IL || sess.RL != inst.RL) && inst.targetCH == inst.activeCH && inst.targetWL == inst.activeWL) sess.valid = true
     sess.IL = inst.IL
     sess.RL = inst.RL
-    sess.CH = inst.activeCH
-    return `WL: ${inst.activeWL} CH: ${sess.CH} IL:${(sess.IL == -100) ? "---" : sess.IL} RL:${(sess.RL == -100) ? "---" : sess.RL}`
+    return `WL: ${inst.activeWL} CH: ${inst.activeCH} IL:${(sess.IL == -100) ? "---" : sess.IL} RL:${(sess.RL == -100) ? "---" : sess.RL}`
 }
 
 export function makeStatus(sess, ip, inst, port) {

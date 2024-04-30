@@ -8,8 +8,9 @@ export class Instrument {
         this.connected = false
         this.activeWL = this.wavelengths[0]
         this.activeORL = config.orl[0].address
-        this.activeCH = 0
-        this.targetCH = 0
+        this.activeCH = 1
+        this.targetCH = 1
+        this.targetWL = this.activeWL
         this.IL = -100
         this.RL = -100
         this.busy = false
@@ -69,6 +70,7 @@ export class Instrument {
         await this.connect()
     }
     async query(q, rsps = 1) {
+        console.log(q)
         while (this.busy) await Bun.sleep(10)
         this.busy = true
         this.socket.data.rsps = rsps
@@ -117,11 +119,13 @@ export class ViaviInstrument extends Instrument {
     }
     async startLive(){
         //:SENSe:POWer:MODE? has to return 1
-        this.activeWL = parseInt(await this.query(":SOURCE:WAV? "+ this.activeORL))
-        console.log("WL", this.activeWL)
         while(this.mode == "live") {
             try {
-                
+                this.activeWL = parseInt(await this.query(":SOURCE:WAV? "+ this.activeORL))
+                if(this.activeWL != this.targetWL) {
+                    await this.setWL(this.targetWL)
+                }
+                this.activeCH = parseInt(await this.query(`:PATH:CHAN? ${this.activeORL}, 1`))
                 if(this.activeCH != this.targetCH) {
                     console.log("current, next", this.activeCH, this.targetCH)
                     await this.setChannel(this.targetCH)
@@ -138,7 +142,7 @@ export class ViaviInstrument extends Instrument {
         }
     }
     async setChannel(c) {
-        let res = await this.query(`:PATH:CHAN 1,${this.activeORL},${c};*OPC?`)
+        let res = await this.query(`:PATH:CHAN ${this.activeORL},1,${c};*OPC?`)
         if (res == 1) {
             await Bun.sleep(400) //needed?
             this.activeCH = c
@@ -146,13 +150,21 @@ export class ViaviInstrument extends Instrument {
         }
         
     }
+    async setWL(wl) {
+        let res = await this.query(`:SOURCE:WAV ${this.activeORL},${wl};*OPC?`)
+        if (res == 1) {
+            await Bun.sleep(400) //needed?
+            this.activeWL = wl
+            console.log("wavelength switched to ",wl)
+        }
+    }
     async readChannels(channels) {
         let ILs = []
         let RLs = []
         for (chan of channels) {
             await this.setChannel(chan)
-            IL[chan] = await this.query(":MEAS:IL? 1")
-            RL[chan] = await this.query(":MEAS:ORL? 1")
+            IL[chan] = await this.query(`:MEAS:IL? ${this.activeORL}`)
+            RL[chan] = await this.query(`:MEAS:ORL? ${this.activeORL}`)
         }
         return [ILs, RLs]
     }
@@ -161,8 +173,8 @@ export class ViaviInstrument extends Instrument {
         let RLs = []
         for (chan of channels) {
             await this.setChannel(chan)
-            IL[chan] = await this.query(":FETCH:LOSS? 1")
-            RL[chan] = await this.query(":FETCH:ORL? 1")
+            IL[chan] = await this.query(`:FETCH:LOSS? ${this.activeORL}`)
+            RL[chan] = await this.query(`:FETCH:ORL? ${this.activeORL}`)
         }
         return [ILs, RLs]
     }
@@ -194,5 +206,9 @@ export class SantecInstrument extends Instrument {
             this.activeCH = c
             console.log("channel switched to ",c)
         }
+    }
+    async setWL(wl) {
+        this.activeWL = wl
+        console.log("wavelength switched to ",wl)
     }
 }

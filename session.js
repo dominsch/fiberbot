@@ -20,7 +20,6 @@ export class Session {
         this.autoAdvance = true
         this.switchAdvance = false
         
-        this.CH = 0
         this.IL = -100
         this.RL = -100
         this.valid = false
