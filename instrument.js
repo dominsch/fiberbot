@@ -31,15 +31,11 @@ export class Instrument {
                             
                         },
                         data(socket, buffer) {
-                            socket.data.buffer += String.fromCharCode.apply(null, buffer).trim()
-                            // console.log("data in: ", res)
-                            let res = socket.data.buffer.split(",")
-                            if (res.length >= socket.data.rsps-1) {
-                                //console.log("res: ", res.length, socket.data.rsps, res, typeof(res))
-                                socket.data.resolver(res)
+                            socket.data.buffer += buffer.toString().trim()
+                            if (socket.data.buffer.split(",").length >= socket.data.rsps && socket.data.buffer.length >0) {
+                                socket.data.resolver(socket.data.buffer.split(","))
                                 socket.data.buffer = ""
                             }
-                            
                         },
                         close(socket) {
                             console.log("socket close")
@@ -70,7 +66,7 @@ export class Instrument {
         await this.connect()
     }
     async query(q, rsps = 1) {
-        //console.log(q)
+        console.log(q, rsps)
         while (this.busy) await Bun.sleep(10)
         this.busy = true
         this.socket.data.rsps = rsps
@@ -118,17 +114,21 @@ export class ViaviInstrument extends Instrument {
         super(name, address, netport);
     }
     async startLive(){
+        this.targetWL = parseInt(await this.query(":SOURCE:WAV? "+ this.activeORL))
+        this.targetCH = parseInt(await this.query(`:PATH:CHAN? ${this.activeORL}, 1`))
         //:SENSe:POWer:MODE? has to return 1
         while(this.mode == "live") {
             try {
                 this.activeWL = parseInt(await this.query(":SOURCE:WAV? "+ this.activeORL))
                 if(this.activeWL != this.targetWL) {
                     await this.setWL(this.targetWL)
+                    this.targetWL = this.activeWL
                 }
-                //this.activeCH = parseInt(await this.query(`:PATH:CHAN? ${this.activeORL}, 1`))
+                this.activeCH = parseInt(await this.query(`:PATH:CHAN? ${this.activeORL}, 1`))
                 if(this.activeCH != this.targetCH) {
                     console.log("current, next", this.activeCH, this.targetCH)
                     await this.setChannel(this.targetCH)
+                    this.targetCH = this.activeCH
                 }
                 let il = (await this.query(":FETCH:LOSS? " + this.activeORL))[0]
                 this.IL = (il.match(/(-?\d+\.\d+)/g) || [-100])[0]
@@ -185,9 +185,15 @@ export class SantecInstrument extends Instrument {
         super(name, address, netport);
     }
     async startLive(){
+        //this.targetCH = parseInt(await this.query(`SW1:CLOSE?`))
         while(this.mode == "live") {
             try{
-                //if(this.activeCH != this.targetCH) await this.setChannel(this.targetCH)
+                this.activeWL = this.targetWL
+                this.activeCH = parseInt(await this.query(`SW1:CLOSE?`))
+                // if(this.activeCH != this.targetCH) {
+                //     await this.setChannel(this.targetCH)
+                //     this.targetCH = this.activeCH
+                // }
                 let il = (await this.query("READ:IL:DET1? " + this.activeWL))[0]
                 this.IL = (il.match(/(\d+\.\d+)/g) || [-100])[0]
                 let rl = (await this.query("READ:RL? " + this.activeWL, 4))[0]
@@ -201,6 +207,7 @@ export class SantecInstrument extends Instrument {
     }
     async setChannel(c) {
         let res = await this.query(`SW1:CLOSE ${c};*OPC?`)
+        console.log("response was ", res)
         if (res == 1) {
             await Bun.sleep(600) //needed?
             this.activeCH = c
