@@ -4,7 +4,7 @@ import { file } from "bun"
 
 export async function makeCSV(duts, sess) {
     let tester = "Anon"
-    let chassis = sess.instrument
+    let chassis = sess.instrument.name
     let start = sess.startTime
     let end = new Date(Date.now())
     let partName = "" + sess.numEnds + "x" + sess.numFibers + "F" 
@@ -16,21 +16,21 @@ export async function makeCSV(duts, sess) {
     console.log(tester, chassis, start, end, partName, wlString)
 
     let header = 
-`PART#,${partName}
-TESTER,${tester}
-CHASSIS,${chassis}
-MODULE,123
-START,${start.toLocaleDateString('en-CA')} ${start.toLocaleTimeString('de-CA')}
-FINISH,${end.toLocaleDateString('en-CA')} ${end.toLocaleTimeString('de-CA')}
-CUSTOM1,
-CUSTOM2,
-CUSTOM3,
-CUSTOM4,
-CUSTOM5,
-NOTES,
-
-RESULTS,,,IL(dB),${duts[0].hasrl ? "RL(dB)" : ""}
-SERIAL#,INPUT,OUTPUT${wlString}\n`
+`PART#,${partName}\r
+TESTER,${tester}\r
+CHASSIS,${chassis}\r
+MODULE,123\r
+START,${start.toLocaleDateString('en-CA')} ${start.toLocaleTimeString('de-CA')}\r
+FINISH,${end.toLocaleDateString('en-CA')} ${end.toLocaleTimeString('de-CA')}\r
+CUSTOM1,\r
+CUSTOM2,\r
+CUSTOM3,\r
+CUSTOM4,\r
+CUSTOM5,\r
+NOTES,\r
+\r
+RESULTS,,,IL(dB),${duts[0].hasrl ? "RL(dB)" : ""}\r
+SERIAL#,INPUT,OUTPUT${wlString}\r\n`
 
     let results = ""
     for(let d of duts) {
@@ -47,11 +47,12 @@ SERIAL#,INPUT,OUTPUT${wlString}\n`
                         results += (entry == "-100") ? "," : `,${entry}`
                     }
                 }
-                results += "\n"
+                results += "\r\n"
             }
         }
     }
     const csv = header + results
     const fileName = chassis + "_" + partName + "_P" + duts[0].sn + ((duts.length > 1) ? ("-P" + duts[duts.length-1].sn) : "") + ".csv"
-    await Bun.write("./TestData/" + fileName, csv);
+    let path = (process.arch == "x64") ? "C:/TestData/" : "./TestData/"
+    await Bun.write(path + fileName, csv);
 }
