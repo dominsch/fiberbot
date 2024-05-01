@@ -66,7 +66,7 @@ export class Instrument {
         await this.connect()
     }
     async query(q, rsps = 1) {
-        console.log(q, rsps)
+        //console.log(q, rsps)
         while (this.busy) await Bun.sleep(10)
         this.busy = true
         this.socket.data.rsps = rsps
@@ -185,7 +185,7 @@ export class SantecInstrument extends Instrument {
         super(name, address, netport);
     }
     async startLive(){
-        //this.targetCH = parseInt(await this.query(`SW1:CLOSE?`))
+        this.targetCH = parseInt(await this.query(`SW1:CLOSE?`))
         while(this.mode == "live") {
             try{
                 this.activeWL = this.targetWL
