@@ -8,9 +8,9 @@ let ip = (process.arch == "x64") ? "127.0.0.1" : await $`ip addr show eth0 | gre
 
 
 let config = await Bun.file(Bun.argv[2].match( /.*\.json/g )[0]).json()
-console.log("config = ", config)
+//console.log("config = ", config)
 let serverPort = (config.ip == "localhost") ? 7000 : 7000 + parseInt(config.ip.match( /\d+$/g )[0])
-console.log(config, config.port, serverPort)
+//console.log(config, config.port, serverPort)
 let inst = (config.manufacturer == "Santec") ? new SantecInstrument(config) : new ViaviInstrument(config)
 
 await inst.connect()
@@ -24,8 +24,10 @@ const server = Bun.serve({
     fetch(req) {
         const url = new URL(req.url);
         
-        const sp = Object.fromEntries(url.searchParams)
-        if(url.pathname != "/live" && url.pathname != "/status") console.log("url", url.pathname, "params:", sp, url.searchParams)
+        let sp = Object.fromEntries(url.searchParams)
+        if (url.searchParams.has("wls")) sp.wls = url.searchParams.getAll("wls")
+
+        if(url.pathname != "/live" && url.pathname != "/status") console.log("url", url.pathname, "params:", sp)
         
         let d = sess.getActiveDUT()
         let res = ""
@@ -36,12 +38,10 @@ const server = Bun.serve({
             case "/digital.woff2": return new Response(Bun.file("media/subset-Digital-7Mono.woff2"))
             case "/status": return new Response(makeStatus(sess, ip, inst, server.port), {headers: { "Access-Control-Allow-Origin": "*" }})
             case "/submit/setup":
-                sess.configure(sp.firstSN, sp.lastSN, sp.numFibers, sp.base, sp.numEnds, sp.maxILA, sp.maxILB, sp.minRLA, sp.minRLB, sp.wl)
+                sess.configure(sp.firstSN, sp.lastSN, sp.numFibers, sp.base, sp.numEnds, sp.maxILA, sp.maxILB, sp.minRLA, sp.minRLB, sp.wls)
                 sess.makeDUTs()
-                inst.targetWL = sp.wl
-                console.log(inst)
-                inst.orl.forEach((o) => { 
-                    console.log(o.wavelengths)
+                inst.targetWL = sp.wls[0]
+                inst.orl.forEach((o) => {
                     if(o.wavelengths.includes(inst.activeWL)) {
                         inst.activeORL = o.address
                     }   
@@ -59,7 +59,7 @@ const server = Bun.serve({
                 if(sess.next != sp.type || sess.backwards != (sp.direction == "prev")){
                     sess.next = sp.type
                     sess.backwards = (sp.direction == "prev")
-                    res += makeCellOuter(sess, sess.DUTs[sess.nextDUT], sess.nextEnd, sess.nextFiber, d.wavs[0], true, false, false)
+                    res += makeCellOuter(sess, sess.DUTs[sess.nextDUT], sess.nextEnd, sess.nextFiber, sess.nextWL, true, false, false)
                     switch(sess.next) {
                         case "end":
                             sess.nextEnd = sess.getNext(sess.currentEnd, sess.next)
@@ -67,10 +67,13 @@ const server = Bun.serve({
                         case "fiber":
                             sess.nextFiber = sess.getNext(sess.currentFiber, sess.next)
                             break;
+                        case "wl":
+                            sess.nextWL = sess.getNext(sess.currentWL, sess.next)
+                            break;
                         case "dut":
                             sess.nextDUT = sess.getNext(sess.currentDUT, sess.next)
                     }
-                    res += makeCellOuter(sess, sess.DUTs[sess.nextDUT], sess.nextEnd, sess.nextFiber, d.wavs[0], true, false, true)
+                    res += makeCellOuter(sess, sess.DUTs[sess.nextDUT], sess.nextEnd, sess.nextFiber, sess.nextWL, true, false, true)
                 }
                 return new Response(res, {headers: { "HX-Trigger": "update-navigation" }})
             case "/submit/cellInnerForm":
@@ -119,30 +122,30 @@ const server = Bun.serve({
                 sess.nextDUT = parseInt(sp.sn) - sess.firstSN
                 sess.nextFiber = parseInt(sp.fiber)
                 sess.nextEnd = parseInt(sp.end)
+                sess.nextWL = parseInt(sp.wl)
                 sess.advance()
                 if (sess.switchAdvance) {
                     let chan = sess.currentFiber%sess.base
                     if (chan == 0) chan = sess.base
                     inst.targetCH = chan
-                    inst.targetWL = sess.currentWL
                 }
                 inst.targetWL = sess.currentWL
-                res += makeCellOuter(sess, sess.DUTs[sess.nextDUT], sess.nextEnd, sess.nextFiber, d.wavs[0], true, false, true)
-                res += makeCellOuter(sess, sess.DUTs[sess.currentDUT], sess.currentEnd, sess.currentFiber, d.wavs[0], true, true)
+                res += makeCellOuter(sess, sess.DUTs[sess.nextDUT], sess.nextEnd, sess.nextFiber, sess.nextWL, true, false, true)
+                res += makeCellOuter(sess, sess.DUTs[sess.currentDUT], sess.currentEnd, sess.currentFiber, sess.currentWL, true, true)
                 return new Response(res)
             case "/cap":
                 if (sess.valid) {
-                    if (sess.IL != -100 && sess.IL < Math.abs(d.IL[sess.currentEnd][sess.currentFiber][d.wavs[0]])) d.IL[sess.currentEnd][sess.currentFiber][d.wavs[0]] = Number.parseFloat(sess.IL).toFixed(2)
-                    if (sess.RL != -100 && sess.RL > d.RL[sess.currentEnd][sess.currentFiber][d.wavs[0]]) d.RL[sess.currentEnd][sess.currentFiber][d.wavs[0]] = Math.trunc(parseFloat(sess.RL))
+                    if (sess.IL != -100 && sess.IL < Math.abs(d.IL[sess.currentEnd][sess.currentFiber][sess.currentWL])) d.IL[sess.currentEnd][sess.currentFiber][sess.currentWL] = Number.parseFloat(sess.IL).toFixed(2)
+                    if (sess.RL != -100 && sess.RL > d.RL[sess.currentEnd][sess.currentFiber][sess.currentWL]) d.RL[sess.currentEnd][sess.currentFiber][sess.currentWL] = Math.trunc(parseFloat(sess.RL))
                 }
                 return new Response(makeRow(sess, d, sess.currentFiber, true))
             case "/capend":
                 if ((d.IL[sess.currentEnd][sess.currentFiber][sess.currentWL] <= sess.maxIL[sess.currentEnd] && d.RL[sess.currentEnd][sess.currentFiber][sess.currentWL] >= sess.minRL[sess.currentEnd]) || sess.autoAdvance == "always") {
                     console.log("advancing")
-                    res += makeCellOuter(sess, sess.DUTs[sess.currentDUT], sess.currentEnd, sess.currentFiber, d.wavs[0], true, false, false)
+                    res += makeCellOuter(sess, sess.DUTs[sess.currentDUT], sess.currentEnd, sess.currentFiber, sess.currentWL, true, false, false)
                     if (sess.autoAdvance != "never") sess.advance()
-                    res += makeCellOuter(sess, sess.DUTs[sess.nextDUT], sess.nextEnd, sess.nextFiber, d.wavs[0], true, false, true)
-                    res += makeCellOuter(sess, sess.DUTs[sess.currentDUT], sess.currentEnd, sess.currentFiber, d.wavs[0], true, true)
+                    res += makeCellOuter(sess, sess.DUTs[sess.nextDUT], sess.nextEnd, sess.nextFiber, sess.currentWL, true, false, true)
+                    res += makeCellOuter(sess, sess.DUTs[sess.currentDUT], sess.currentEnd, sess.currentFiber, sess.currentWL, true, true)
                     if (sess.switchAdvance) {
                         let chan = sess.currentFiber%sess.base
                         if (chan == 0) chan = sess.base

@@ -8,8 +8,10 @@ export class Session {
         this.nextDUT = 0
         this.nextFiber = 2
         this.nextEnd = 1
+        this.nextWL = instrument.activeWL
         this.numEnds = 1
         this.numFibers = 12
+        this.wavelengths = []
         this.firstSN = 1292001
         this.lastSN = 1292002
         this.maxIL = [0, 0.4, 0.4]
@@ -19,13 +21,16 @@ export class Session {
         this.backwards = false
         this.autoAdvance = true
         this.switchAdvance = false
+
+        this.strict = false
         
         this.IL = -100
         this.RL = -100
         this.valid = false
         this.DUTs = []
     }
-    configure(firstSN, lastSN, numFibers, base, numEnds, maxILA, maxILB, minRLA, minRLB, wl) {
+    configure(firstSN, lastSN, numFibers, base, numEnds, maxILA, maxILB, minRLA, minRLB, wls) {
+        console.log("configure: ", firstSN, lastSN, numFibers, base, numEnds, maxILA, maxILB, minRLA, minRLB, wls)
         this.firstSN = parseInt(firstSN)
         this.lastSN = parseInt(lastSN)
         this.numFibers = parseInt(numFibers)
@@ -35,7 +40,9 @@ export class Session {
         this.maxIL[2] = parseFloat(maxILB)
         this.minRL[1] = parseInt(minRLA)
         this.minRL[2] = parseInt(minRLB)
-        this.currentWL = parseInt(wl)
+        this.wavelengths = wls.map(function (x) {return parseInt(x)})
+        this.currentWL = parseInt(wls[0])
+        this.nextWL = this.currentWL
         this.DUTs = []
     }
     makeDUTs() {
@@ -44,7 +51,7 @@ export class Session {
             this.DUTs[i] = new DUT( this.firstSN + i,
                                     this.numEnds,
                                     this.numFibers,
-                                    [this.currentWL],
+                                    this.wavelengths,
                                     true,
                                     // this.maxIL,
                                     // this.minRL,
@@ -66,6 +73,11 @@ export class Session {
         this.currentEnd = this.nextEnd
         this.currentFiber = this.nextFiber
         this.currentDUT = this.nextDUT
+        this.currentWL = this.nextWL
+        console.log("current position: ", this.currentEnd , this.nextEnd,
+            this.currentFiber , this.nextFiber,
+            this.currentDUT ,this.nextDUT,
+            this.currentWL,this.nextWL)
         switch(this.next) {
             case "end":
                 this.nextEnd = this.getNext(this.currentEnd, this.next)
@@ -74,8 +86,9 @@ export class Session {
                 this.nextFiber = this.getNext(this.currentFiber, this.next)
                 break;
             case "wl":
-                // this.currentEnd = this.nextEnd
-                // this.nextEnd += 1
+                console.log("current wl ", this.currentWL, " next wl ", this.nextWL)
+                this.nextWL = this.getNext(this.currentWL, this.next)
+                console.log("current wl ", this.currentWL, " next wl ", this.nextWL)
                 break;
             case "dut":
                 this.nextDUT = this.getNext(this.currentDUT, this.next)
@@ -106,7 +119,20 @@ export class Session {
                     return this.numFibers
                 }
             case "wl":
-                break;
+                console.log("wlll", this.wavelengths, this.wavelengths.indexOf(1310), this.wavelengths.indexOf(n), this.wavelengths.indexOf(n+1),this.wavelengths.indexOf(n))
+                let i = this.wavelengths.indexOf(n)
+                if (!this.backwards) {
+                    if (i < this.wavelengths.length-1){
+                        console.log("debug ", i < this.wavelengths.length-1,n, this.wavelengths[i+1])
+                        return this.wavelengths[++i]
+                    } 
+                    this.nextFiber = this.getNext(this.currentFiber, "fiber")
+                    return this.wavelengths[0]
+                } else {
+                    if (this.wavelengths.indexOf(n) > 0) return this.wavelengths[--i]
+                    this.nextFiber = this.getNext(this.currentFiber, "fiber")
+                    return this.wavelengths[1]
+                }
             case "dut":
                 if (!this.backwards) {
                     if (n < (this.DUTs.length-1)) return ++n

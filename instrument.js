@@ -120,10 +120,10 @@ export class ViaviInstrument extends Instrument {
         while(this.mode == "live") {
             try {
                 this.activeWL = parseInt(await this.query(":SOURCE:WAV? "+ this.activeORL))
-                if(this.activeWL != this.targetWL) {
-                    await this.setWL(this.targetWL)
-                    this.targetWL = this.activeWL
-                }
+                // if(this.activeWL != this.targetWL) {
+                //     await this.setWL(this.targetWL)
+                //     this.targetWL = this.activeWL
+                // }
                 this.activeCH = parseInt(await this.query(`:PATH:CHAN? ${this.activeORL}, 1`))
                 if(this.activeCH != this.targetCH) {
                     console.log("current, next", this.activeCH, this.targetCH)

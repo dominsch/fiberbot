@@ -44,7 +44,7 @@ export function makeSettingsForm(sess, inst) {
             <legend>Wavelength</legend>
             ${inst.wavelengths.map((wl) => `
             <div class="option">
-                <input type="radio" id="setup-${wl}" name="wl" value="${wl}" ${(wl==inst.activeWL)?"checked":""}/>
+                <input type="checkbox" id="setup-${wl}" name="wls" value="${wl}" ${(wl==inst.activeWL)?"checked":""}/>
                 <label for ="setup-${wl}">${wl}</label>
             </div>
           `).join('')}
@@ -259,7 +259,7 @@ export function makeRow(s, d, f, oob = false) {
     let cells = ""
     for (let e = 1; e <= s.numEnds; e++) {
         for(let wl of d.wavs) {
-            cells += makeCellOuter(s, d, e, f, wl, false, (d.sn-s.firstSN==s.currentDUT&&f==s.currentFiber&&e==s.currentEnd), (d.sn-s.firstSN==s.nextDUT&&f==s.nextFiber&&e==s.nextEnd))
+            cells += makeCellOuter(s, d, e, f, wl, false, (d.sn-s.firstSN==s.currentDUT&&f==s.currentFiber&&e==s.currentEnd&&wl==s.currentWL), (d.sn-s.firstSN==s.nextDUT&&f==s.nextFiber&&e==s.nextEnd&&wl==s.nextWL))
         }
     }
     return /*html*/`
@@ -325,7 +325,7 @@ export function makeCellInnerForm(d, e, f, wl, type, value) {
 
 
 export function makeLive(sess, inst) {
-    if ((sess.IL != inst.IL || sess.RL != inst.RL) && inst.targetCH == inst.activeCH && inst.targetWL == inst.activeWL) sess.valid = true
+    if (!sess.strict || (sess.IL != inst.IL || sess.RL != inst.RL) && inst.targetCH == inst.activeCH && inst.targetWL == inst.activeWL) sess.valid = true
     sess.IL = inst.IL
     sess.RL = inst.RL
     return `WL: ${inst.activeWL} CH: ${inst.activeCH} IL:${(sess.IL == -100) ? "---" : sess.IL} RL:${(sess.RL == -100) ? "---" : sess.RL}`
