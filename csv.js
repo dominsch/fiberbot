@@ -53,6 +53,6 @@ SERIAL#,INPUT,OUTPUT${wlString}\r\n`
     }
     const csv = header + results
     const fileName = chassis + "_" + partName + "_P" + duts[0].sn + ((duts.length > 1) ? ("-P" + duts[duts.length-1].sn) : "") + ".csv"
-    let path = (process.arch == "x64") ? "C:/TestData/" : "./TestData/"
+    let path = (process.arch == "x64") ? "C:/TestData/" : "/mnt/TestData/Unprocessed"
     await Bun.write(path + fileName, csv);
 }
