@@ -125,11 +125,11 @@ export class ViaviInstrument extends Instrument {
                 //     this.targetWL = this.activeWL
                 // }
                 this.activeCH = parseInt(await this.query(`:PATH:CHAN? ${this.activeORL}, 1`))
-                if(this.activeCH != this.targetCH) {
-                    console.log("current, next", this.activeCH, this.targetCH)
-                    await this.setChannel(this.targetCH)
-                    this.targetCH = this.activeCH
-                }
+                // if(this.activeCH != this.targetCH) {
+                //     console.log("current, next", this.activeCH, this.targetCH)
+                //     await this.setChannel(this.targetCH)
+                //     this.targetCH = this.activeCH
+                // }
                 let il = (await this.query(":FETCH:LOSS? " + this.activeORL))[0]
                 this.IL = (il.match(/(-?\d+\.\d+)/g) || [-100])[0]
                 let rl = (await this.query(":FETCH:ORL? " + this.activeORL))[0]
